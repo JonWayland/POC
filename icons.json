@@ -10,6 +10,121 @@
       "description": "A palm tree that looks like a queen palm"
     },
     {
+      "filename": "adirondack-chair.png",
+      "short_description": "Adirondack Chair",
+      "description": "Adirondack Chair for sitting"
+    },
+    {
+      "filename": "palm-plant.png",
+      "short_description": "Palm Plant",
+      "description": "Majesty palm plant pot"
+    },
+    {
+      "filename": "palm-leaf.png",
+      "short_description": "Palm Leaf",
+      "description": "Palm plant leaf"
+    },
+    {
+      "filename": "sun.png",
+      "short_description": "Sun",
+      "description": "Sun sunshine"
+    },
+    {
+      "filename": "fire.png",
+      "short_description": "Fire",
+      "description": "Fire firepit"
+    },
+    {
+      "filename": "ocean-wave.png",
+      "short_description": "Wave",
+      "description": "Ocean wave"
+    },
+    {
+      "filename": "beach.png",
+      "short_description": "Beach",
+      "description": "Beach sun umbrella ocean"
+    },
+    {
+      "filename": "lime.png",
+      "short_description": "Lime",
+      "description": "Lime fruit"
+    },
+    {
+      "filename": "sliced-lime.png",
+      "short_description": "Sliced Lime",
+      "description": "Sliced lime fruit"
+    },
+    {
+      "filename": "pineapple.png",
+      "short_description": "Pineapple",
+      "description": "Pineapple fruit"
+    },
+    {
+      "filename": "banana.png",
+      "short_description": "Banana",
+      "description": "Banana fruit"
+    },
+    {
+      "filename": "cheeseburger.png",
+      "short_description": "Cheeseburger",
+      "description": "Cheeseburger food"
+    },
+    {
+      "filename": "hotdog.png",
+      "short_description": "Hot Dog",
+      "description": "Hotdog hot dog food"
+    },
+    {
+      "filename": "grapes.png",
+      "short_description": "Grapes",
+      "description": "grapes fruit"
+    },
+    {
+      "filename": "pizza-slice.png",
+      "short_description": "Pizza Slice",
+      "description": "Pizza slice food"
+    },
+    {
+      "filename": "flamingo.png",
+      "short_description": "Flamingo",
+      "description": "Flamingo bird"
+    },
+    {
+      "filename": "parrot.png",
+      "short_description": "Parrot",
+      "description": "Parrot bird"
+    },
+    {
+      "filename": "seagull.png",
+      "short_description": "Seagull",
+      "description": "Seagull bird"
+    },
+    {
+      "filename": "sandcastle.png",
+      "short_description": "Sand Castle",
+      "description": "Sand castle beach"
+    },
+    {
+      "filename": "flower.png",
+      "short_description": "Flower",
+      "description": "Tropical flower"
+    },
+    {
+      "filename": "propane-grill.png",
+      "short_description": "Propane Grill",
+      "description": "Propane grill"
+    },
+    {
+      "filename": "santa.png",
+      "short_description": "Santa Clause",
+      "description": "Santa Clause Christmas season holidays"
+    },
+    {
+      "filename": "christmas-tree.png",
+      "short_description": "Christmas Tree",
+      "description": "Christmas tree season holidays"
+    },
+    {
       "filename": "person-flexing.png",
       "short_description": "Person Flexing",
       "description": "A stick figure person standing in a flexing position to show off their muscles"
@@ -18,6 +133,16 @@
       "filename": "laundry.png",
       "short_description": "Laundry",
       "description": "A laundry washer or dryer"
+    },
+    {
+      "filename": "coffee.png",
+      "short_description": "Coffee",
+      "description": "Coffee drink hot"
+    },
+    {
+      "filename": "icecream-cone.png",
+      "short_description": "Icecream Cone",
+      "description": "Icecream cone dessert"
     },
     {
       "filename": "store-front.png",
@@ -58,11 +183,6 @@
       "filename": "shirt.png",
       "short_description": "T-Shirt",
       "description": "A t-shirt shirt that is short sleeve"
-    },
-    {
-      "filename": "adirondack-chair.png",
-      "short_description": "Adirondack Chair",
-      "description": "Adirondack Chair for sitting"
     },
     {
       "filename": "car.png",
