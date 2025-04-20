@@ -1,0 +1,870 @@
+// Apply initial colors based on default template (template1)
+    window.addEventListener('DOMContentLoaded', () => {
+      // Set default colors for initial template
+      bgColorInput.value = '#ffffff';
+      textColorInput.value = '#333333';
+      titleColorInput.value = '#05668d';
+      borderColorInput.value = '#00a896';
+      
+      // Apply default colors
+      adPreview.style.backgroundColor = bgColorInput.value;
+      adPreview.style.color = textColorInput.value;
+      document.getElementById('adTitle').style.color = titleColorInput.value;
+      adPreview.style.borderColor = borderColorInput.value;
+    });    .ad-preview img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+    }<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ad Creator | DollarWeb</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&family=Raleway:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      padding-bottom: 40px;
+    }
+    
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    nav .logo {
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    nav svg {
+      margin-right: 8px;
+    }
+    
+    .content-wrapper {
+      padding-top: 100px;
+      width: 100%;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    
+    h1 { 
+      text-align: center; 
+      margin-bottom: 30px;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+    
+    .app-container {
+      display: flex;
+      flex-direction: row;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Decorative elements */
+    .app-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .app-container::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      right: -80px;
+      width: 200px;
+      height: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.05'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+      z-index: 0;
+    }
+    
+    .controls {
+      width: 350px;
+      padding: 30px;
+      border-right: 1px solid #e0e0e0;
+      background: #fafafa;
+      z-index: 1;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+      font-size: 1.1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      position: relative;
+      margin-top: 25px;
+    }
+    
+    .section-title:first-child {
+      margin-top: 0;
+    }
+    
+    .controls label {
+      display: block;
+      margin-bottom: 15px;
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+    
+    .controls input[type="text"],
+    .controls textarea,
+    .controls select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      margin-top: 5px;
+      transition: all 0.3s;
+    }
+    
+    .controls input[type="text"]:focus,
+    .controls textarea:focus,
+    .controls select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    }
+    
+    .controls input[type="file"] {
+      margin-top: 5px;
+      cursor: pointer;
+    }
+    
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+    }
+    
+    .color-picker-wrapper label {
+      margin-bottom: 0;
+      flex: 1;
+    }
+    
+    .color-picker-wrapper input[type="color"] {
+      height: 30px;
+      width: 60px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: none;
+    }
+    
+    .controls button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      font-family: inherit;
+      margin-top: 5px;
+    }
+    
+    .controls button:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .preview-wrapper {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+    }
+    
+    .preview-options {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+    
+    .preview-options button {
+      background: var(--secondary);
+      color: var(--dark);
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .preview-options button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .ad-preview {
+      flex: 1;
+      border: 2px solid #e0e0e0;
+      padding: 20px;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 650px;
+      min-height: 400px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      background: white;
+      border-radius: 12px;
+      position: relative;
+    }
+    
+    .ad-preview > * {
+      margin-bottom: 15px;
+      display: block;
+      width: 100%;
+    }
+    
+    /* Logo is absolutely positioned in top right */
+    .logo-image {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      max-width: 80px;
+      max-height: 50px;
+      z-index: 10;
+      margin-bottom: 0;
+      width: auto;
+    }
+    
+    /* Title - always at top */
+    .ad-title {
+      margin: 0 0 15px 0;
+      padding: 0;
+      line-height: 1.3;
+    }
+    
+    /* Details - below title */
+    .ad-details {
+      margin: 0 0 15px 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+    
+    /* Ad Image - below details */
+    .main-image {
+      width: 100%;
+      max-height: 250px;
+      object-fit: contain;
+      margin: 0 0 15px 0;
+    }
+    
+    /* Product List - below ad image */
+    .product-list {
+      list-style: disc inside;
+      margin: 0 0 15px 0;
+      padding-left: 20px;
+    }
+    
+    .product-list li {
+      margin: 5px 0;
+      display: list-item;
+    }
+    
+    /* QR Code - at bottom */
+    .qr {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      margin: 0 auto 15px auto;
+    }
+    
+    /* Footer text */
+    .ad-footer {
+      margin-top: auto;
+      text-align: right;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+    
+    .logo-image {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      max-width: 80px;
+      max-height: 50px;
+      z-index: 2;
+    }
+    
+    .ad-footer {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      font-size: 0.7rem;
+      opacity: 0.8;
+      font-style: italic;
+    }
+    
+    .ad-content {
+      flex: 1 1 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .ad-title {
+      margin: 0;
+      line-height: 1.3;
+    }
+    
+    .ad-details {
+      flex: 1;
+      line-height: 1.5;
+    }
+    
+    .product-list {
+      list-style: disc inside;
+      margin: 8px 0 0 0;
+      padding-left: 5px;
+    }
+    
+    .product-list li {
+      margin: 5px 0;
+    }
+    
+    /* TEMPLATE STYLES */
+    /* 1: Modern with Roboto */
+    .template1 { flex-direction: row; }
+    .template1 .ad-title { font-family: 'Roboto', sans-serif; font-size: 26px; font-weight: 500; }
+    .template1 .ad-details { font-family: 'Roboto', sans-serif; }
+    .template1 .product-list { font-family: 'Roboto', sans-serif; }
+    
+    /* 2: Elegant with Playfair Display */
+    .template2 { flex-direction: column; }
+    .template2 .ad-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
+    .template2 .ad-details { font-family: 'Montserrat', sans-serif; }
+    .template2 .product-list { font-family: 'Montserrat', sans-serif; }
+    .template2 .main-image { width: 100%; max-height: 250px; object-fit: cover; margin-bottom: 20px; }
+    
+    /* 3: Creative with Raleway */
+    .template3 { flex-direction: row; }
+    .template3 .qr { order: -1; width: 120px; height: 120px; object-fit: contain; }
+    .template3 .ad-title { font-family: 'Raleway', sans-serif; font-size: 26px; font-weight: 600; }
+    .template3 .ad-details { font-family: 'Raleway', sans-serif; }
+    .template3 .product-list { font-family: 'Raleway', sans-serif; }
+    
+    /* 4: Professional with Montserrat */
+    .template4 { flex-direction: row; }
+    .template4 .ad-content { order: -1; }
+    .template4 .ad-title { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 600; }
+    .template4 .ad-details { font-family: 'Montserrat', sans-serif; }
+    .template4 .product-list { font-family: 'Montserrat', sans-serif; }
+    .template4 .media { display: flex; flex-direction: column; gap: 15px; }
+    
+    /* Status message */
+    #status-message {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 168, 150, 0.9);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px 0;
+      color: var(--dark);
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    @media (max-width: 900px) {
+      .app-container {
+        flex-direction: column;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      
+      .controls {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      DollarWeb
+    </a>
+    <a href="index.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Tools
+    </a>
+  </nav>
+
+  <div class="content-wrapper">
+    <h1>Ad Creator</h1>
+    
+    <div class="app-container">
+      <aside class="controls">
+        <div class="section-title">Layout & Style</div>
+        <label>
+          Template
+          <select id="templateSelect">
+            <option value="template1">Modern (Roboto)</option>
+            <option value="template2">Elegant (Playfair)</option>
+            <option value="template3">Creative (Raleway)</option>
+            <option value="template4">Professional (Montserrat)</option>
+          </select>
+        </label>
+        
+        <div class="section-title">Colors</div>
+        <div class="color-picker-wrapper">
+          <label>Background
+            <input type="color" id="bgColorInput" value="#ffffff">
+          </label>
+          <label>Text
+            <input type="color" id="textColorInput" value="#333333">
+          </label>
+        </div>
+        <div class="color-picker-wrapper">
+          <label>Title
+            <input type="color" id="titleColorInput" value="#000000">
+          </label>
+          <label>Border
+            <input type="color" id="borderColorInput" value="#e0e0e0">
+          </label>
+        </div>
+        
+        <div class="section-title">Media</div>
+        <label>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Ad Image <i>(transparent PNG images work best)</i></span>
+            <input type="checkbox" id="showAdImage" checked>
+          </div>
+          <input type="file" id="adImageInput" accept="image/*">
+        </label>
+        <label>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>QR Code</span>
+            <input type="checkbox" id="showQrImage" checked>
+          </div>
+          <input type="file" id="qrImageInput" accept="image/*">
+        </label>
+        <label>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Logo (top right)</span>
+            <input type="checkbox" id="showLogoImage" checked>
+          </div>
+          <input type="file" id="logoImageInput" accept="image/*">
+        </label>
+        
+        <div class="section-title">Content</div>
+        <label>
+          Title
+          <input type="text" id="adTitleInput" placeholder="Your ad title">
+        </label>
+        <label>
+          Details
+          <textarea id="adDetailsInput" rows="4" placeholder="Ad details..."></textarea>
+        </label>
+        <label>
+          Add Product/Feature
+          <input type="text" id="productInput" placeholder="Product name or feature">
+        </label>
+        <button id="addProductBtn">Add to List</button>
+      </aside>
+
+      <section class="preview-wrapper">
+        <div class="preview-options">
+          <button id="downloadPngBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download PNG
+          </button>
+          <button id="downloadPdfBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Download PDF
+          </button>
+        </div>
+        
+        <div id="adPreview" class="ad-preview template1">
+          <!-- Logo (top right) -->
+          <img id="logoImage" class="logo-image" src="" alt="" style="display:none;">
+          
+          <!-- Title at top - fixed width div with forced wrapping -->
+          <div style="width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; word-break: break-all;">
+            <h3 id="adTitle" class="ad-title" style="width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; word-break: break-all;">Your Title Here</h3>
+          </div>
+          
+          <!-- Details below title - fixed width div with forced wrapping -->
+          <div style="width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; word-break: break-all;">
+            <p id="adDetails" class="ad-details" style="width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; word-break: break-all;">Your details here...</p>
+          </div>
+          
+          <!-- Ad Image below details -->
+          <img id="adImage" class="main-image" src="" alt="" style="display:none;">
+          
+          <!-- Product List below image -->
+          <ul id="productList" class="product-list" style="width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; word-break: break-all;"></ul>
+          
+          <!-- QR Code at bottom -->
+          <img id="qrImage" class="qr" src="" alt="" style="display:none;">
+          
+          <!-- DollarWeb Footer -->
+          <div class="ad-footer">Powered by DollarWeb</div>
+        </div>
+      </section>
+    </div>
+  </div>
+  
+  <footer>
+    &copy; 2025 DollarWeb - Professional tools that won't break the bank
+  </footer>
+  
+  <!-- Status message -->
+  <div id="status-message"></div>
+
+  <!-- html2canvas and jsPDF for download functionality -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <script>
+    // DOM Elements
+    const templateSelect = document.getElementById('templateSelect');
+    const adPreview = document.getElementById('adPreview');
+    const bgColorInput = document.getElementById('bgColorInput');
+    const textColorInput = document.getElementById('textColorInput');
+    const titleColorInput = document.getElementById('titleColorInput');
+    const borderColorInput = document.getElementById('borderColorInput');
+    const adTitleInput = document.getElementById('adTitleInput');
+    const adDetailsInput = document.getElementById('adDetailsInput');
+    const productInput = document.getElementById('productInput');
+    const addProductBtn = document.getElementById('addProductBtn');
+    const downloadPngBtn = document.getElementById('downloadPngBtn');
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    
+    // Status message display
+    function showStatus(message, duration = 3000) {
+      const statusEl = document.getElementById('status-message');
+      statusEl.textContent = message;
+      statusEl.style.display = 'block';
+      setTimeout(() => { statusEl.style.opacity = 1; }, 10);
+      
+      setTimeout(() => {
+        statusEl.style.opacity = 0;
+        setTimeout(() => { statusEl.style.display = 'none'; }, 300);
+      }, duration);
+    }
+    
+    // Template change handler
+    templateSelect.addEventListener('change', (e) => {
+      adPreview.className = 'ad-preview ' + e.target.value;
+      
+      // Update color inputs to match selected template default colors
+      switch(e.target.value) {
+        case 'template1': // Modern
+          bgColorInput.value = '#ffffff';
+          textColorInput.value = '#333333';
+          titleColorInput.value = '#05668d';
+          borderColorInput.value = '#00a896';
+          break;
+        case 'template2': // Elegant
+          bgColorInput.value = '#f8f5f0';
+          textColorInput.value = '#333333';
+          titleColorInput.value = '#8b4513';
+          borderColorInput.value = '#d4a76a';
+          break;
+        case 'template3': // Creative
+          bgColorInput.value = '#f0f7ff';
+          textColorInput.value = '#333333';
+          titleColorInput.value = '#9c27b0';
+          borderColorInput.value = '#673ab7';
+          break;
+        case 'template4': // Professional
+          bgColorInput.value = '#f5f9ff';
+          textColorInput.value = '#333333';
+          titleColorInput.value = '#3f51b5';
+          borderColorInput.value = '#2196f3';
+          break;
+      }
+      
+      // Apply the colors
+      adPreview.style.backgroundColor = bgColorInput.value;
+      adPreview.style.color = textColorInput.value;
+      document.getElementById('adTitle').style.color = titleColorInput.value;
+      adPreview.style.borderColor = borderColorInput.value;
+    });
+
+    // Color change handlers
+    bgColorInput.addEventListener('input', () => {
+      adPreview.style.backgroundColor = bgColorInput.value;
+    });
+    
+    textColorInput.addEventListener('input', () => {
+      adPreview.style.color = textColorInput.value;
+    });
+    
+    titleColorInput.addEventListener('input', () => {
+      document.getElementById('adTitle').style.color = titleColorInput.value;
+    });
+    
+    borderColorInput.addEventListener('input', () => {
+      adPreview.style.borderColor = borderColorInput.value;
+    });
+
+    // Handle image uploads and toggles
+    function handleImageUpload(inputEl, imgEl, toggleEl) {
+      // Set up file input
+      inputEl.addEventListener('change', () => {
+        const file = inputEl.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = () => {
+          imgEl.src = reader.result;
+          imgEl.style.display = 'block';
+          toggleEl.disabled = false; // Enable toggle once image is loaded
+        };
+        reader.readAsDataURL(file);
+      });
+      
+      // Set up toggle checkbox
+      toggleEl.addEventListener('change', () => {
+        imgEl.style.display = toggleEl.checked ? 'block' : 'none';
+      });
+    }
+    
+    // Set up all image inputs
+    handleImageUpload(
+      document.getElementById('adImageInput'),
+      document.getElementById('adImage'),
+      document.getElementById('showAdImage')
+    );
+    
+    handleImageUpload(
+      document.getElementById('qrImageInput'),
+      document.getElementById('qrImage'),
+      document.getElementById('showQrImage')
+    );
+    
+    handleImageUpload(
+      document.getElementById('logoImageInput'),
+      document.getElementById('logoImage'),
+      document.getElementById('showLogoImage')
+    );
+    
+    // Disable toggles initially until images are uploaded
+    document.getElementById('showAdImage').disabled = true;
+    document.getElementById('showQrImage').disabled = true;
+    document.getElementById('showLogoImage').disabled = true;
+
+    // Title & details live update with forced table layout for text wrapping
+    adTitleInput.addEventListener('input', e => {
+      const content = e.target.value || 'Your Title Here';
+      document.getElementById('adTitle').textContent = content;
+    });
+    
+    adDetailsInput.addEventListener('input', e => {
+      // Preserve line breaks by using innerHTML and replacing newlines with <br>
+      const content = e.target.value || 'Your details here...';
+      // Create wrapped content with forced line breaks
+      // Replace long strings (30+ chars without spaces) with chunks that have spaces
+      const processedContent = content
+        .replace(/\n/g, '<br>')
+        // Force break for extremely long words by adding zero-width spaces
+        .replace(/([^\s]{30})/g, '$1\u200B');
+      
+      document.getElementById('adDetails').innerHTML = processedContent;
+    });
+
+    // Product list
+    const productList = document.getElementById('productList');
+    addProductBtn.addEventListener('click', () => {
+      const val = productInput.value.trim();
+      if (!val) return;
+      
+      // Create list item with product name
+      const li = document.createElement('li');
+      li.textContent = val;
+      
+      // Create remove button
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-item';
+      removeBtn.textContent = '×';
+      removeBtn.title = 'Remove item';
+      removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        li.remove();
+        showStatus('Item removed!');
+      });
+      
+      // Add remove button to list item
+      li.appendChild(removeBtn);
+      
+      // Add list item to product list
+      productList.appendChild(li);
+      
+      // Clear input field
+      productInput.value = '';
+      showStatus('Item added to list!');
+    });
+    
+    // Add Enter key functionality to product input
+    productInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addProductBtn.click();
+      }
+    });
+    
+    // Download as image
+    downloadPngBtn.addEventListener('click', () => {
+      showStatus('Preparing PNG download...');
+      
+      html2canvas(adPreview, {
+        backgroundColor: null,
+        scale: 2,
+        logging: false,
+        useCORS: true
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'dollaweb-ad.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showStatus('PNG download complete!');
+      }).catch(err => {
+        console.error(err);
+        showStatus('Error generating image. Please try again.');
+      });
+    });
+    
+    // Download as PDF
+    downloadPdfBtn.addEventListener('click', () => {
+      showStatus('Preparing PDF download...');
+      
+      html2canvas(adPreview, {
+        backgroundColor: null,
+        scale: 2,
+        logging: false,
+        useCORS: true
+      }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const marginX = 10; // Margins in mm
+        const marginY = 10;
+        
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.addImage(
+          canvas.toDataURL('image/jpeg', 1.0),
+          'JPEG',
+          marginX,
+          marginY,
+          imgWidth - (marginX * 2),
+          imgHeight - (marginY * 2)
+        );
+        
+        pdf.save('dollaweb-ad.pdf');
+        showStatus('PDF download complete!');
+      }).catch(err => {
+        console.error(err);
+        showStatus('Error generating PDF. Please try again.');
+      });
+    });
+  </script>
+</body>
+</html>

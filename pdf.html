@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF Combiner | DollarWeb</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: var(--bg);
+      color: var(--text);
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+    }
+    
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    nav .logo {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    nav svg {
+      margin-right: 8px;
+    }
+    
+    .container { 
+      width: 90%; 
+      max-width: 650px; 
+      background: #fff; 
+      padding: 2.5rem; 
+      border-radius: 16px; 
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
+      margin-top: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Wave decoration */
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .container::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      right: -80px;
+      width: 200px;
+      height: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.05'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+      z-index: 0;
+    }
+    
+    h1 { 
+      text-align: center; 
+      margin-bottom: 2rem; 
+      font-weight: 600;
+      color: var(--primary);
+      position: relative;
+      z-index: 1;
+      font-size: 1.8rem;
+    }
+    
+    .drop-area { 
+      border: 2px dashed #ccc; 
+      border-radius: 12px; 
+      padding: 2.5rem; 
+      text-align: center; 
+      cursor: pointer; 
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    
+    .drop-area.dragover { 
+      background: rgba(0, 168, 150, 0.08); 
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    
+    .drop-area p {
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    
+    .file-list { 
+      list-style: none; 
+      padding: 0; 
+      margin: 1.8rem 0; 
+      position: relative;
+      z-index: 1;
+    }
+    
+    .file-item { 
+      padding: 1rem 1.2rem; 
+      margin-bottom: 0.8rem; 
+      background: #f9f9f9; 
+      border-left: 4px solid var(--secondary); 
+      border-radius: 10px; 
+      cursor: move; 
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+      font-weight: 500;
+      color: #444;
+    }
+    
+    .file-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+      background: #fcfcfc;
+    }
+    
+    .file-item::before {
+      content: '⋮⋮';
+      margin-right: 12px;
+      color: #aaa;
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+    
+    button { 
+      display: inline-block; 
+      padding: 0.9rem 1.5rem; 
+      font-size: 1rem; 
+      border: none; 
+      border-radius: 10px; 
+      background: var(--primary); 
+      color: white; 
+      cursor: pointer; 
+      transition: all 0.3s; 
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      position: relative;
+      z-index: 1;
+    }
+    
+    button:disabled { 
+      background: #ccc; 
+      cursor: not-allowed; 
+    }
+    
+    button:not(:disabled):hover {
+      background: var(--dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    #fileSelect { 
+      margin-top: 10px;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      font-size: 0.95rem;
+      padding: 0.7rem 1.2rem;
+    }
+    
+    #fileSelect:hover {
+      background: rgba(0, 168, 150, 0.08);
+    }
+    
+    #combine-btn { 
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #combine-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      right: 15px;
+      height: 24px;
+      width: 24px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' opacity='0.6'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      DollarWeb
+    </a>
+    <a href="index.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Tools
+    </a>
+  </nav>
+
+  <div class="container">
+    <h1>PDF Combiner</h1>
+    <div id="drop-area" class="drop-area">
+      <p>Drag & Drop PDF files here</p>
+      <input type="file" id="fileElem" multiple accept="application/pdf" style="display:none"/>
+      <button id="fileSelect">Select Files</button>
+    </div>
+    <ul id="file-list" class="file-list"></ul>
+    <button id="combine-btn" disabled>Download Combined PDF</button>
+  </div>
+  <script>
+    const { PDFDocument } = PDFLib;
+    let filesData = [];
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    const dropArea = document.getElementById('drop-area');
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+    });
+    dropArea.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      addFiles(files);
+    });
+
+    document.getElementById('fileSelect').addEventListener('click', () => document.getElementById('fileElem').click());
+    document.getElementById('fileElem').addEventListener('change', (e) => addFiles(e.target.files));
+
+    function addFiles(files) {
+      [...files].forEach(file => {
+        if (file.type !== 'application/pdf') return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          filesData.push({ name: file.name, arrayBuffer: e.target.result });
+          renderFileList();
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function renderFileList() {
+      const list = document.getElementById('file-list');
+      list.innerHTML = '';
+      filesData.forEach((f, index) => {
+        const li = document.createElement('li');
+        li.className = 'file-item';
+        li.setAttribute('data-index', index);
+        li.textContent = f.name;
+        list.appendChild(li);
+      });
+      document.getElementById('combine-btn').disabled = filesData.length < 2;
+    }
+
+    new Sortable(document.getElementById('file-list'), {
+      animation: 150,
+      onEnd: (evt) => {
+        const moved = filesData.splice(evt.oldIndex, 1)[0];
+        filesData.splice(evt.newIndex, 0, moved);
+        renderFileList();
+      }
+    });
+
+    document.getElementById('combine-btn').addEventListener('click', async () => {
+      const mergedPdf = await PDFDocument.create();
+      for (let f of filesData) {
+        const pdf = await PDFDocument.load(f.arrayBuffer);
+        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        pages.forEach(page => mergedPdf.addPage(page));
+      }
+      const blob = await mergedPdf.save().then(bytes => new Blob([bytes], { type: 'application/pdf' }));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'combined.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

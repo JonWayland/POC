@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word Cloud Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Basic reset */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      max-width: 800px;
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 1.75rem;
+    }
+
+    #text-input {
+      width: 100%;
+      height: 150px;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      line-height: 1.4;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    #generate-btn {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      background: #4A90E2;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #generate-btn:hover {
+      background: #357ABD;
+    }
+
+    #cloud {
+      width: 100%;
+      height: 400px;
+      margin-top: 1.5rem;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      background: #fafafa;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Word Cloud Generator</h1>
+    <textarea id="text-input" placeholder="Paste your text here…"></textarea>
+    <button id="generate-btn">Generate Word Cloud</button>
+    <div id="cloud"></div>
+  </div>
+
+  <!-- wordcloud2.js via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.2/wordcloud2.min.js"
+          integrity="sha512-LJIXQ+9Dskdc1XswSSs6ZPjKHwYQgFYK8igKeuKKg4m+4hYPJueRSZVv6JSscZSICNATpciKkddL61HN/rM6ZA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    document.getElementById('generate-btn').addEventListener('click', () => {
+      const text = document.getElementById('text-input').value.trim();
+      if (!text) return;
+
+      // Extract words (letters/numbers), to lower‑case
+      const words = text.toLowerCase().match(/\b\w+\b/g);
+      if (!words) return;
+
+      // Count frequencies
+      const freq = words.reduce((acc, w) => {
+        acc[w] = (acc[w] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Convert to [word, count] pairs & sort by count desc
+      const list = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+
+      // Optionally limit to top N words
+      const topN = 100;
+      const wordList = list.slice(0, topN);
+
+      // Clear any previous cloud
+      document.getElementById('cloud').innerHTML = '';
+
+      // Generate the cloud
+      WordCloud(document.getElementById('cloud'), {
+        list: wordList,
+        gridSize: Math.round(16 * document.getElementById('cloud').offsetWidth / 1024),
+        weightFactor: size => Math.pow(size, 1.2),
+        fontFamily: 'Inter, sans-serif',
+        color: 'random-dark',
+        backgroundColor: '#fafafa',
+        rotateRatio: 0.4,
+        rotationSteps: 2
+      });
+    });
+  </script>
+
+</body>
+</html>

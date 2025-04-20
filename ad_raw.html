@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ad Creator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+    .app {
+      display: flex;
+      flex: 1;
+    }
+    .controls {
+      width: 300px;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      box-sizing: border-box;
+    }
+    .controls h2 {
+      margin-top: 0;
+    }
+    .controls label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .controls input[type="text"],
+    .controls textarea,
+    .controls select {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+    .controls input[type="file"] {
+      margin-top: 4px;
+    }
+    .controls button {
+      margin-top: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .preview-wrapper {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      background: #f9f9f9;
+    }
+    .ad-preview {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      border: 2px solid #333;
+      padding: 16px;
+      box-sizing: border-box;
+      background: #fff;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .ad-preview img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    .ad-content {
+      flex: 1 1 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ad-title {
+      font-size: 1.5em;
+      margin: 0;
+    }
+    .ad-details {
+      flex: 1;
+    }
+    .product-list {
+      list-style: disc inside;
+      margin: 0;
+      padding-left: 0;
+    }
+    .product-list li {
+      margin: 2px 0;
+    }
+    /* TEMPLATE STYLES */
+    /* 1: image left, content right */
+    .template1 { flex-direction: row; }
+    /* 2: image top, content bottom */
+    .template2 { flex-direction: column; }
+    /* 3: QR left, content & image right */
+    .template3 { flex-direction: row; }
+    .template3 .qr { order: -1; width: 100px; }
+    .template3 .main-image { flex: 1; }
+    /* 4: content left, image & QR right */
+    .template4 { flex-direction: row; }
+    .template4 .ad-content { order: -1; }
+    .template4 .media { display: flex; flex-direction: column; gap: 8px; }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: #333;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="controls">
+      <h2>Ad Settings</h2>
+      <label>
+        Template
+        <select id="templateSelect">
+          <option value="template1">Template 1</option>
+          <option value="template2">Template 2</option>
+          <option value="template3">Template 3</option>
+          <option value="template4">Template 4</option>
+        </select>
+      </label>
+      <label>
+        Ad Image
+        <input type="file" id="adImageInput" accept="image/*">
+      </label>
+      <label>
+        QR Code Image
+        <input type="file" id="qrImageInput" accept="image/*">
+      </label>
+      <label>
+        Title
+        <input type="text" id="adTitleInput" placeholder="Your ad title">
+      </label>
+      <label>
+        Details
+        <textarea id="adDetailsInput" rows="4" placeholder="Ad details..."></textarea>
+      </label>
+      <label>
+        Add Product
+        <input type="text" id="productInput" placeholder="Product name">
+      </label>
+      <button id="addProductBtn">Add Product</button>
+    </aside>
+
+    <section class="preview-wrapper">
+      <div id="adPreview" class="ad-preview template1">
+        <img id="adImage" class="main-image" src="" alt="" style="display:none;">
+        <div class="ad-content">
+          <h3 id="adTitle" class="ad-title">Your Title Here</h3>
+          <p id="adDetails" class="ad-details">Your details here...</p>
+          <ul id="productList" class="product-list"></ul>
+        </div>
+        <img id="qrImage" class="qr" src="" alt="" style="display:none; width:80px;">
+      </div>
+    </section>
+  </div>
+
+  <footer>Created with Love</footer>
+
+  <script>
+    const templateSelect = document.getElementById('templateSelect');
+    const adPreview = document.getElementById('adPreview');
+    templateSelect.addEventListener('change', (e) => {
+      adPreview.className = 'ad-preview ' + e.target.value;
+    });
+
+    // handle image uploads
+    function handleImageUpload(inputEl, imgEl) {
+      inputEl.addEventListener('change', () => {
+        const file = inputEl.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          imgEl.src = reader.result;
+          imgEl.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    handleImageUpload(
+      document.getElementById('adImageInput'),
+      document.getElementById('adImage')
+    );
+    handleImageUpload(
+      document.getElementById('qrImageInput'),
+      document.getElementById('qrImage')
+    );
+
+    // title & details live update
+    document.getElementById('adTitleInput')
+      .addEventListener('input', e => {
+        document.getElementById('adTitle').textContent = e.target.value || 'Your Title Here';
+      });
+    document.getElementById('adDetailsInput')
+      .addEventListener('input', e => {
+        document.getElementById('adDetails').textContent = e.target.value || 'Your details here...';
+      });
+
+    // product list
+    const productInput = document.getElementById('productInput');
+    const addProductBtn = document.getElementById('addProductBtn');
+    const productList = document.getElementById('productList');
+    addProductBtn.addEventListener('click', () => {
+      const val = productInput.value.trim();
+      if (!val) return;
+      const li = document.createElement('li');
+      li.textContent = val;
+      productList.appendChild(li);
+      productInput.value = '';
+    });
+  </script>
+</body>
+</html>

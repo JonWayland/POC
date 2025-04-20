@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hash Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .container { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
+    h1 { text-align: center; margin-bottom: 1rem; font-size: 1.5rem; color: #333; }
+    textarea, input { width: 100%; padding: 0.75rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; margin-top: 0.5rem; }
+    button { margin-top: 1rem; width: 100%; padding: 0.75rem; font-size: 1rem; background: #4a90e2; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #357ab8; }
+    .output-group { margin-top: 1rem; }
+    .output-group label { font-weight: 600; color: #555; }
+    .output-wrapper { display: flex; align-items: center; margin-top: 0.5rem; }
+    .output-wrapper input { flex: 1; margin-right: 0.5rem; }
+    .copy-btn { padding: 0.5rem 1rem; font-size: 0.9rem; background: #34a853; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .copy-btn:hover { background: #2c8e45; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hash Generator</h1>
+    <label for="text">Input Text</label>
+    <textarea id="text" rows="4" placeholder="Enter text to hash..."></textarea>
+    <button id="generate">Generate Hashes</button>
+    <div class="output-group">
+      <label for="md5">MD5</label>
+      <div class="output-wrapper">
+        <input type="text" id="md5" readonly />
+        <button class="copy-btn" data-target="md5">Copy</button>
+      </div>
+    </div>
+    <div class="output-group">
+      <label for="sha1">SHA-1</label>
+      <div class="output-wrapper">
+        <input type="text" id="sha1" readonly />
+        <button class="copy-btn" data-target="sha1">Copy</button>
+      </div>
+    </div>
+    <div class="output-group">
+      <label for="sha256">SHA-256</label>
+      <div class="output-wrapper">
+        <input type="text" id="sha256" readonly />
+        <button class="copy-btn" data-target="sha256">Copy</button>
+      </div>
+    </div>
+  </div>
+  <!-- Load MD5 library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-md5/0.7.3/md5.min.js"></script>
+  <script>
+    async function computeHashes() {
+      try {
+        console.log('Generating hashes');
+        const text = document.getElementById('text').value;
+        if (!text) {
+          ['md5','sha1','sha256'].forEach(id => document.getElementById(id).value = '');
+          return;
+        }
+        // MD5
+        document.getElementById('md5').value = md5(text);
+        // SHA-1 & SHA-256 using Web Crypto API
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const sha1Buffer = await crypto.subtle.digest('SHA-1', data);
+        const sha256Buffer = await crypto.subtle.digest('SHA-256', data);
+        document.getElementById('sha1').value = bufferToHex(sha1Buffer);
+        document.getElementById('sha256').value = bufferToHex(sha256Buffer);
+      } catch (err) {
+        console.error(err);
+        alert('Error generating hashes: ' + err.message);
+      }
+    }
+    function bufferToHex(buffer) {
+      return Array.from(new Uint8Array(buffer))
+        .map(b => b.toString(16).padStart(2,'0'))
+        .join('');
+    }
+    document.getElementById('generate').addEventListener('click', computeHashes);
+    document.querySelectorAll('.copy-btn').forEach(btn =>
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        target.select();
+        document.execCommand('copy');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+      })
+    );
+  </script>
+</body>
+</html>

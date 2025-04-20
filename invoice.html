@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invoice Generator | DollarWeb</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- jsPDF and html2canvas via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+    
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    nav .logo {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    nav svg {
+      margin-right: 8px;
+    }
+    
+    .content-wrapper {
+      padding-top: 100px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    
+    h1 { 
+      text-align: center; 
+      margin-bottom: 30px;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+    
+    .container { 
+      display: flex; 
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+    
+    .controls, .preview { 
+      background: #fff; 
+      padding: 30px; 
+      border-radius: 16px; 
+      flex: 1;
+      min-width: 320px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Modern decorative elements */
+    .controls::before,
+    .preview::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .controls::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      right: -80px;
+      width: 200px;
+      height: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.05'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+      z-index: 0;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+      font-size: 1.1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+    }
+    
+    .controls label { 
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .controls input,
+    .controls textarea,
+    .controls button { 
+      width: 100%;
+      margin-bottom: 18px;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s;
+    }
+    
+    .controls textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .controls input:focus,
+    .controls textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    }
+    
+    .controls table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .controls th, 
+    .controls td { 
+      border: 1px solid #eee; 
+      padding: 12px; 
+      text-align: left;
+    }
+    
+    .controls th {
+      background: rgba(0, 168, 150, 0.05);
+      color: var(--dark);
+      font-weight: 500;
+    }
+    
+    .controls .add-row { 
+      background: var(--primary); 
+      color: #fff; 
+      cursor: pointer;
+      border: none;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .controls .add-row:hover {
+      background: var(--dark);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .controls .remove-row { 
+      background: var(--accent); 
+      color: #fff; 
+      cursor: pointer;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    
+    .controls .remove-row:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .controls td input {
+      margin-bottom: 0;
+      width: 100%;
+    }
+    
+    .preview { 
+      position: relative;
+      padding: 0;
+    }
+    
+    .invoice { 
+      width: 100%;
+      padding: 40px; 
+      border: 1px solid #eee; 
+      margin: auto; 
+      background: #fff;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* For PDF rendering */
+    .pdf-container {
+      width: 8.5in;
+      background: white;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      margin: 0;
+      padding: 0.75in;
+      box-sizing: border-box;
+    }
+    
+    .invoice-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--secondary);
+      padding-bottom: 20px;
+    }
+    
+    .logo-container {
+      width: 180px; 
+      height: 90px;
+    }
+    
+    #logo-drop { 
+      width: 100%;
+      height: 100%;
+      border: 2px dashed #ccc; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      color: #aaa; 
+      cursor: pointer; 
+      background-size: contain; 
+      background-repeat: no-repeat; 
+      background-position: center;
+      transition: all 0.3s;
+      border-radius: 10px;
+    }
+    
+    #logo-drop:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    }
+    
+    .company-info { 
+      text-align: right;
+    }
+    
+    .customer-info {
+      margin-bottom: 25px;
+      border: 1px solid #f0f0f0;
+      border-radius: 10px;
+      padding: 15px;
+      background: #fafafa;
+    }
+    
+    .customer-info h3 {
+      margin-bottom: 10px;
+      color: var(--dark);
+      font-size: 1rem;
+    }
+    
+    .service-lines { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-bottom: 30px;
+    }
+    
+    .service-lines th, 
+    .service-lines td { 
+      border: 1px solid #eee; 
+      padding: 12px;
+    }
+    
+    .service-lines th {
+      background: rgba(0, 168, 150, 0.05);
+      color: var(--dark);
+      font-weight: 500;
+    }
+    
+    .totals { 
+      text-align: right; 
+      font-size: 1.2em;
+      margin-top: 20px;
+      border-top: 2px solid var(--secondary);
+      padding-top: 20px;
+    }
+    
+    .invoice-footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #777;
+      text-align: center;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+    
+    .dollaweb-branding {
+      text-align: center;
+      margin-top: 35px;
+      font-size: 0.8em;
+      color: #aaa;
+      border-top: 1px dashed #eee;
+      padding-top: 15px;
+    }
+    
+    .dollaweb-branding a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    /* Styling for the invoice number and date */
+    .invoice-meta {
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .invoice-meta div {
+      background: #f9f9f9;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+    
+    .invoice-meta span {
+      font-weight: 500;
+      color: var(--dark);
+      margin-right: 8px;
+    }
+    
+    /* Status messages */
+    #status-message {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 168, 150, 0.9);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      
+      .invoice {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      DollarWeb
+    </a>
+    <a href="index.html">
+      Back to Tools
+    </a>
+  </nav>
+  
+  <div class="content-wrapper">
+    <h1>Invoice Generator</h1>
+    <div class="container">
+      <!-- Controls -->
+      <div class="controls">
+        <div class="section-title">Your Company Details</div>
+        <label>Company Name</label>
+        <input type="text" id="input-company" placeholder="Your Company Inc." />
+
+        <label>Company Email</label>
+        <input type="email" id="input-email" placeholder="contact@yourcompany.com" />
+        
+        <label>Upload Logo (optional)</label>
+        <input type="file" id="logo-input" accept="image/*" />
+        
+        <div class="section-title">Customer Details</div>
+        <label>Customer Name</label>
+        <input type="text" id="input-customer-name" placeholder="Customer Name (Optional)" />
+        
+        <label>Customer Address</label>
+        <textarea id="input-customer-address" placeholder="Customer Address (Optional)"></textarea>
+        
+        <label>Customer Email</label>
+        <input type="email" id="input-customer-email" placeholder="customer@example.com (Optional)" />
+        
+        <div class="section-title">Invoice Details</div>
+        <label>Date</label>
+        <input type="date" id="input-date" />
+
+        <label>Service Lines</label>
+        <table id="lines-table">
+          <thead>
+            <tr><th>Description</th><th>Amount ($)</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button class="add-row">+ Add Service Item</button>
+        
+        <div class="section-title">Custom Options</div>
+        <label>Footer Message</label>
+        <textarea id="input-footer" placeholder="Custom footer message (Optional)">Thank you for your business! Payment is due within 30 days.</textarea>
+
+        <div class="download-buttons">
+          <button id="btn-png">Download PNG</button>
+          <button id="btn-pdf">Download PDF</button>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview">
+        <div class="invoice" id="invoice">
+          <div class="invoice-header">
+            <div class="logo-container">
+              <div id="logo-drop">Drop Logo Here</div>
+            </div>
+            <div class="company-info">
+              <div id="preview-company" style="font-size:1.5em;font-weight:600;">Your Company Inc.</div>
+              <div id="preview-email">contact@yourcompany.com</div>
+            </div>
+          </div>
+          
+          <div class="invoice-meta">
+            <div><span>Invoice:</span> <span id="preview-invoice-number">INV-25042</span></div>
+            <div><span>Date:</span> <span id="preview-date">April 18, 2025</span></div>
+          </div>
+          
+          <div class="customer-info" id="customer-info">
+            <h3>Billed To:</h3>
+            <div id="preview-customer-name"></div>
+            <div id="preview-customer-address"></div>
+            <div id="preview-customer-email"></div>
+          </div>
+          
+          <table class="service-lines" id="preview-lines">
+            <thead>
+              <tr><th>Description</th><th>Amount ($)</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          
+          <div class="totals">
+            Total: $<span id="preview-total">0.00</span>
+          </div>
+          
+          <div class="invoice-footer" id="preview-footer">
+            Thank you for your business! Payment is due within 30 days.
+          </div>
+          
+          <!-- DollarWeb branding - always present, not customizable -->
+          <div class="dollaweb-branding">
+            Powered by <a href="index.html">DollarWeb</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Status message -->
+  <div id="status-message"></div>
+
+  <script>
+    // Utilities
+    const $ = sel => document.querySelector(sel);
+    const createCell = (tag, text='') => { let el = document.createElement(tag); el.textContent = text; return el; };
+
+    // Set today's date as default
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    $('#input-date').value = formattedDate;
+    $('#preview-date').textContent = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'});
+
+    // State
+    let lines = [];
+    let hasLogo = false;
+    
+    // Status message display
+    function showStatus(message, duration = 3000) {
+      const statusEl = $('#status-message');
+      statusEl.textContent = message;
+      statusEl.style.display = 'block';
+      setTimeout(() => { statusEl.style.opacity = 1; }, 10);
+      
+      setTimeout(() => {
+        statusEl.style.opacity = 0;
+        setTimeout(() => { statusEl.style.display = 'none'; }, 300);
+      }, duration);
+    }
+    
+    // Function to generate a unique invoice number
+    function generateInvoiceNumber() {
+      const companyPart = $('#input-company').value.trim() ? 
+        $('#input-company').value.trim().replace(/[^A-Z0-9]/gi, '').substring(0, 3).toUpperCase() : 
+        'INV';
+      
+      const customerPart = $('#input-customer-name').value.trim() ?
+        $('#input-customer-name').value.trim().replace(/[^A-Z0-9]/gi, '').substring(0, 2).toUpperCase() :
+        '';
+      
+      const datePart = today.getFullYear().toString().substring(2) + 
+                      (today.getMonth() + 1).toString().padStart(2, '0');
+      
+      const randomPart = Math.floor(Math.random() * 9000 + 1000);
+      
+      return `${companyPart}-${datePart}${randomPart}${customerPart}`;
+    }
+
+    // DOM elements
+    const tableBody = $('#lines-table tbody');
+    const previewLines = $('#preview-lines tbody');
+    const previewTotal = $('#preview-total');
+    const inputCompany = $('#input-company');
+    const inputEmail = $('#input-email');
+    const previewCompany = $('#preview-company');
+    const previewEmail = $('#preview-email');
+    const previewInvoiceNumber = $('#preview-invoice-number');
+    const inputDate = $('#input-date');
+    const previewDate = $('#preview-date');
+    const inputCustomerName = $('#input-customer-name');
+    const inputCustomerAddress = $('#input-customer-address');
+    const inputCustomerEmail = $('#input-customer-email');
+    const previewCustomerName = $('#preview-customer-name');
+    const previewCustomerAddress = $('#preview-customer-address');
+    const previewCustomerEmail = $('#preview-customer-email');
+    const inputFooter = $('#input-footer');
+    const previewFooter = $('#preview-footer');
+    const customerInfo = $('#customer-info');
+    const logoDrop = $('#logo-drop');
+    const logoInput = $('#logo-input');
+
+    // Add a new service line
+    function addLine(desc='', amt='0.00') {
+      const idx = lines.length;
+      lines.push({ desc, amt: parseFloat(amt) });
+
+      // Controls row
+      const tr = document.createElement('tr');
+      const tdDesc = document.createElement('td'), tdAmt = document.createElement('td'), tdRm = document.createElement('td');
+      const inpDesc = document.createElement('input');
+      inpDesc.value = desc;
+      inpDesc.placeholder = 'Service description';
+      inpDesc.oninput = () => { 
+        lines[idx].desc = inpDesc.value; 
+        renderPreview();
+        updateInvoiceNumber();
+      };
+      const inpAmt = document.createElement('input');
+      inpAmt.type = 'number'; inpAmt.step = '0.01'; inpAmt.value = amt;
+      inpAmt.placeholder = '0.00';
+      inpAmt.oninput = () => { 
+        lines[idx].amt = parseFloat(inpAmt.value)||0; 
+        renderPreview();
+        updateInvoiceNumber();
+      };
+      const btnRm = document.createElement('button');
+      btnRm.textContent = '–';
+      btnRm.className = 'remove-row';
+      btnRm.onclick = () => { 
+        lines.splice(idx,1); 
+        rebuildLines(); 
+        renderPreview();
+        updateInvoiceNumber();
+      };
+
+      tdDesc.appendChild(inpDesc);
+      tdAmt.appendChild(inpAmt);
+      tdRm.appendChild(btnRm);
+      tr.append(tdDesc, tdAmt, tdRm);
+      tableBody.appendChild(tr);
+
+      renderPreview();
+    }
+
+    // Rebuild controls table (after remove)
+    function rebuildLines() {
+      tableBody.innerHTML = '';
+      const old = [...lines];
+      lines = [];
+      old.forEach(l => addLine(l.desc, l.amt.toFixed(2)));
+    }
+
+    // Render preview panel
+    function renderPreview() {
+      previewLines.innerHTML = '';
+      let total = 0;
+      lines.forEach(l => {
+        const tr = document.createElement('tr');
+        tr.append(createCell('td', l.desc), createCell('td', l.amt.toFixed(2)));
+        previewLines.appendChild(tr);
+        total += l.amt;
+      });
+      previewTotal.textContent = total.toFixed(2);
+      
+      // Update customer info visibility
+      if (inputCustomerName.value || inputCustomerAddress.value || inputCustomerEmail.value) {
+        customerInfo.style.display = 'block';
+      } else {
+        customerInfo.style.display = 'none';
+      }
+    }
+    
+    // Update the invoice number based on details
+    function updateInvoiceNumber() {
+      previewInvoiceNumber.textContent = generateInvoiceNumber();
+    }
+    
+    // Set up logo handling
+    function handleLogoUpload(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        logoDrop.style.backgroundImage = `url(${ev.target.result})`;
+        logoDrop.textContent = '';
+        hasLogo = true;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Logo drag & drop in preview
+    logoDrop.addEventListener('dragover', e => { e.preventDefault(); logoDrop.style.borderColor='var(--primary)'; });
+    logoDrop.addEventListener('dragleave', e => { e.preventDefault(); logoDrop.style.borderColor='#ccc'; });
+    logoDrop.addEventListener('drop', e => {
+      e.preventDefault();
+      logoDrop.style.borderColor='#ccc';
+      const file = e.dataTransfer.files[0];
+      handleLogoUpload(file);
+    });
+
+    // Click to select logo in preview
+    logoDrop.addEventListener('click', () => {
+      logoInput.click();
+    });
+    
+    // File input change
+    logoInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      handleLogoUpload(file);
+    });
+
+    // Bind inputs
+    inputCompany.oninput = () => { 
+      previewCompany.textContent = inputCompany.value || 'Your Company Inc.'; 
+      updateInvoiceNumber();
+    };
+    inputEmail.oninput = () => { 
+      previewEmail.textContent = inputEmail.value || 'contact@yourcompany.com'; 
+    };
+    inputDate.onchange = () => { 
+      const d = new Date(inputDate.value);
+      previewDate.textContent = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'});
+      updateInvoiceNumber();
+    };
+    inputCustomerName.oninput = () => {
+      previewCustomerName.textContent = inputCustomerName.value;
+      renderPreview();
+      updateInvoiceNumber();
+    };
+    inputCustomerAddress.oninput = () => {
+      previewCustomerAddress.textContent = inputCustomerAddress.value;
+      renderPreview();
+    };
+    inputCustomerEmail.oninput = () => {
+      previewCustomerEmail.textContent = inputCustomerEmail.value;
+      renderPreview();
+    };
+    inputFooter.oninput = () => {
+      previewFooter.textContent = inputFooter.value || 'Thank you for your business! Payment is due within 30 days.';
+    };
+
+    // Create a properly formatted invoice for PDF output
+    function createPdfInvoice() {
+      // Create container div with proper dimensions
+      const pdfContainer = document.createElement('div');
+      pdfContainer.className = 'pdf-container';
+      
+      // Clone the invoice content
+      const invoiceContent = $('#invoice').cloneNode(true);
+      
+      // If no logo, remove the logo placeholder
+      if (!hasLogo) {
+        const logoElement = invoiceContent.querySelector('#logo-drop');
+        logoElement.textContent = '';
+        logoElement.style.border = 'none';
+      }
+      
+      // Add to container
+      pdfContainer.appendChild(invoiceContent);
+      
+      // Hide it offscreen
+      pdfContainer.style.position = 'fixed';
+      pdfContainer.style.left = '-9999px';
+      pdfContainer.style.top = '0';
+      
+      // Add to body for rendering
+      document.body.appendChild(pdfContainer);
+      
+      return pdfContainer;
+    }
+
+    // Download functions
+    async function downloadPNG() {
+      showStatus('Generating PNG...');
+      
+      try {
+        // Create a clean copy of the invoice for downloading
+        const pdfContainer = createPdfInvoice();
+        
+        // Create the image and download
+        const canvas = await html2canvas(pdfContainer, { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff'
+        });
+        
+        const link = document.createElement('a');
+        link.download = 'invoice.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        // Clean up
+        document.body.removeChild(pdfContainer);
+        
+        showStatus('PNG downloaded successfully!');
+      } catch (error) {
+        console.error('Error generating PNG:', error);
+        showStatus('Error generating PNG. Please try again.');
+      }
+    }
+
+    async function downloadPDF() {
+      showStatus('Generating PDF...');
+      
+      try {
+        // Create a properly formatted invoice
+        const pdfContainer = createPdfInvoice();
+        
+        // Get the invoice element directly from the container
+        const invoiceEl = pdfContainer.firstChild;
+        
+        // Create PDF using canvas as intermediary
+        const canvas = await html2canvas(invoiceEl, { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff'
+        });
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        // Calculate proportions to fit onto A4
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(
+          canvas.toDataURL('image/jpeg', 1.0), 
+          'JPEG', 
+          0, 0, 
+          imgWidth, imgHeight
+        );
+        
+        pdf.save('invoice.pdf');
+        
+        // Clean up
+        document.body.removeChild(pdfContainer);
+        
+        showStatus('PDF downloaded successfully!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        showStatus('Error generating PDF. Please try again.');
+      }
+    }
+
+    // Wire up
+    $('.add-row').onclick = () => { 
+      addLine('', '0.00');
+      updateInvoiceNumber();
+    };
+    $('#btn-png').onclick = downloadPNG;
+    $('#btn-pdf').onclick = downloadPDF;
+
+    // Initialize invoice number
+    updateInvoiceNumber();
+    
+    // Hide customer info section initially
+    customerInfo.style.display = 'none';
+
+    // Seed a few sample lines
+    addLine('Web Design Services', '1500.00');
+    addLine('Hosting (12 months)', '240.00');
+  </script>
+</body>
+</html>

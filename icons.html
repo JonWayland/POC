@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icon Library | DollarWeb</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      padding-bottom: 40px;
+    }
+    
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    nav .logo {
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    nav svg {
+      margin-right: 8px;
+    }
+    
+    .content-wrapper {
+      padding-top: 100px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    
+    h1 { 
+      text-align: center; 
+      margin-bottom: 30px;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+    
+    .container { 
+      background: #fff; 
+      padding: 30px;
+      border-radius: 16px; 
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Decorative elements */
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .container::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      right: -80px;
+      width: 200px;
+      height: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.05'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+      z-index: 0;
+    }
+    
+    .app-container {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .search-container {
+      position: relative;
+      margin-bottom: 30px;
+      z-index: 2;
+    }
+    
+    #search {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    #search:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    }
+    
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+    
+    .results-container {
+      margin-bottom: 30px; 
+    }
+    
+    .result-count {
+      margin-bottom: 20px;
+      color: var(--dark);
+      font-weight: 500;
+      position: relative;
+      z-index: 2;
+    }
+    
+    #icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .icon-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s;
+      border: 1px solid #eee;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+      height: 100%;
+    }
+    
+    .icon-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-color: var(--primary);
+    }
+    
+    .icon-card img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+    
+    .icon-card:hover img {
+      transform: scale(1.1);
+    }
+    
+    .icon-card .desc {
+      margin: 0 0 15px 0;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.4;
+      flex: 1;
+    }
+    
+    .icon-card a {
+      text-decoration: none;
+      background: var(--primary);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-block;
+      margin-top: auto;
+    }
+    
+    .icon-card a:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #777;
+      font-size: 1.1rem;
+      grid-column: 1 / -1;
+    }
+    
+    /* Pagination styles */
+    .pagination-container {
+      margin-top: 30px;
+      z-index: 2;
+      position: relative;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .pagination-button {
+      background: white;
+      border: 1px solid #e0e0e0;
+      color: var(--dark);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .pagination-button:hover {
+      background: #f5f5f5;
+      border-color: #ccc;
+      transform: translateY(-2px);
+    }
+    
+    .pagination-button.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .pagination-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .pagination-info {
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px 0;
+      color: var(--dark);
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    @media (max-width: 768px) {
+      #icon-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+      
+      .icon-card {
+        padding: 15px;
+      }
+      
+      .icon-card img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      DollarWeb
+    </a>
+    <a href="index.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Tools
+    </a>
+  </nav>
+
+  <div class="content-wrapper">
+    <h1>Icon Library</h1>
+    
+    <div class="container">
+      <div class="app-container">
+        <!-- Search section - always visible -->
+        <div class="search-container">
+          <input type="text" id="search" placeholder="Search icons by name or description..." />
+          <div class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+        </div>
+        
+        <!-- Results section -->
+        <div class="results-container">
+          <div class="result-count" id="result-count">Showing all icons</div>
+          <div id="icon-grid"></div>
+        </div>
+        
+        <!-- Pagination section -->
+        <div class="pagination-container">
+          <div class="pagination" id="pagination">
+            <button class="pagination-button" id="prev-page" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Previous
+            </button>
+            <div class="pagination-info" id="pagination-info">Page 1 of 1</div>
+            <button class="pagination-button" id="next-page" disabled>
+              Next
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    &copy; 2025 DollarWeb - Professional tools that won't break the bank
+  </footer>
+
+  <script>
+    // Pagination settings
+    const ICONS_PER_PAGE = 24;
+    let currentPage = 1;
+    let filteredIcons = [];
+    
+    // DOM elements
+    let icons = [];
+    const searchInput = document.getElementById('search');
+    const resultCount = document.getElementById('result-count');
+    const iconGrid = document.getElementById('icon-grid');
+    const pagination = document.getElementById('pagination');
+    const paginationInfo = document.getElementById('pagination-info');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    
+    // Update pagination UI
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredIcons.length / ICONS_PER_PAGE);
+      paginationInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+      
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+      
+      // Show/hide pagination based on number of pages
+      pagination.style.display = totalPages > 1 ? 'flex' : 'none';
+    }
+    
+    // Get current page of icons
+    function getCurrentPageIcons() {
+      const startIndex = (currentPage - 1) * ICONS_PER_PAGE;
+      const endIndex = startIndex + ICONS_PER_PAGE;
+      return filteredIcons.slice(startIndex, endIndex);
+    }
+
+    // Render a list of icon‑objects into the grid
+    function renderIcons(list) {
+      filteredIcons = list;
+      renderCurrentPage();
+    }
+    
+    // Function to render just the current page
+    function renderCurrentPage() {
+      iconGrid.innerHTML = '';
+      
+      if (filteredIcons.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          <p>No icons found matching your search.</p>
+        `;
+        iconGrid.appendChild(noResults);
+        resultCount.textContent = 'No results found';
+        
+        currentPage = 1;
+        updatePagination();
+        return;
+      }
+      
+      // Display only the current page of icons
+      const pageIcons = getCurrentPageIcons();
+      
+      pageIcons.forEach(icon => {
+        const card = document.createElement('div');
+        card.className = 'icon-card';
+
+        const img = document.createElement('img');
+        img.src = 'icons/' + icon.filename;
+        img.alt = icon.short_description;
+        img.loading = 'lazy'; // Lazy loading for better performance
+
+        const desc = document.createElement('p');
+        desc.className = 'desc';
+        desc.textContent = icon.short_description;
+
+        const link = document.createElement('a');
+        link.href = 'icons/' + icon.filename;
+        link.download = icon.filename;
+        link.textContent = 'Download';
+
+        card.append(img, desc, link);
+        iconGrid.appendChild(card);
+      });
+      
+      // Update result count display
+      if (filteredIcons.length === icons.length) {
+        resultCount.textContent = `Showing ${pageIcons.length} of ${filteredIcons.length} icons`;
+      } else {
+        resultCount.textContent = `Found ${filteredIcons.length} icon${filteredIcons.length !== 1 ? 's' : ''} • Showing ${pageIcons.length} per page`;
+      }
+      
+      updatePagination();
+    }
+
+    // Simple filter on filename + description
+    function filterIcons(term) {
+      return icons.filter(icon =>
+        icon.description.toLowerCase().includes(term) ||
+        icon.filename.toLowerCase().includes(term) ||
+        (icon.short_description && icon.short_description.toLowerCase().includes(term))
+      );
+    }
+
+    // Wire up search box - with debounce for better performance
+    let searchTimeout;
+    searchInput.addEventListener('input', e => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const term = e.target.value.trim().toLowerCase();
+        currentPage = 1; // Reset to first page on new search
+        renderIcons(term ? filterIcons(term) : icons);
+      }, 300);
+    });
+    
+    // Wire up pagination buttons
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderCurrentPage();
+        window.scrollTo({
+          top: document.querySelector('.search-container').offsetTop - 120,
+          behavior: 'smooth'
+        });
+      }
+    });
+    
+    nextPageBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredIcons.length / ICONS_PER_PAGE);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderCurrentPage();
+        window.scrollTo({
+          top: document.querySelector('.search-container').offsetTop - 120,
+          behavior: 'smooth'
+        });
+      }
+    });
+
+    // Load your JSON and kick things off
+    fetch('icons.json')
+      .then(res => res.json())
+      .then(data => {
+        icons = data;
+        renderIcons(icons);
+      })
+      .catch(err => {
+        console.error('Error loading icons:', err);
+        // Display friendly error message
+        iconGrid.innerHTML = `
+          <div class="no-results" style="color: #ff6b6b;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p>Unable to load icons. Please try again later.</p>
+          </div>
+        `;
+        resultCount.textContent = 'Error loading icons';
+        pagination.style.display = 'none';
+      });
+  </script>
+</body>
+</html>

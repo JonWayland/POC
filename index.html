@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Adding Montserrat Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <title>DollarWeb - Tools that work for you</title>
+  <style>
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+    
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 4.8rem; /* Increased from 3.2rem */
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    p.tagline {
+      font-size: 1.8rem;
+      color: var(--dark);
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+    
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .tool-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+    }
+    
+    .tool-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--secondary);
+    }
+    
+    .tool-img {
+      height: 180px;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 3rem;
+      background-image: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tool-img::after {
+      content: '';
+      position: absolute;
+      right: -20px;
+      bottom: -20px;
+      width: 100px;
+      height: 100px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.15'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    
+    .tool-content {
+      padding: 25px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .tool-content h3 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    .tool-content p {
+      margin-bottom: 25px;
+      font-size: 1rem;
+      line-height: 1.6;
+      flex: 1;
+      color: #555;
+    }
+    
+    .tool-content a {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .tool-content a:hover {
+      background: var(--dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      padding: 40px 0;
+      color: var(--dark);
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* Navigation Bar Styles */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Adjust spacing for the fixed navbar */
+    body {
+      padding-top: 70px;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .nav-logo span {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) {
+        display: none;
+      }
+    }
+    
+    /* Tropical pattern at the bottom */
+    footer::before {
+      content: '';
+      display: block;
+      height: 80px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' width='1200' height='60' opacity='0.2'%3E%3Cpath d='M0,50 C200,10 400,30 600,40 C800,50 1000,20 1200,60 L1200,60 L0,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .tools-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+      
+      h1 {
+        font-size: 2.4rem;
+      }
+    }
+
+    /* Footer Styles *//* Updated Footer Styles */
+    .site-footer {
+      background: var(--dark); /* Changed to darker background */
+      padding: 40px 0 50px; /* Doubled padding */
+      margin-top: 80px;
+      position: relative;
+      color: white; /* Changed to light text */
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -120px; /* Doubled height position */
+      left: 0;
+      right: 0;
+      height: 120px; /* Doubled height */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px; /* Doubled padding */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px; /* Doubled margin */
+      color: var(--secondary); /* Changed to secondary color for visibility */
+    }
+
+    .footer-logo svg {
+      width: 48px; /* Doubled size */
+      height: 48px; /* Doubled size */
+      margin-right: 16px; /* Doubled margin */
+    }
+
+    .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem; /* Doubled font size */
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px; /* Doubled margin */
+    }
+
+    .footer-links a {
+      color: var(--light); /* Changed to light color */
+      text-decoration: none;
+      margin: 0 30px; /* Doubled margin */
+      font-size: 1.8rem; /* Doubled font size */
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary); /* Changed hover color */
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 30px; /* Doubled gap */
+      margin-bottom: 40px; /* Doubled margin */
+    }
+
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px; /* Doubled width */
+      height: 72px; /* Doubled height */
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1); /* Semi-transparent light background */
+      color: white; /* Light icon color */
+      transition: all 0.2s;
+    }
+
+    .footer-social a svg {
+      width: 40px; /* Doubled size */
+      height: 40px; /* Doubled size */
+    }
+
+    .footer-social a:hover {
+      background: var(--secondary); /* Changed hover color */
+      color: var(--dark); /* Changed hover text color */
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      font-size: 1.8rem; /* Doubled font size */
+      color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+    }
+
+    @media (max-width: 768px) {
+      .footer-links {
+        flex-direction: column;
+        gap: 20px; /* Doubled gap */
+      }
+      
+      .footer-links a {
+        margin: 10px 0; /* Doubled margin */
+      }
+    }
+  </style>
+</head>
+
+<!-- Navigation Bar -->
+<nav class="main-nav">
+  <div class="container nav-container">
+    <a href="index.html" class="nav-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>DollarWeb</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="#tools">Tools</a>
+      <a href="#about">About</a>
+      <a href="login.html" class="login-btn">Login</a>
+    </div>
+  </div>
+</nav>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>DollarWeb</h1>
+      <p class="tagline">Your digital toolbox for productivity. Simple, powerful tools that help you get things done quickly and efficiently.</p>
+    </header>
+    
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <rect x="7" y="7" width="10" height="10" rx="2" ry="2"></rect>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>QR Code Generator</h3>
+          <p>Create custom QR codes for websites, contact info, and more. Perfect for connecting your physical and digital worlds.</p>
+          <a href="qr.html">Generate QR Codes</a>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>PDF Combiner</h3>
+          <p>Merge multiple PDF files into one document. Drag, drop, and rearrange pages with ease to keep your documents organized.</p>
+          <a href="pdf.html">Combine PDFs</a>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Icon grid with search symbol -->
+            <rect x="3" y="3" width="6" height="6" rx="1" ry="1"></rect>
+            <rect x="15" y="3" width="6" height="6" rx="1" ry="1"></rect>
+            <rect x="3" y="15" width="6" height="6" rx="1" ry="1"></rect>
+            <rect x="15" y="15" width="6" height="6" rx="1" ry="1"></rect>
+            <circle cx="18" cy="18" r="3"></circle>
+            <line x1="20.5" y1="20.5" x2="23" y2="23"></line>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>Icon Library</h3>
+          <p>Search, preview, and download a wide collection of free icons for your designs.</p>
+          <a href="icons.html">Browse Icons</a>
+        </div>
+      </div>      
+      
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="13.5" cy="6.5" r="4.5"></circle>
+            <circle cx="7" cy="17" r="4"></circle>
+            <circle cx="19" cy="17" r="4"></circle>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>Color Palette Generator</h3>
+          <p>Design harmonious color palettes inspired by tropical scenes. Perfect for websites, presentations, and creative projects.</p>
+          <a href="color-palette.html">Create Palettes</a>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>Invoice Generator</h3>
+          <p>Create professional invoices in seconds. Customize with your logo, add line items, and download as PDF or PNG.</p>
+          <a href="invoice.html">Generate Invoices</a>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>Password Generator</h3>
+          <p>Create strong, secure passwords that are difficult to crack yet easy to use. Customize length and complexity to match your security needs.</p>
+          <a href="password.html">Generate Passwords</a>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Image icon -->
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>Ad Generator</h3>
+          <p>Design eye‑catching ads and download them as high‑quality images or PDFs.</p>
+          <a href="ad.html">Create Ads</a>
+        </div>
+      </div>
+      
+
+      <div class="tool-card">
+        <div class="tool-img">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <div class="tool-content">
+          <h3>Calendar Generator</h3>
+          <p>Create custom calendars with important dates and events. Perfect for planning schedules, tracking deadlines, or printing monthly calendars.</p>
+          <a href="calendar.html">Create Calendars</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>DollarWeb</span>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+          </svg>
+        </a>
+        <a href="#" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+          </svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 DollarWeb<br><br><i>Professional tools that won't break the bank</i><br></p>
+    </div>
+  </footer>
+</body>
+</html>

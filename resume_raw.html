@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Live Résumé Generator</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2a2a2a;
+      --accent-color: #0073e6;
+      --bg-light: #f5f5f5;
+      --font-sans: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: var(--font-sans); display: flex; min-height: 100vh;
+    }
+    .form-container {
+      width: 35%; padding: 1.5rem; background: white; overflow-y: auto;
+      border-right: 1px solid #ddd;
+    }
+    .form-container h2 {
+      margin-top: 0; color: var(--primary-color);
+    }
+    .form-container label {
+      display: block; margin-bottom: 1rem;
+      font-size: 0.9rem; color: #444;
+    }
+    .form-container input,
+    .form-container textarea {
+      width: 100%; padding: 0.5rem; margin-top: 0.3rem;
+      border: 1px solid #ccc; border-radius: 4px;
+      font-family: var(--font-sans);
+    }
+    .form-container textarea { resize: vertical; min-height: 60px; }
+    .preview-container {
+      flex: 1; padding: 2rem; background: var(--bg-light); overflow-y: auto;
+    }
+    /* Resume styling */
+    #resumePreview {
+      max-width: 800px; margin: auto; background: white; padding: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #resumePreview h1 {
+      margin: 0; font-size: 2rem; color: var(--primary-color);
+    }
+    #resumePreview h2 {
+      margin: 0 0 1rem; font-size: 1.2rem; font-weight: 400; color: var(--accent-color);
+    }
+    #resumePreview .contact {
+      font-size: 0.9rem; margin-bottom: 1.5rem; color: #555;
+    }
+    section { margin-bottom: 1.5rem; }
+    section h3 {
+      margin-bottom: 0.5rem; font-size: 1rem; text-transform: uppercase;
+      color: var(--primary-color); letter-spacing: 0.5px;
+    }
+    section p { margin: 0; color: #333; line-height: 1.4; }
+    ul { margin: 0; padding-left: 1.2rem; }
+    ul li { margin-bottom: 0.3rem; color: #333; }
+    .skills-list {
+      display: flex; flex-wrap: wrap; list-style: none; padding: 0;
+    }
+    .skills-list li {
+      background: var(--accent-color); color: white; padding: 0.3rem 0.6rem;
+      margin: 0.2rem; border-radius: 3px; font-size: 0.8rem;
+    }
+    @media (max-width: 800px) {
+      body { flex-direction: column; }
+      .form-container { width: 100%; border-right: none; border-bottom: 1px solid #ddd; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Your Details</h2>
+    <label>
+      Full Name
+      <input id="nameInput" type="text" placeholder="Jane Doe">
+    </label>
+    <label>
+      Job Title
+      <input id="titleInput" type="text" placeholder="Software Engineer">
+    </label>
+    <label>
+      Contact Info (email, phone, location)
+      <input id="contactInput" type="text" placeholder="jane@domain.com | (123) 456‑7890 | City, ST">
+    </label>
+    <label>
+      LinkedIn / Website URLs
+      <input id="linksInput" type="text" placeholder="linkedin.com/in/janedoe • janedoe.dev">
+    </label>
+    <label>
+      Professional Summary
+      <textarea id="summaryInput" placeholder="A brief 2–3 sentence summary…"></textarea>
+    </label>
+    <label>
+      Skills (comma‑separated)
+      <textarea id="skillsInput" placeholder="JavaScript, Python, SQL, React…"></textarea>
+    </label>
+    <label>
+      Experience (one entry per line)
+      <textarea id="experienceInput" placeholder="Senior Engineer at Acme Corp (2021–Present)…"></textarea>
+    </label>
+    <label>
+      Education (one entry per line)
+      <textarea id="educationInput" placeholder="B.S. in Computer Science, University X (2017–2021)…"></textarea>
+    </label>
+  </div>
+
+  <div class="preview-container">
+    <div id="resumePreview">
+      <h1 id="namePreview">Your Name</h1>
+      <h2 id="titlePreview">Your Job Title</h2>
+      <div class="contact" id="contactPreview">email • phone • location</div>
+      <div class="contact" id="linksPreview">LinkedIn • Website</div>
+
+      <section>
+        <h3>Summary</h3>
+        <p id="summaryPreview">A concise professional summary will appear here.</p>
+      </section>
+
+      <section>
+        <h3>Skills</h3>
+        <ul class="skills-list" id="skillsPreview">
+          <li>Skill 1</li>
+          <li>Skill 2</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Experience</h3>
+        <ul id="experiencePreview">
+          <li>Job Title at Company (Year–Year): description…</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Education</h3>
+        <ul id="educationPreview">
+          <li>Degree, Institution (Year–Year)</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const fields = [
+      { in: 'nameInput', out: 'namePreview' },
+      { in: 'titleInput', out: 'titlePreview' },
+      { in: 'contactInput', out: 'contactPreview' },
+      { in: 'linksInput', out: 'linksPreview' },
+      { in: 'summaryInput', out: 'summaryPreview' }
+    ];
+
+    // Simple text copy
+    fields.forEach(f => {
+      document.getElementById(f.in).addEventListener('input', e => {
+        document.getElementById(f.out).textContent = e.target.value || document.getElementById(f.out).getAttribute('data-placeholder') || '';
+      });
+    });
+
+    // Skills → tags
+    document.getElementById('skillsInput').addEventListener('input', e => {
+      const list = document.getElementById('skillsPreview');
+      list.innerHTML = '';
+      e.target.value.split(',')
+        .map(s => s.trim())
+        .filter(s => s)
+        .forEach(skill => {
+          const li = document.createElement('li');
+          li.textContent = skill;
+          list.appendChild(li);
+        });
+    });
+
+    // Multi‑line lists (experience / education)
+    function bindList(inputId, listId) {
+      document.getElementById(inputId).addEventListener('input', e => {
+        const lines = e.target.value.split('\n').map(l => l.trim()).filter(l => l);
+        const ul = document.getElementById(listId);
+        ul.innerHTML = '';
+        lines.forEach(line => {
+          const li = document.createElement('li');
+          li.textContent = line;
+          ul.appendChild(li);
+        });
+      });
+    }
+    bindList('experienceInput', 'experiencePreview');
+    bindList('educationInput', 'educationPreview');
+  </script>
+
+</body>
+</html>

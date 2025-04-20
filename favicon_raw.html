@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Favicon Generator</title>
+  <style>
+    :root {
+      --primary: #007bff;
+      --bg: #f9f9f9;
+      --bg-hover: #f1f1f1;
+      --border: #ccc;
+      --text: #333;
+      --radius: 8px;
+      --font: 'Segoe UI', Tahoma, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: #fff;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    .upload-area {
+      border: 2px dashed var(--border);
+      background: var(--bg);
+      padding: 2rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+      margin-bottom: 1rem;
+    }
+    .upload-area.hover { 
+      background: var(--bg-hover);
+      border-color: var(--primary);
+    }
+    .upload-area p {
+      margin: 0.5rem 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .2s, box-shadow .2s;
+    }
+    .btn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    .btn:not(:disabled):hover {
+      background: darken(var(--primary),10%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    #preview img {
+      max-width: 100px;
+      margin-top: 1rem;
+      border-radius: var(--radius);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Favicon Generator</h1>
+    <div id="upload-area" class="upload-area">
+      <p>Drag & Drop an image here</p>
+      <p>or</p>
+      <button id="browse-btn" class="btn">Browse Files</button>
+    </div>
+    <input type="file" id="file-input" accept="image/*" hidden />
+    <div id="preview"></div>
+    <button id="generate-btn" class="btn" disabled>Download Favicon ZIP</button>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <script>
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput  = document.getElementById('file-input');
+    const browseBtn  = document.getElementById('browse-btn');
+    const preview    = document.getElementById('preview');
+    const generateBtn= document.getElementById('generate-btn');
+
+    let imgElement = null;
+
+    // Highlight on drag
+    ['dragenter','dragover'].forEach(evt => {
+      uploadArea.addEventListener(evt, e => {
+        e.preventDefault(); 
+        uploadArea.classList.add('hover');
+      });
+    });
+    ['dragleave','drop'].forEach(evt => {
+      uploadArea.addEventListener(evt, e => {
+        e.preventDefault(); 
+        uploadArea.classList.remove('hover');
+      });
+    });
+
+    // Handle drop
+    uploadArea.addEventListener('drop', e => {
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    // Handle browse
+    browseBtn.addEventListener('click', _ => fileInput.click());
+    fileInput.addEventListener('change', _ => {
+      if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) return alert('Please upload an image file.');
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          imgElement = img;
+          preview.innerHTML = '';
+          preview.appendChild(img);
+          generateBtn.disabled = false;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    generateBtn.addEventListener('click', async () => {
+      if (!imgElement) return;
+      const sizes = [16, 32, 48, 64, 128, 256];
+      const zip   = new JSZip();
+      let done    = 0;
+
+      sizes.forEach(size => {
+        // create a canvas for each size
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        // draw the image scaled to fit
+        ctx.drawImage(imgElement, 0, 0, size, size);
+        canvas.toBlob(blob => {
+          zip.file(`favicon-${size}x${size}.png`, blob);
+          done++;
+          if (done === sizes.length) {
+            zip.generateAsync({ type: 'blob' }).then(content => {
+              saveAs(content, 'favicons.zip');
+            });
+          }
+        }, 'image/png');
+      });
+    });
+  </script>
+</body>
+</html>

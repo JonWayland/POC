@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Custom Calendar Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', sans-serif; background: #f5f5f5; margin:0; padding:20px; }
+    .container { max-width:900px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+    h1 { text-align:center; margin-bottom:10px; }
+    #calendarTitleDisplay { text-align:center; margin: 10px 0 20px; font-size:1.5em; font-weight:500; color:#333; }
+
+    /* Form styling */
+    form { display:flex; flex-wrap:wrap; gap:10px; }
+    form label { display:flex; flex-direction:column; font-size:0.9em; flex:1; }
+    form input, form button { padding:8px; font-size:1em; border:1px solid #ccc; border-radius:4px; }
+    form button { background: #1976d2; color: #fff; border:none; cursor:pointer; transition: background 0.2s ease; }
+    form button:hover { background: #1565c0; }
+
+    /* Calendar cells fixed square */
+    #calendarContainer { margin-top:20px; }
+    .month { margin-bottom:30px; page-break-inside: avoid; }
+    .month h3 { text-align:center; margin-bottom:10px; color:#555; }
+    .month table { width:100%; border-collapse:collapse; table-layout: fixed; }
+    .month th, .month td { width:14.28%; aspect-ratio:1/1; border:1px solid #ddd; padding:4px; vertical-align:top; overflow:hidden; position:relative; }
+    .month th { background:#f0f0f0; text-align:center; font-weight:500; }
+    .day-number { font-weight:500; margin-bottom:4px; }
+    .key-label { display:block; font-size:0.85em; font-weight:500; color:#1976d2; font-family:'Roboto',sans-serif; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    /* Key date list styling */
+    #keyDateList { list-style:none; padding:0; margin:10px 0; }
+    #keyDateList li { background:#e3f2fd; margin-bottom:5px; padding:5px 10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center; }
+    #keyDateList button { background:transparent; border:none; color:#d32f2f; cursor:pointer; }
+    #keyDateDetails { margin-top:20px; font-size:0.9em; }
+    #keyDateDetails h3 { margin-bottom:5px; }
+    #keyDateDetails ul { padding-left:20px; }
+
+    /* Download button */
+    .download-btn { margin-top:10px; float:right; padding:10px 15px; font-size:1em; background:#388e3c; color:#fff; border:none; border-radius:4px; cursor:pointer; transition: background 0.2s ease; }
+    .download-btn:hover { background:#2e7d32; }
+
+    /* Print styling */
+    @media print {
+      /* Hide UI controls */
+      #controls, #keyDateList, .download-btn { display:none; }
+      /* Fit single month on one page */
+      @page { size: letter portrait; margin: 0.5in; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="calendar-wrapper">
+    <h1>Custom Calendar Generator</h1>
+    <form id="controls">
+      <label>
+        Title
+        <input type="text" id="calendarTitle" placeholder="Enter calendar title">
+      </label>
+      <label>
+        Start Date
+        <input type="date" id="startDate" required>
+      </label>
+      <label>
+        End Date
+        <input type="date" id="endDate" required>
+      </label>
+      <label>
+        Key Date
+        <input type="date" id="keyDate">
+      </label>
+      <label>
+        Description
+        <input type="text" id="keyDesc" placeholder="Description">
+      </label>
+      <button type="button" id="addKeyBtn">Add Key Date</button>
+      <button type="button" id="generateBtn">Generate Calendar</button>
+    </form>
+
+    <div id="calendarTitleDisplay"></div>
+    <ul id="keyDateList"></ul>
+    <div id="calendarContainer"></div>
+    <div id="keyDateDetails"></div>
+    <button class="download-btn" id="downloadBtn">Download as PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script>
+    const keyDates = [];
+    const calendarWrapper   = document.getElementById('calendar-wrapper');
+    const titleInput        = document.getElementById('calendarTitle');
+    const titleDisplay      = document.getElementById('calendarTitleDisplay');
+    const startInput        = document.getElementById('startDate');
+    const endInput          = document.getElementById('endDate');
+    const generateBtn       = document.getElementById('generateBtn');
+    const keyDateInput      = document.getElementById('keyDate');
+    const keyDescInput      = document.getElementById('keyDesc');
+    const addKeyBtn         = document.getElementById('addKeyBtn');
+    const keyDateList       = document.getElementById('keyDateList');
+    const calendarContainer = document.getElementById('calendarContainer');
+    const keyDateDetails    = document.getElementById('keyDateDetails');
+    const downloadBtn       = document.getElementById('downloadBtn');
+
+    function parseDate(str) {
+      const [y,m,d] = str.split('-').map(Number);
+      return new Date(y, m-1, d);
+    }
+
+    addKeyBtn.addEventListener('click', () => {
+      const date = keyDateInput.value;
+      const desc = keyDescInput.value.trim();
+      if (!date || !desc) return alert('Select date and description.');
+      keyDates.push({ date, desc });
+      renderKeyDates();
+      keyDateInput.value=''; keyDescInput.value='';
+    });
+
+    function renderKeyDates() {
+      keyDateList.innerHTML = '';
+      keyDates.forEach((kd,i) => {
+        const li = document.createElement('li');
+        li.textContent = `${kd.date} – ${kd.desc}`;
+        const btn = document.createElement('button'); btn.textContent='✕';
+        btn.onclick = () => { keyDates.splice(i,1); renderKeyDates(); };
+        li.appendChild(btn); keyDateList.appendChild(li);
+      });
+    }
+
+    generateBtn.addEventListener('click', () => {
+      if (!startInput.value || !endInput.value) return alert('Pick start and end dates.');
+      const start = parseDate(startInput.value);
+      const end   = parseDate(endInput.value);
+      if (start > end) return alert('Start must be before end.');
+      titleDisplay.textContent = titleInput.value.trim();
+      calendarContainer.innerHTML = '';
+      let current = new Date(start.getFullYear(), start.getMonth(), 1);
+      while (current <= end) {
+        drawMonth(current);
+        current.setMonth(current.getMonth()+1);
+      }
+      renderKeyDateDetails();
+    });
+
+    function drawMonth(dateObj) {
+      const year = dateObj.getFullYear(), month = dateObj.getMonth();
+      const monthName = dateObj.toLocaleString('default',{month:'long'});
+      const monthDiv = document.createElement('div'); monthDiv.className='month';
+      monthDiv.innerHTML = `<h3>${monthName} ${year}</h3>`;
+      const table = document.createElement('table');
+      const header = document.createElement('tr');
+      ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{const th=document.createElement('th');th.textContent=d;header.appendChild(th);});
+      table.appendChild(header);
+
+      const daysInMonth = new Date(year,month+1,0).getDate();
+      const firstDay = new Date(year,month,1).getDay();
+      let row = document.createElement('tr');
+      for(let i=0;i<firstDay;i++) row.appendChild(document.createElement('td'));
+      for(let d=1;d<=daysInMonth;d++) {
+        if (row.children.length===7) { table.appendChild(row); row = document.createElement('tr'); }
+        const cell = document.createElement('td');
+        const dayNum = document.createElement('div'); dayNum.className='day-number'; dayNum.textContent=d;
+        cell.appendChild(dayNum);
+        const iso = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const kd  = keyDates.find(k=>k.date===iso);
+        if (kd) {
+          const label = document.createElement('div'); label.className='key-label'; label.textContent = kd.desc;
+          cell.appendChild(label);
+        }
+        row.appendChild(cell);
+      }
+      while(row.children.length<7) row.appendChild(document.createElement('td'));
+      table.appendChild(row);
+      monthDiv.appendChild(table);
+      calendarContainer.appendChild(monthDiv);
+    }
+
+    function renderKeyDateDetails() {
+      if (!keyDates.length) { keyDateDetails.innerHTML=''; return; }
+      let html = '<h3>Key Dates</h3><ul>';
+      keyDates.forEach(k=>{ html+=`<li>${k.date}: ${k.desc}</li>`; });
+      html+='</ul>';
+      keyDateDetails.innerHTML = html;
+    }
+
+    downloadBtn.addEventListener('click', ()=>{
+      html2pdf().set({margin:0.5, filename:'custom-calendar.pdf', html2canvas:{scale:2}, jsPDF:{unit:'in',format:'letter'}}).from(calendarWrapper).save();
+    });
+  </script>
+</body>
+</html>

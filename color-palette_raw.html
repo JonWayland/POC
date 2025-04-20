@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Palette Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .swatch {
+      height: 100px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+      cursor: pointer;
+    }
+    .swatch span {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(255,255,255,0.7);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .export-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    button {
+      background: #3a5e84;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Color Palette Generator</h1>
+    <div class="controls">
+      <label>
+        Base Color:
+        <input type="color" id="base-color" value="#3a5e84">
+      </label>
+      <label>
+        Harmony:
+        <select id="harmony">
+          <option value="complement">Complementary</option>
+          <option value="analogous" selected>Analogous</option>
+          <option value="triadic">Triadic</option>
+          <option value="tetradic">Tetradic</option>
+          <option value="monochromatic">Monochromatic</option>
+          <option value="splitcomplement">Split-Complement</option>
+        </select>
+      </label>
+      <button id="generate">Generate Palette</button>
+    </div>
+    <div class="palette" id="palette"></div>
+    <div class="export-buttons">
+      <button id="export-css">Copy CSS</button>
+      <button id="export-json">Download JSON</button>
+    </div>
+    <textarea id="code-output" readonly placeholder="Generated code will appear here..."></textarea>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tinycolor2/dist/tinycolor-min.js"></script>
+  <script>
+    const baseInput = document.getElementById('base-color');
+    const harmonySelect = document.getElementById('harmony');
+    const generateBtn = document.getElementById('generate');
+    const paletteContainer = document.getElementById('palette');
+    const exportCssBtn = document.getElementById('export-css');
+    const exportJsonBtn = document.getElementById('export-json');
+    const codeOutput = document.getElementById('code-output');
+    let currentPalette = [];
+
+    function generatePalette() {
+      const base = tinycolor(baseInput.value);
+      const type = harmonySelect.value;
+      let colors = [];
+      switch(type) {
+        case 'complement':
+          colors = [base.toHexString(), base.complement().toHexString()];
+          break;
+        case 'analogous':
+          colors = base.analogous().map(c => c.toHexString());
+          break;
+        case 'triadic':
+          colors = base.triad().map(c => c.toHexString());
+          break;
+        case 'tetradic':
+          colors = base.tetrad().map(c => c.toHexString());
+          break;
+        case 'monochromatic':
+          colors = base.monochromatic().map(c => c.toHexString());
+          break;
+        case 'splitcomplement':
+          colors = [base.toHexString(), base.splitcomplement()[1].toHexString(), base.splitcomplement()[0].toHexString()];
+          break;
+      }
+      currentPalette = colors;
+      displayPalette(colors);
+      codeOutput.value = '';
+    }
+
+    function displayPalette(colors) {
+      paletteContainer.innerHTML = '';
+      colors.forEach(color => {
+        const swatch = document.createElement('div');
+        swatch.className = 'swatch';
+        swatch.style.backgroundColor = color;
+        swatch.innerHTML = `<span>${color}</span>`;
+        paletteContainer.appendChild(swatch);
+      });
+    }
+
+    function copyCss() {
+      if(!currentPalette.length) return;
+      const css = currentPalette.map((col, i) => `--color-${i+1}: ${col};`).join('\n');
+      codeOutput.value = `:root {\n${css}\n}`;
+      navigator.clipboard.writeText(codeOutput.value);
+      alert('CSS copied to clipboard');
+    }
+
+    function downloadJson() {
+      if(!currentPalette.length) return;
+      const data = {
+        palette: currentPalette
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'palette.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    generateBtn.addEventListener('click', generatePalette);
+    exportCssBtn.addEventListener('click', copyCss);
+    exportJsonBtn.addEventListener('click', downloadJson);
+
+    // Initial generate
+    generatePalette();
+  </script>
+</body>
+</html>

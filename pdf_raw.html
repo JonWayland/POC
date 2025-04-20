@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF Combiner</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333; display: flex; justify-content: center; align-items: center; min-height:100vh; }
+    .container { width: 90%; max-width:600px; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+    h1 { text-align:center; margin-bottom:20px; }
+    .drop-area { border:2px dashed #bbb; border-radius:8px; padding:30px; text-align:center; cursor:pointer; transition:background 0.3s; }
+    .drop-area.dragover { background:#eaeaea; }
+    .file-list { list-style:none; padding:0; margin:20px 0; }
+    .file-item { padding:10px 15px; margin-bottom:10px; background:#fafafa; border:1px solid #ddd; border-radius:4px; cursor:move; }
+    button { display:inline-block; padding:10px 20px; font-size:16px; border:none; border-radius:4px; background:#3a5e84; color:white; cursor:pointer; transition:background 0.3s; }
+    button:disabled { background:#ccc; cursor:not-allowed; }
+    #fileSelect { margin-top:10px; }
+    #combine-btn { width:100%; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>PDF Combiner</h1>
+    <div id="drop-area" class="drop-area">
+      <p>Drag & Drop PDF files here</p>
+      <input type="file" id="fileElem" multiple accept="application/pdf" style="display:none"/>
+      <button id="fileSelect">Select Files</button>
+    </div>
+    <ul id="file-list" class="file-list"></ul>
+    <button id="combine-btn" disabled>Download Combined PDF</button>
+  </div>
+  <script>
+    const { PDFDocument } = PDFLib;
+    let filesData = [];
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    const dropArea = document.getElementById('drop-area');
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+    });
+    dropArea.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      addFiles(files);
+    });
+
+    document.getElementById('fileSelect').addEventListener('click', () => document.getElementById('fileElem').click());
+    document.getElementById('fileElem').addEventListener('change', (e) => addFiles(e.target.files));
+
+    function addFiles(files) {
+      [...files].forEach(file => {
+        if (file.type !== 'application/pdf') return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          filesData.push({ name: file.name, arrayBuffer: e.target.result });
+          renderFileList();
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function renderFileList() {
+      const list = document.getElementById('file-list');
+      list.innerHTML = '';
+      filesData.forEach((f, index) => {
+        const li = document.createElement('li');
+        li.className = 'file-item';
+        li.setAttribute('data-index', index);
+        li.textContent = f.name;
+        list.appendChild(li);
+      });
+      document.getElementById('combine-btn').disabled = filesData.length < 2;
+    }
+
+    new Sortable(document.getElementById('file-list'), {
+      animation: 150,
+      onEnd: (evt) => {
+        const moved = filesData.splice(evt.oldIndex, 1)[0];
+        filesData.splice(evt.newIndex, 0, moved);
+        renderFileList();
+      }
+    });
+
+    document.getElementById('combine-btn').addEventListener('click', async () => {
+      const mergedPdf = await PDFDocument.create();
+      for (let f of filesData) {
+        const pdf = await PDFDocument.load(f.arrayBuffer);
+        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        pages.forEach(page => mergedPdf.addPage(page));
+      }
+      const blob = await mergedPdf.save().then(bytes => new Blob([bytes], { type: 'application/pdf' }));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'combined.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

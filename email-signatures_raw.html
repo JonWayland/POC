@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Email Signature Generator</title>
+  <!-- Font Awesome Kit for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --accent-color: #3498db;
+      --bg-color: #ecf0f1;
+      --text-color: #2c3e50;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; color: var(--primary-color); }
+    .builder {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group label { margin-bottom: 5px; font-weight: bold; }
+    .form-group input, .form-group select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #add-social, #copy-btn, #download-btn, #signature-form button[type=submit] {
+      padding: 8px 12px;
+      background-color: var(--accent-color);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .preview { border-left: 1px solid #ddd; padding-left: 20px; }
+    #signature-preview {
+      background-color: #fff;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      min-height: 120px;
+    }
+    .drop-zone {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #777;
+    }
+    .drop-zone.dragover {
+      background-color: var(--bg-color);
+      border-color: var(--accent-color);
+    }
+    .social-field {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .social-field button { background: transparent; border: none; color: var(--accent-color); cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Email Signature Generator</h1>
+    <div class="builder">
+      <form id="signature-form">
+        <div class="form-group">
+          <label for="name">Name *</label>
+          <input type="text" id="name" placeholder="Your Name" required>
+        </div>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" placeholder="Your Title">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" placeholder="e.g., +1 (555) 123-4567">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="your.email@example.com">
+        </div>
+        <div class="form-group social-group">
+          <label>Social Links</label>
+          <div id="social-links"></div>
+          <button type="button" id="add-social">Add Social Link</button>
+        </div>
+        <div class="form-group">
+          <label>Company Logo</label>
+          <div id="logo-drop" class="drop-zone">Drag &amp; Drop Logo Here or Click to Upload
+            <input type="file" id="logo-input" accept="image/*" hidden>
+          </div>
+          <img id="logo-preview" alt="Logo Preview" style="max-width:100px;display:none;margin-top:10px;">
+        </div>
+        <button type="submit">Generate Signature</button>
+      </form>
+      <div class="preview">
+        <h2>Preview</h2>
+        <div id="signature-preview"></div>
+        <button id="copy-btn">Copy Signature</button>
+        <button id="download-btn">Download Signature</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Social links builder
+    const addSocial = document.getElementById('add-social');
+    const socialLinksDiv = document.getElementById('social-links');
+    addSocial.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.className = 'social-field';
+      const select = document.createElement('select');
+      ['LinkedIn','Twitter','Facebook','Instagram','GitHub','Custom'].forEach(type => {
+        const opt = document.createElement('option');
+        opt.value = type.toLowerCase();
+        opt.textContent = type;
+        select.appendChild(opt);
+      });
+      const input = document.createElement('input');
+      input.type = 'url';
+      input.placeholder = 'Profile URL';
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = 'Remove';
+      removeBtn.addEventListener('click', () => div.remove());
+      div.append(select, input, removeBtn);
+      socialLinksDiv.appendChild(div);
+    });
+
+    // Logo drag & drop
+    const dropZone = document.getElementById('logo-drop');
+    const logoInput = document.getElementById('logo-input');
+    const logoPreview = document.getElementById('logo-preview');
+    let logoDataUrl = '';
+
+    dropZone.addEventListener('click', () => logoInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault(); dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    logoInput.addEventListener('change', e => {
+      if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        logoDataUrl = e.target.result;
+        logoPreview.src = logoDataUrl;
+        logoPreview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Generate signature
+    document.getElementById('signature-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const title = document.getElementById('title').value;
+      const phone = document.getElementById('phone').value;
+      const email = document.getElementById('email').value;
+      const socialDivs = document.querySelectorAll('#social-links .social-field');
+      let html = '<table cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;">';
+      html += '<tr>';
+      if (logoDataUrl) {
+        html += '<td style="vertical-align:top;padding-right:10px;"><img src="'+logoDataUrl+'" alt="Logo" style="max-width:100px;"></td>';
+      }
+      html += '<td style="vertical-align:top;">';
+      html += '<div style="font-size:16px;font-weight:bold;color:#000;">'+name+'</div>';
+      if (title) html += '<div style="font-size:14px;color:#555;">'+title+'</div>';
+      if (phone) html += '<div style="font-size:14px;color:#555;">'+phone+'</div>';
+      if (email) html += '<div style="font-size:14px;color:#555;"><a href="mailto:'+email+'" style="color:#555;text-decoration:none;">'+email+'</a></div>';
+
+      // Build social links HTML
+      const socialHtml = Array.from(socialDivs).map(div => {
+        const type = div.querySelector('select').value;
+        const url = div.querySelector('input').value.trim();
+        if (!url) return '';
+        let iconClass;
+        switch(type) {
+          case 'linkedin': iconClass = 'fab fa-linkedin'; break;
+          case 'twitter': iconClass = 'fab fa-twitter'; break;
+          case 'facebook': iconClass = 'fab fa-facebook'; break;
+          case 'instagram': iconClass = 'fab fa-instagram'; break;
+          case 'github': iconClass = 'fab fa-github'; break;
+          default: iconClass = 'fas fa-link'; break;
+        }
+        return '<a href="'+url+'" style="text-decoration:none;margin-right:5px;"><i class="'+iconClass+'" style="font-size:16px;"></i></a>';
+      }).filter(item => item).join('');
+      if (socialHtml) html += '<div style="margin-top:5px;">'+socialHtml+'</div>';
+
+      html += '</td></tr></table>';
+      document.getElementById('signature-preview').innerHTML = html;
+    });
+
+    // Copy signature HTML to clipboard
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      const preview = document.getElementById('signature-preview');
+      const html = preview.innerHTML;
+      const textarea = document.createElement('textarea');
+      textarea.value = html;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('Signature HTML copied to clipboard.');
+    });
+
+    // Download signature as HTML file
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const html = document.getElementById('signature-preview').innerHTML;
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'signature.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

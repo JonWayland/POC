@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Calendar Generator | DollarWeb</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --text: #333;
+      --bg: #f5f9f8;
+      --dark: #05668d;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Inter',sans-serif;
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E") 0 0/120px no-repeat;
+      min-height:100vh;
+      color:var(--text);
+      padding-bottom:40px;
+    }
+    nav {
+      position:fixed; top:0; left:0; right:0;
+      background:var(--primary); color:white;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:1rem 2rem; box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:100;
+    }
+    nav .logo { font-weight:600; display:flex; align-items:center; }
+    nav a { color:white; text-decoration:none; display:flex; align-items:center }
+    nav svg { margin-right:8px }
+    .content-wrapper {
+      padding-top:100px;
+      max-width:1000px;
+      margin:0 auto;
+      padding:0 20px;
+    }
+    h1 {
+      text-align:center; margin-bottom:30px;
+      color:var(--primary); font-size:1.8rem; font-weight:600;
+    }
+    #calendarTitleDisplay {
+      text-align:center; margin:20px 0;
+      font-size:1.6rem; font-weight:600; color:var(--dark);
+    }
+    .container {
+      background:white; padding:30px; border-radius:16px;
+      box-shadow:0 15px 40px rgba(0,0,0,0.08);
+      position:relative; overflow:hidden;
+    }
+    .container::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:6px;
+      background:linear-gradient(90deg,var(--primary),var(--secondary));
+    }
+    .section-title {
+      font-weight:600; margin-bottom:15px; color:var(--dark);
+      border-bottom:1px solid #eee; padding-bottom:8px; font-size:1.1rem;
+      position:relative; z-index:1;
+    }
+    form {
+      display:flex; flex-wrap:wrap; gap:15px; margin-bottom:25px;
+      position:relative; z-index:1;
+    }
+    form label {
+      flex:1; min-width:200px; font-weight:500; font-size:0.95rem;
+      display:flex; flex-direction:column; color:var(--dark);
+    }
+    .key-date-row { display:flex; gap:15px; width:100%; }
+    form input, form button {
+      padding:12px; font-size:1rem; border:1px solid #e0e0e0;
+      border-radius:10px; margin-top:6px; font-family:inherit;
+    }
+    form input:focus {
+      outline:none; border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(0,168,150,0.1);
+    }
+    form button {
+      background:var(--primary); color:white; border:none;
+      cursor:pointer; transition:0.3s; font-weight:500; min-width:150px;
+      margin-top:26px;
+    }
+    form button:hover {
+      background:var(--dark); transform:translateY(-3px);
+      box-shadow:0 8px 15px rgba(0,0,0,0.1);
+    }
+    #addKeyBtn { background:var(--secondary); color:var(--dark); }
+    #addKeyBtn:hover { background:#e5a700; }
+    #calendarContainer { margin-top:30px; z-index:1; position:relative; }
+    .month {
+      background:white; border-radius:12px; padding:20px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.05);
+      margin-bottom:40px; page-break-inside:avoid;
+    }
+    .month h3 {
+      text-align:center; margin-bottom:15px;
+      color:var(--primary); font-weight:600; font-size:1.4rem;
+    }
+    .month table {
+      width:100%; border-collapse:collapse; table-layout:fixed;
+    }
+    .month th, .month td {
+      border:1px solid #e5e5e5; padding:8px; vertical-align:top;
+      overflow:hidden; position:relative; width:14.28%; aspect-ratio:1/1;
+    }
+    .month th {
+      background:rgba(0,168,150,0.1); color:var(--dark);
+      text-align:center; font-weight:600; padding:12px 8px;
+    }
+    .day-number {
+      font-weight:600; margin-bottom:6px; color:var(--dark);
+    }
+    .key-label {
+      display:block; background:rgba(0,168,150,0.1);
+      padding:4px 6px; border-radius:4px; margin-top:2px;
+      font-size:0.85rem; font-weight:500; color:var(--primary);
+      text-overflow:ellipsis; white-space:nowrap; overflow:hidden;
+    }
+    #keyDateList {
+      list-style:none; margin:0 0 25px; padding:0; z-index:1; position:relative;
+    }
+    #keyDateList li {
+      background:rgba(0,168,150,0.08); margin-bottom:8px;
+      padding:12px 15px; border-radius:10px;
+      display:flex; justify-content:space-between; align-items:center;
+      font-weight:500;
+    }
+    #keyDateList button {
+      background:transparent; border:none; color:var(--accent);
+      font-size:1.2rem; width:30px; height:30px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:50%; transition:0.2s;
+    }
+    #keyDateList button:hover { background:rgba(255,107,107,0.1); }
+    #keyDateDetails {
+      display:none; background:white; padding:20px; border-radius:12px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-top:30px; z-index:1;
+      position:relative;
+    }
+    #keyDateDetails h3 {
+      margin-bottom:15px; color:var(--primary); font-weight:600;
+    }
+    #keyDateDetails ul { padding-left:20px; margin:0; }
+    #keyDateDetails li { margin-bottom:8px; color:var(--text); }
+    .button-container {
+      display:flex; justify-content:flex-end; margin-top:25px; z-index:1;
+      position:relative;
+    }
+    .download-btn {
+      display:flex; align-items:center; gap:8px;
+      background:var(--secondary); color:var(--dark);
+      border:none; padding:12px 20px; font-size:1rem;
+      border-radius:10px; cursor:pointer; transition:0.3s;
+      font-weight:500; font-family:inherit;
+    }
+    .download-btn:hover {
+      transform:translateY(-3px); box-shadow:0 8px 15px rgba(0,0,0,0.1);
+    }
+    .download-btn svg { width:20px; height:20px; }
+    #status-message {
+      position:fixed; top:70px; left:50%; transform:translateX(-50%);
+      background:rgba(0,168,150,0.9); color:white;
+      padding:12px 24px; border-radius:6px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.2);
+      display:none; opacity:0; transition:opacity 0.3s;
+      z-index:1000;
+    }
+    /* Branding footer for PDF */
+    .dollaweb-branding {
+      text-align:center; margin-top:35px;
+      font-size:0.8em; color:#aaa;
+      border-top:1px dashed #eee; padding-top:15px;
+    }
+    .dollaweb-branding a {
+      color:var(--primary); text-decoration:none; font-weight:500;
+    }
+
+    /* reserve space at the top of the page so nothing sits under the fixed navbar */
+    body {
+    /* adjust this value to exactly match your nav’s total height (padding + content) */
+    padding-top: 70px !important;
+    }
+
+    /* since we no longer need content-wrapper’s built-in top padding, zero it out */
+    .content-wrapper {
+    padding-top: 0 !important;
+    }
+
+    
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+           viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      DollarWeb
+    </a>
+    <a href="index.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+           viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to Tools
+    </a>
+  </nav>
+
+  <div class="page-title-container">
+    <h1>Calendar Generator</h1>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="container" id="calendar-wrapper">
+      <div class="section-title">Calendar Settings</div>
+      <form id="controls">
+        <label>
+          Calendar Title
+          <input type="text" id="calendarTitle" placeholder="Enter calendar title (optional)">
+        </label>
+        <label>
+          Start Date
+          <input type="date" id="startDate" required>
+        </label>
+        <label>
+          End Date
+          <input type="date" id="endDate" required>
+        </label>
+        <div class="key-date-row">
+          <label>
+            Key Date
+            <input type="date" id="keyDate">
+          </label>
+          <label>
+            Description
+            <input type="text" id="keyDesc" placeholder="Enter description for key date">
+          </label>
+          <button type="button" id="addKeyBtn">Add Key Date</button>
+        </div>
+        <button type="button" id="generateBtn">Generate Calendar</button>
+      </form>
+
+      <div id="calendarTitleDisplay"></div>
+      <div id="keyDateList-container">
+        <div class="section-title">Key Dates</div>
+        <ul id="keyDateList"></ul>
+      </div>
+      <div id="calendarContainer"></div>
+      <div id="keyDateDetails"></div>
+      <div class="button-container">
+        <button class="download-btn" id="downloadBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download as PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="status-message"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script>
+    // DOM references
+    const keyDates = [];
+    const titleInput        = document.getElementById('calendarTitle');
+    const titleDisplay      = document.getElementById('calendarTitleDisplay');
+    const startInput        = document.getElementById('startDate');
+    const endInput          = document.getElementById('endDate');
+    const generateBtn       = document.getElementById('generateBtn');
+    const keyDateInput      = document.getElementById('keyDate');
+    const keyDescInput      = document.getElementById('keyDesc');
+    const addKeyBtn         = document.getElementById('addKeyBtn');
+    const keyDateList       = document.getElementById('keyDateList');
+    const keyDateListContainer = document.getElementById('keyDateList-container');
+    const calendarWrapper   = document.getElementById('calendar-wrapper');
+    const calendarContainer = document.getElementById('calendarContainer');
+    const keyDateDetails    = document.getElementById('keyDateDetails');
+    const downloadBtn       = document.getElementById('downloadBtn');
+
+    // Initially hide
+    keyDateListContainer.style.display='none';
+    keyDateDetails.style.display='none';
+    downloadBtn.style.display='none';
+
+    // Default to current month
+    const today = new Date();
+    startInput.valueAsDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endInput.valueAsDate   = new Date(today.getFullYear(), today.getMonth()+1, 0);
+    keyDateInput.valueAsDate = today;
+
+    function showStatus(msg, dur=3000){
+      const s=document.getElementById('status-message');
+      s.textContent=msg; s.style.display='block';
+      setTimeout(()=>s.style.opacity=1,10);
+      setTimeout(()=>{
+        s.style.opacity=0;
+        setTimeout(()=>s.style.display='none',300);
+      },dur);
+    }
+    function parseDate(str){ const [y,m,d]=str.split('-').map(Number); return new Date(y,m-1,d); }
+    function formatDate(str){ const d=parseDate(str); return d.toLocaleDateString('default',{weekday:'short',year:'numeric',month:'long',day:'numeric'}); }
+
+    // Add key date
+    addKeyBtn.addEventListener('click',()=>{
+      const date=keyDateInput.value, desc=keyDescInput.value.trim();
+      if(!date) return showStatus('Please select a date.');
+      if(!desc) return showStatus('Please enter a description.');
+      if(calendarContainer.innerHTML){
+        const k=parseDate(date), s=parseDate(startInput.value), e=parseDate(endInput.value);
+        if(k<s||k>e) return showStatus('Key date must be within the calendar date range.');
+      }
+      keyDates.push({date,desc});
+      renderKeyDates();
+      keyDateInput.valueAsDate=today; keyDescInput.value='';
+      keyDateListContainer.style.display='block';
+      if(calendarContainer.innerHTML) generateCalendar();
+      showStatus('Key date added successfully!');
+    });
+
+    function renderKeyDates(){
+      keyDateList.innerHTML='';
+      if(!keyDates.length){ keyDateListContainer.style.display='none'; return; }
+      keyDates.forEach((kd,i)=>{
+        const li=document.createElement('li');
+        li.textContent=`${formatDate(kd.date)} – ${kd.desc}`;
+        const btn=document.createElement('button');
+        btn.textContent='×'; btn.title='Remove key date';
+        btn.onclick=()=>{
+          keyDates.splice(i,1); renderKeyDates();
+          if(calendarContainer.innerHTML) generateCalendar();
+          renderKeyDateDetails();
+        };
+        li.appendChild(btn); keyDateList.appendChild(li);
+      });
+      keyDateListContainer.style.display='block';
+    }
+
+    // Generate calendar
+    generateBtn.addEventListener('click',generateCalendar);
+    function generateCalendar(){
+      if(!startInput.value||!endInput.value) return showStatus('Please select both start and end dates.');
+      const s=parseDate(startInput.value), e=parseDate(endInput.value);
+      if(s>e) return showStatus('Start date must be before end date.');
+      titleDisplay.textContent=titleInput.value.trim()||'Custom Calendar';
+      calendarContainer.innerHTML='';
+      let cur=new Date(s.getFullYear(),s.getMonth(),1);
+      const endM=new Date(e.getFullYear(),e.getMonth(),1);
+      if(cur>endM) return showStatus('Date range must include at least one full month.');
+      while(cur<=endM){ drawMonth(cur,s,e); cur.setMonth(cur.getMonth()+1); }
+      renderKeyDateDetails();
+      downloadBtn.style.display='block';
+      showStatus('Calendar generated successfully!');
+    }
+
+    function drawMonth(d,startDate,endDate){
+      const y=d.getFullYear(), m=d.getMonth(), name=d.toLocaleString('default',{month:'long'});
+      const md=document.createElement('div'); md.className='month';
+      md.innerHTML=`<h3>${name} ${y}</h3>`;
+      const tbl=document.createElement('table');
+      const hdr=document.createElement('tr');
+      ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(day=>{const th=document.createElement('th');th.textContent=day;hdr.appendChild(th);});
+      tbl.appendChild(hdr);
+      const total=new Date(y,m+1,0).getDate(), first=new Date(y,m,1).getDay();
+      let row=document.createElement('tr');
+      for(let i=0;i<first;i++) row.appendChild(document.createElement('td'));
+      for(let day=1;day<=total;day++){
+        if(row.children.length===7){ tbl.appendChild(row); row=document.createElement('tr'); }
+        const cell=document.createElement('td');
+        const dn=document.createElement('div'); dn.className='day-number'; dn.textContent=day; cell.appendChild(dn);
+        const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const cd=new Date(y,m,day);
+        if(cd<startDate||cd>endDate){ cell.style.background='#f9f9f9';cell.style.color='#ccc'; }
+        const key=keyDates.find(x=>x.date===iso);
+        if(key){ const lbl=document.createElement('div'); lbl.className='key-label'; lbl.title=key.desc; lbl.textContent=key.desc; cell.appendChild(lbl); }
+        row.appendChild(cell);
+      }
+      while(row.children.length<7) row.appendChild(document.createElement('td'));
+      tbl.appendChild(row);
+      md.appendChild(tbl);
+      calendarContainer.appendChild(md);
+    }
+
+    function renderKeyDateDetails(){
+      if(!keyDates.length){ keyDateDetails.innerHTML=''; keyDateDetails.style.display='none'; return; }
+      let html='<h3>Key Dates</h3><ul>';
+      keyDates.slice().sort((a,b)=>parseDate(a.date)-parseDate(b.date)).forEach(k=>{ html+=`<li><strong>${formatDate(k.date)}:</strong> ${k.desc}</li>`; });
+      html+='</ul>'; keyDateDetails.innerHTML=html; keyDateDetails.style.display='block';
+    }
+
+    // Download as PDF
+    downloadBtn.addEventListener('click', () => {
+    showStatus('Preparing PDF download...');
+    const titleText = titleInput.value.trim() || 'Custom Calendar';
+
+    // 1) Clone only the calendar wrapper
+    const clone = calendarWrapper.cloneNode(true);
+
+    // 2) Hide decorative stripes
+    const hideStripe = document.createElement('style');
+    hideStripe.textContent = `
+        .container::before,
+        .container::after {
+        display: none !important;
+        }
+    `;
+    clone.prepend(hideStripe);
+
+    // 3) Remove the “Calendar Settings” header
+    const settingsHeader = clone.querySelector('.section-title');
+    if (settingsHeader) settingsHeader.remove();
+
+    // 4) Remove the form controls, key‑dates list, and download button
+    clone.querySelector('#controls')?.remove();
+    clone.querySelector('#keyDateList-container')?.remove();
+    clone.querySelector('.button-container')?.remove();
+
+    // 5) Append the DollarWeb footer
+    const brand = document.createElement('div');
+    brand.className = 'dollaweb-branding';
+    brand.innerHTML = 'Powered by <a href="index.html">DollarWeb</a>';
+    clone.appendChild(brand);
+
+    // 6) PDF options
+    const options = {
+        margin: 0.5,
+        filename: `${titleText.replace(/\s+/g,'-').toLowerCase()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    // 7) Generate PDF
+    html2pdf().set(options).from(clone).save()
+        .then(() => showStatus('Calendar downloaded successfully!'))
+        .catch(err => {
+        console.error(err);
+        showStatus('Error downloading calendar. Please try again.');
+        });
+    });
+
+
+
+  </script>
+</body>
+</html>
