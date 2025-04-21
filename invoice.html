@@ -780,9 +780,14 @@
       const invoiceContent = $('#invoice').cloneNode(true);
       
       // If no logo, remove the logo placeholder
+      // Handle logo container for PDF
+      const logoElement = invoiceContent.querySelector('#logo-drop');
       if (!hasLogo) {
-        const logoElement = invoiceContent.querySelector('#logo-drop');
+        // If no logo, remove the placeholder completely
         logoElement.textContent = '';
+        logoElement.style.border = 'none';
+      } else {
+        // If logo exists, keep the logo but remove the dashed border
         logoElement.style.border = 'none';
       }
       

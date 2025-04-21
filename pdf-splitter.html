@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF Splitter | DollarWeb</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+    
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    nav .logo {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    nav svg {
+      margin-right: 8px;
+    }
+    
+    .content-wrapper {
+      padding-top: 100px;
+      width: 100%;
+      max-width: 550px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    
+    h1 { 
+      text-align: center; 
+      margin-bottom: 30px;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+    
+    .card {
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Decorative elements */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      right: -80px;
+      width: 200px;
+      height: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.05'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+      z-index: 0;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+      font-size: 1.1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+      position: relative;
+      z-index: 1;
+    }
+    
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 18px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s;
+    }
+    
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    }
+    
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      background: var(--dark);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .file-input-container {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .file-input-label {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #f9f9f9;
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-input-label:hover {
+      border-color: var(--primary);
+      background: #f0f9f8;
+    }
+    
+    .hidden-input {
+      position: absolute;
+      opacity: 0;
+      width: 0.1px;
+      height: 0.1px;
+      overflow: hidden;
+    }
+    
+    .instructions {
+      margin-bottom: 20px;
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .output-links {
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .output-links a {
+      display: block;
+      padding: 12px;
+      margin: 10px 0;
+      background: #f0f9f8;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .output-links a:hover {
+      background: #e0f5f2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    
+    .status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f9f9f9;
+      display: none;
+    }
+    
+    .status.success {
+      display: block;
+      background: #e0f5e0;
+      color: #2e7d32;
+    }
+    
+    .status.error {
+      display: block;
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    /* Status message */
+    #status-message {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 168, 150, 0.9);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    @media (max-width: 768px) {
+      .content-wrapper {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+      
+      .card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      DollarWeb
+    </a>
+    <a href="index.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Tools
+    </a>
+  </nav>
+  
+  <div class="content-wrapper">
+    <h1>PDF Splitter</h1>
+    
+    <div class="card">
+      <div class="section-title">Extract Pages from PDF</div>
+      
+      <div class="instructions">
+        Upload a PDF file, specify the page ranges you want to extract, and click the Split PDF button to create a new PDF with only the selected pages.
+      </div>
+      
+      <div class="file-input-container">
+        <label for="fileInput" class="file-input-label" id="file-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+          <div>Click to select or drag & drop a PDF file</div>
+        </label>
+        <input type="file" id="fileInput" class="hidden-input" accept="application/pdf" />
+      </div>
+      
+      <label for="rangesInput">Page Ranges</label>
+      <textarea id="rangesInput" placeholder="Enter page ranges (e.g., 1-3,5,7-9)"></textarea>
+      
+      <div class="instructions">
+        <strong>Example formats:</strong>
+        <ul style="margin-left: 20px; margin-top: 5px;">
+          <li><strong>1-5</strong> - Extract pages 1 through 5</li>
+          <li><strong>3,8,11</strong> - Extract only pages 3, 8, and 11</li>
+          <li><strong>1-3,7,9-12</strong> - Extract pages 1-3, 7, and 9-12</li>
+        </ul>
+      </div>
+      
+      <button id="splitBtn" disabled>Split PDF</button>
+      
+      <div id="status" class="status"></div>
+      
+      <div class="output-links" id="links"></div>
+    </div>
+  </div>
+  
+  <!-- Status message -->
+  <div id="status-message"></div>
+
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script>
+    // Utilities
+    const $ = sel => document.querySelector(sel);
+    
+    // DOM Elements
+    const fileInput = $('#fileInput');
+    const fileLabel = $('#file-label');
+    const rangesInput = $('#rangesInput');
+    const splitBtn = $('#splitBtn');
+    const linksDiv = $('#links');
+    const statusDiv = $('#status');
+    let pdfBytes;
+    let fileName = '';
+    
+    // Status message display
+    function showStatus(message, duration = 3000) {
+      const statusEl = $('#status-message');
+      statusEl.textContent = message;
+      statusEl.style.display = 'block';
+      setTimeout(() => { statusEl.style.opacity = 1; }, 10);
+      
+      setTimeout(() => {
+        statusEl.style.opacity = 0;
+        setTimeout(() => { statusEl.style.display = 'none'; }, 300);
+      }, duration);
+    }
+    
+    // Update status in the card
+    function updateStatus(message, type) {
+      statusDiv.textContent = message;
+      statusDiv.className = 'status';
+      if (type) statusDiv.classList.add(type);
+      
+      // Hide status after 5 seconds if it's a success message
+      if (type === 'success') {
+        setTimeout(() => {
+          statusDiv.style.display = 'none';
+        }, 5000);
+      }
+    }
+    
+    // Handle file selection
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        try {
+          fileName = file.name.replace('.pdf', '');
+          fileLabel.innerHTML = `<div>${file.name}</div><div style="font-size: 0.8rem; color: #666;">Click to change file</div>`;
+          
+          pdfBytes = await file.arrayBuffer();
+          splitBtn.disabled = false;
+          
+          // Try to load the PDF to check it's valid
+          const pdf = await PDFLib.PDFDocument.load(pdfBytes);
+          const pageCount = pdf.getPageCount();
+          
+          updateStatus(`PDF loaded successfully. Total pages: ${pageCount}`, 'success');
+          showStatus(`PDF loaded successfully. Total pages: ${pageCount}`);
+        } catch (error) {
+          console.error('Error loading PDF:', error);
+          updateStatus('Error loading PDF. Please try another file.', 'error');
+          showStatus('Error loading PDF');
+          splitBtn.disabled = true;
+        }
+      }
+    });
+    
+    // Parse page ranges
+    function parseRanges(str, total) {
+      const ranges = str.split(',').map(r => r.trim());
+      const pagesList = [];
+      
+      for (let r of ranges) {
+        if (r.includes('-')) {
+          const [start, end] = r.split('-').map(n => parseInt(n.trim(), 10));
+          if (isNaN(start) || isNaN(end)) continue;
+          for (let i = start; i <= end; i++) pagesList.push(i - 1);
+        } else {
+          const page = parseInt(r.trim(), 10);
+          if (isNaN(page)) continue;
+          pagesList.push(page - 1);
+        }
+      }
+      
+      // Filter valid pages and remove duplicates
+      return [...new Set(pagesList)].filter(i => i >= 0 && i < total).sort((a, b) => a - b);
+    }
+    
+    // Handle drag and drop
+    fileLabel.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = 'var(--primary)';
+      fileLabel.style.background = '#e0f5f2';
+    });
+    
+    fileLabel.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#ccc';
+      fileLabel.style.background = '#f9f9f9';
+    });
+    
+    fileLabel.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      fileLabel.style.borderColor = '#ccc';
+      fileLabel.style.background = '#f9f9f9';
+      
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        // Update the file input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        
+        // Trigger the change event manually
+        const changeEvent = new Event('change');
+        fileInput.dispatchEvent(changeEvent);
+      } else {
+        updateStatus('Please drop a valid PDF file.', 'error');
+        showStatus('Please drop a valid PDF file');
+      }
+    });
+    
+    // Split PDF button click handler
+    splitBtn.addEventListener('click', async () => {
+      linksDiv.innerHTML = '';
+      statusDiv.className = 'status';
+      statusDiv.style.display = 'none';
+      
+      const rangesText = rangesInput.value.trim();
+      if (!rangesText) {
+        updateStatus('Please enter page ranges.', 'error');
+        showStatus('Please enter page ranges');
+        return;
+      }
+      
+      try {
+        showStatus('Processing PDF...');
+        
+        const srcPdf = await PDFLib.PDFDocument.load(pdfBytes);
+        const totalPages = srcPdf.getPageCount();
+        const pagesToExtract = parseRanges(rangesText, totalPages);
+        
+        if (pagesToExtract.length === 0) {
+          updateStatus('No valid pages found. Please check your page ranges.', 'error');
+          showStatus('No valid pages found');
+          return;
+        }
+        
+        // Create a new PDF with selected pages
+        const newPdf = await PDFLib.PDFDocument.create();
+        const copiedPages = await newPdf.copyPages(srcPdf, pagesToExtract);
+        copiedPages.forEach(page => newPdf.addPage(page));
+        
+        const newPdfBytes = await newPdf.save();
+        const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${fileName}_pages_${rangesText.replace(/,/g, '_')}.pdf`;
+        link.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download Split PDF (${pagesToExtract.length} pages)
+        `;
+        linksDiv.appendChild(link);
+        
+        updateStatus(`PDF split successfully! ${pagesToExtract.length} pages extracted.`, 'success');
+        showStatus('PDF split successfully!');
+      } catch (error) {
+        console.error('Error splitting PDF:', error);
+        updateStatus('Error processing PDF. Please try again.', 'error');
+        showStatus('Error processing PDF');
+      }
+    });
+  </script>
+</body>
+</html>

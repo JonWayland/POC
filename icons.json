@@ -180,7 +180,7 @@
       "description": "Lion animal roar"
     },
     {
-      "filename": "centuar.png",
+      "filename": "centaur.png",
       "short_description": "Centaur",
       "description": "Centaur myth horse human"
     },
@@ -398,6 +398,106 @@
       "filename": "liquor.png",
       "short_description": "Liquor Bottle",
       "description": "liquor bottle alcohol drink"
+    },
+    {
+      "filename": "firefighter.png",
+      "short_description": "Firefighter",
+      "description": "firefighter fire person occupation"
+    },
+    {
+      "filename": "horse.png",
+      "short_description": "Horse",
+      "description": "horse animal"
+    },
+    {
+      "filename": "tennis-racket.png",
+      "short_description": "Tennis Racket",
+      "description": "tennis racket sports"
+    },
+    {
+      "filename": "golf-club.png",
+      "short_description": "Golf Club",
+      "description": "golf club sports"
+    },
+    {
+      "filename": "basketball-hoop.png",
+      "short_description": "Basketball Hoop",
+      "description": "basketball hoop ball sports"
+    },
+    {
+      "filename": "shoes.png",
+      "short_description": "Shoes",
+      "description": "shoes clothes accessories"
+    },
+    {
+      "filename": "computer-desk.png",
+      "short_description": "Computer Desk",
+      "description": "computer desk technology"
+    },
+    {
+      "filename": "soccer-ball.png",
+      "short_description": "Soccer Ball",
+      "description": "soccerball ball sports"
+    },
+    {
+      "filename": "person-running.png",
+      "short_description": "Person Running",
+      "description": "person running"
+    },
+    {
+      "filename": "shovel.png",
+      "short_description": "Shovel",
+      "description": "Shovel tools tool"
+    },
+    {
+      "filename": "shark.png",
+      "short_description": "Shark",
+      "description": "Shark fish ocean"
+    },
+    {
+      "filename": "fish.png",
+      "short_description": "Fish",
+      "description": "fish ocean"
+    },
+    {
+      "filename": "turtle.png",
+      "short_description": "Turtle",
+      "description": "Turtle ocean"
+    },
+    {
+      "filename": "dolphin.png",
+      "short_description": "Dolphin",
+      "description": "Dolphin fish ocean"
+    },
+    {
+      "filename": "snowman.png",
+      "short_description": "Snowman",
+      "description": "Snowman winter Christmas"
+    },
+    {
+      "filename": "propane-tank.png",
+      "short_description": "Propane Tank",
+      "description": "Propane tank gas grill"
+    },
+    {
+      "filename": "sunflower.png",
+      "short_description": "Sunflower",
+      "description": "Sunflower sun flower plant"
+    },
+    {
+      "filename": "mountain.png",
+      "short_description": "Mountain",
+      "description": "mountain mountains landscape"
+    },
+    {
+      "filename": "pumpkin.png",
+      "short_description": "Pumpkin",
+      "description": "Pumpkin vegetable halloween"
+    },
+    {
+      "filename": "ghost.png",
+      "short_description": "Ghost",
+      "description": "Ghost halloween"
     }
   ]
   
