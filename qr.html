@@ -4,10 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>QR Code Generator | DollarWeb</title>
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
+  
   <style>
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/inter-semibold.woff2') format('woff2');
+    }
+
     :root {
       --primary: #00a896;
       --secondary: #f8b500;
@@ -190,7 +207,7 @@
       z-index: 1;
     }
     
-    #qr {
+    #qr-img {
       width: 210px;
       height: 210px;
       border: 1px solid #eee;
@@ -234,6 +251,39 @@
     .download-buttons button:nth-child(2) {
       background: var(--accent);
     }
+    
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #777;
+      margin-top: 1.5rem;
+    }
+    
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    
+    .footer-links {
+      margin-top: 0.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -270,7 +320,8 @@
     <button id="generate">Generate QR Code</button>
 
     <div id="qr-container">
-      <canvas id="qr"></canvas>
+      <div id="qr-img" aria-label="Generated QR code"></div>
+      <p id="qr-desc" class="sr-only">QR code for: https://example.com</p>
     </div>
 
     <div class="download-buttons" id="downloads" style="display: none;">
@@ -282,88 +333,264 @@
         <p class="note">JPG files cannot be transparent</p>
       </div>
     </div>
+    
+    <footer>
+      QR Code is a registered trademark of DENSO WAVE Incorporated.
+      <div class="footer-links">
+        <a href="/licenses/NOTICE.txt">Open-source acknowledgements</a>
+      </div>
+    </footer>
   </div>
 
-  <!-- QRious library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="/libs/qrcode.js"></script>
 
   <script>
-    const DISPLAY_SIZE = 200;
-    const displayQR = new QRious({
-      element: document.getElementById('qr'), 
-      value: '', 
-      size: DISPLAY_SIZE,
-      background: '#ffffff', 
-      backgroundAlpha: 0, 
-      foreground: '#000000', 
-      level: 'H'
-    });
-    
-    const textInput = document.getElementById('text');
-    const sizeInput = document.getElementById('size');
-    const transparentChk = document.getElementById('transparent');
-    const generateBtn = document.getElementById('generate');
-    const pngBtn = document.getElementById('download-png');
-    const jpgBtn = document.getElementById('download-jpg');
-    const downloadsDiv = document.getElementById('downloads');
-
-    function updateJpgState() {
-      if (transparentChk.checked) {
-        jpgBtn.disabled = true;
-        jpgBtn.title = "JPEG does not support transparency";
-      } else {
-        jpgBtn.disabled = false;
-        jpgBtn.title = "";
+    // Initialize after page has fully loaded
+    window.addEventListener('DOMContentLoaded', function() {
+      const DISPLAY_SIZE = 200;
+      const qrContainer = document.getElementById('qr-img');
+      
+      const textInput = document.getElementById('text');
+      const sizeInput = document.getElementById('size');
+      const transparentChk = document.getElementById('transparent');
+      const generateBtn = document.getElementById('generate');
+      const pngBtn = document.getElementById('download-png');
+      const jpgBtn = document.getElementById('download-jpg');
+      const downloadsDiv = document.getElementById('downloads');
+      
+      // CRITICAL: Make sure the input field is completely empty when page loads
+      if (textInput.value !== '') {
+        textInput.value = '';
       }
-    }
+      
+      function generateQR(text, size, isTransparent) {
+        // Clear previous QR code
+        qrContainer.innerHTML = '';
+        
+        // Set ARIA label for accessibility
+        qrContainer.setAttribute('aria-label', `QR code for: ${text}`);
+        
+        // Update the hidden description for screen readers
+        const qrDesc = document.getElementById('qr-desc');
+        if (qrDesc) {
+          qrDesc.textContent = `QR code for: ${text}`;
+        }
+        
+        // Generate QR code using qrcode-generator (MIT license)
+        const qr = qrcode(0, 'H');
+        qr.addData(text);
+        qr.make();
+        
+        // Calculate cell size to fit the container
+        const cellSize = Math.floor(size / qr.getModuleCount());
+        
+        // Create QR code as SVG for better transparency support
+        const svg = qr.createSvgTag({
+          cellSize: cellSize,
+          margin: 0,
+          scalable: true
+        });
+        
+        // Set HTML content
+        qrContainer.innerHTML = svg;
+        
+        // Append the description back (it was cleared)
+        qrContainer.appendChild(qrDesc);
+        
+        // Get the SVG element and adjust its style
+        const svgElement = qrContainer.querySelector('svg');
+        svgElement.style.width = '100%';
+        svgElement.style.height = '100%';
+        
+        // Handle transparency
+        if (isTransparent) {
+          const rects = svgElement.querySelectorAll('rect');
+          // The first rect is usually the background
+          if (rects.length > 0) {
+            rects[0].setAttribute('fill', 'transparent');
+          }
+        }
+        
+        return svgElement;
+      }
 
-    generateBtn.addEventListener('click', () => {
-      const text = textInput.value.trim();
-      if (!text) return alert('Please enter some text or a URL.');
-      const isTransparent = transparentChk.checked;
-      displayQR.set({ value: text, backgroundAlpha: isTransparent ? 0 : 1 });
-      downloadsDiv.style.display = 'flex';
-      updateJpgState();
-    });
+      function updateJpgState() {
+        if (transparentChk.checked) {
+          jpgBtn.disabled = true;
+          jpgBtn.title = "JPEG does not support transparency";
+        } else {
+          jpgBtn.disabled = false;
+          jpgBtn.title = "";
+        }
+      }
 
-    pngBtn.addEventListener('click', () => {
-      const text = textInput.value.trim();
-      const size = parseInt(sizeInput.value, 10) || DISPLAY_SIZE;
-      const isTransparent = transparentChk.checked;
-      const downloadQR = new QRious({ 
-        value: text, 
-        size: size, 
-        background: '#ffffff',
-        backgroundAlpha: isTransparent ? 0 : 1, 
-        foreground: '#000000', 
-        level: 'H' 
+      generateBtn.addEventListener('click', function() {
+        const text = textInput.value.trim();
+        if (!text) return alert('Please enter some text or a URL.');
+        const isTransparent = transparentChk.checked;
+        
+        // Generate display QR code
+        generateQR(text, DISPLAY_SIZE, isTransparent);
+        
+        downloadsDiv.style.display = 'flex';
+        updateJpgState();
       });
-      const dataURL = downloadQR.canvas.toDataURL('image/png');
-      const a = document.createElement('a'); 
-      a.href = dataURL; 
-      a.download = 'qr-code.png'; 
-      a.click();
-    });
 
-    jpgBtn.addEventListener('click', () => {
-      const text = textInput.value.trim();
-      const size = parseInt(sizeInput.value, 10) || DISPLAY_SIZE;
-      const downloadQR = new QRious({ 
-        value: text, 
-        size: size, 
-        background: '#ffffff',
-        backgroundAlpha: 1, 
-        foreground: '#000000', 
-        level: 'H' 
+      function svgToCanvas(svgElement, size, isTransparent) {
+        return new Promise((resolve) => {
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          
+          // Fill with white background if not transparent
+          if (!isTransparent) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+          }
+          
+          // Convert SVG to image
+          const img = new Image();
+          const svgData = new XMLSerializer().serializeToString(svgElement);
+          const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+          const url = URL.createObjectURL(svgBlob);
+          
+          img.onload = function() {
+            ctx.drawImage(img, 0, 0, size, size);
+            URL.revokeObjectURL(url);
+            resolve(canvas);
+          };
+          
+          img.src = url;
+        });
+      }
+
+      pngBtn.addEventListener('click', async function() {
+        try {
+          const text = textInput.value.trim() || textInput.placeholder;
+          
+          // Validate and constrain the size between 100 and 2000
+          let size = parseInt(sizeInput.value, 10);
+          if (!Number.isFinite(size) || size < 100) {
+            size = 100;
+          } else if (size > 2000) {
+            size = 2000;
+          }
+          
+          const isTransparent = transparentChk.checked;
+          
+          // Create a new temporary div to generate the QR code
+          const tempDiv = document.createElement('div');
+          tempDiv.style.position = 'absolute';
+          tempDiv.style.visibility = 'hidden';
+          document.body.appendChild(tempDiv);
+          
+          // Generate a new QR code in the temporary div
+          const qr = qrcode(0, 'H');
+          qr.addData(text);
+          qr.make();
+          
+          const svg = qr.createSvgTag({
+            cellSize: Math.floor(size / qr.getModuleCount()),
+            margin: 0,
+            scalable: true
+          });
+          
+          tempDiv.innerHTML = svg;
+          const svgElement = tempDiv.querySelector('svg');
+          
+          // Handle transparency for the SVG
+          if (isTransparent) {
+            const rects = svgElement.querySelectorAll('rect');
+            if (rects.length > 0) {
+              rects[0].setAttribute('fill', 'transparent');
+            }
+          }
+          
+          // Convert to canvas and download
+          const canvas = await svgToCanvas(svgElement, size, isTransparent);
+          
+          // Convert to PNG
+          const dataURL = canvas.toDataURL('image/png');
+          const a = document.createElement('a'); 
+          a.href = dataURL; 
+          a.download = 'qr-code.png'; 
+          a.click();
+          
+          // Clean up
+          document.body.removeChild(tempDiv);
+        } catch (error) {
+          console.error('Error generating PNG:', error);
+          alert('There was an error generating the PNG file. Please try again.');
+        }
       });
-      const dataURL = downloadQR.canvas.toDataURL('image/jpeg');
-      const a = document.createElement('a'); 
-      a.href = dataURL; 
-      a.download = 'qr-code.jpg'; 
-      a.click();
-    });
 
-    transparentChk.addEventListener('change', updateJpgState);
+      jpgBtn.addEventListener('click', async function() {
+        try {
+          const text = textInput.value.trim() || textInput.placeholder;
+          
+          // Validate and constrain the size between 100 and 2000
+          let size = parseInt(sizeInput.value, 10);
+          if (!Number.isFinite(size) || size < 100) {
+            size = 100;
+          } else if (size > 2000) {
+            size = 2000;
+          }
+          
+          // Create a new temporary div to generate the QR code
+          const tempDiv = document.createElement('div');
+          tempDiv.style.position = 'absolute';
+          tempDiv.style.visibility = 'hidden';
+          document.body.appendChild(tempDiv);
+          
+          // Generate a new QR code in the temporary div (never transparent for JPG)
+          const qr = qrcode(0, 'H');
+          qr.addData(text);
+          qr.make();
+          
+          const svg = qr.createSvgTag({
+            cellSize: Math.floor(size / qr.getModuleCount()),
+            margin: 0,
+            scalable: true
+          });
+          
+          tempDiv.innerHTML = svg;
+          const svgElement = tempDiv.querySelector('svg');
+          
+          // Convert to canvas and download (with white background)
+          const canvas = await svgToCanvas(svgElement, size, false);
+          
+          // Convert to JPG
+          const dataURL = canvas.toDataURL('image/jpeg');
+          const a = document.createElement('a'); 
+          a.href = dataURL; 
+          a.download = 'qr-code.jpg'; 
+          a.click();
+          
+          // Clean up
+          document.body.removeChild(tempDiv);
+        } catch (error) {
+          console.error('Error generating JPG:', error);
+          alert('There was an error generating the JPG file. Please try again.');
+        }
+      });
+
+      transparentChk.addEventListener('change', updateJpgState);
+      
+      // Generate default QR code on page load from the placeholder text
+      // This must happen after we've verified the input is empty
+      setTimeout(function() {
+        // Make absolutely sure the input field is empty
+        textInput.value = '';
+        
+        // Generate QR code from the placeholder text
+        generateQR(textInput.placeholder, DISPLAY_SIZE, transparentChk.checked);
+        
+        // Show download buttons
+        downloadsDiv.style.display = 'flex';
+        updateJpgState();
+      }, 100);
+    });
   </script>
 </body>
 </html>

@@ -498,6 +498,96 @@
       "filename": "ghost.png",
       "short_description": "Ghost",
       "description": "Ghost halloween"
+    },
+    {
+      "filename": "golf-cart-clubs.png",
+      "short_description": "Golf Cart w/ Clubs",
+      "description": "golf cart bag clubs sports golfball"
+    },
+    {
+      "filename": "golf-cart.png",
+      "short_description": "Golf Cart",
+      "description": "golf cart clubs sports golfball"
+    },
+    {
+      "filename": "person-pushups.png",
+      "short_description": "Person Doing Pushups",
+      "description": "Person pushups workout exercise"
+    },
+    {
+      "filename": "kayak.png",
+      "short_description": "Kayak",
+      "description": "Kayak boat water"
+    },
+    {
+      "filename": "ceiling-fan.png",
+      "short_description": "Ceiling Fan",
+      "description": "Ceiling fan air house"
+    },
+    {
+      "filename": "baseball-glove.png",
+      "short_description": "Baseball Glove",
+      "description": "baseball glove sports"
+    },
+    {
+      "filename": "tennis-ball.png",
+      "short_description": "Tennis Ball",
+      "description": "tennis ball sports"
+    },
+    {
+      "filename": "surf-board.png",
+      "short_description": "Surf Board",
+      "description": "surf board sports"
+    },
+    {
+      "filename": "baseball-cap.png",
+      "short_description": "Baseball Cap",
+      "description": "Baseball cap hat sports"
+    },
+    {
+      "filename": "boxer.png",
+      "short_description": "Boxer",
+      "description": "Person boxing boxer"
+    },
+    {
+      "filename": "cloud.png",
+      "short_description": "Cloud",
+      "description": "Cloud sky"
+    },
+    {
+      "filename": "steak.png",
+      "short_description": "Steak",
+      "description": "Steak food meat"
+    },
+    {
+      "filename": "robot.png",
+      "short_description": "Robot",
+      "description": "robot tech ai"
+    },
+    {
+      "filename": "box.png",
+      "short_description": "Box",
+      "description": "box cardboard"
+    },
+    {
+      "filename": "lady.png",
+      "short_description": "Lady",
+      "description": "Lady woman person"
+    },
+    {
+      "filename": "boat.png",
+      "short_description": "Boat",
+      "description": "boat water ship"
+    },
+    {
+      "filename": "lightning-bolt.png",
+      "short_description": "Lightning Bolt",
+      "description": "lightning bolt weather"
+    },
+    {
+      "filename": "tornado.png",
+      "short_description": "Tornado",
+      "description": "tornado weather"
     }
   ]
   
