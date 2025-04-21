@@ -47,22 +47,22 @@
     {
       "filename": "lime.png",
       "short_description": "Lime",
-      "description": "Lime fruit"
+      "description": "Lime fruit food"
     },
     {
       "filename": "sliced-lime.png",
       "short_description": "Sliced Lime",
-      "description": "Sliced lime fruit"
+      "description": "Sliced lime fruit food"
     },
     {
       "filename": "pineapple.png",
       "short_description": "Pineapple",
-      "description": "Pineapple fruit"
+      "description": "Pineapple fruit food"
     },
     {
       "filename": "banana.png",
       "short_description": "Banana",
-      "description": "Banana fruit"
+      "description": "Banana fruit food"
     },
     {
       "filename": "cheeseburger.png",
@@ -77,12 +77,17 @@
     {
       "filename": "grapes.png",
       "short_description": "Grapes",
-      "description": "grapes fruit"
+      "description": "grapes fruit food"
     },
     {
       "filename": "pizza-slice.png",
       "short_description": "Pizza Slice",
       "description": "Pizza slice food"
+    },
+    {
+      "filename": "unicorn.png",
+      "short_description": "Unicorn",
+      "description": "Unicorn horse"
     },
     {
       "filename": "flamingo.png",
@@ -115,6 +120,26 @@
       "description": "Propane grill"
     },
     {
+      "filename": "doctor-male.png",
+      "short_description": "Male Doctor",
+      "description": "Male Doctor clinical medic healthcare"
+    },
+    {
+      "filename": "doctor-female.png",
+      "short_description": "Female Doctor",
+      "description": "Female Doctor clinical medic healthcare"
+    },
+    {
+      "filename": "Hospital.png",
+      "short_description": "Hospital",
+      "description": "Hospital clinical medic healthcare"
+    },
+    {
+      "filename": "Ambulance.png",
+      "short_description": "Ambulance",
+      "description": "Ambulance medic healthcare"
+    },
+    {
       "filename": "santa.png",
       "short_description": "Santa Clause",
       "description": "Santa Clause Christmas season holidays"
@@ -123,6 +148,76 @@
       "filename": "christmas-tree.png",
       "short_description": "Christmas Tree",
       "description": "Christmas tree season holidays"
+    },
+    {
+      "filename": "frog.png",
+      "short_description": "Frog",
+      "description": "frog animal"
+    },
+    {
+      "filename": "deer.png",
+      "short_description": "Deer",
+      "description": "Deer animal antlers"
+    },
+    {
+      "filename": "lizard.png",
+      "short_description": "Lizard",
+      "description": "Lizard animal"
+    },
+    {
+      "filename": "sunglasses.png",
+      "short_description": "Sunglasses",
+      "description": "Sunglasses glasses sun"
+    },
+    {
+      "filename": "alligator.png",
+      "short_description": "Alligator",
+      "description": "Alligator animal"
+    },
+    {
+      "filename": "lion.png",
+      "short_description": "Lion",
+      "description": "Lion animal roar"
+    },
+    {
+      "filename": "centuar.png",
+      "short_description": "Centaur",
+      "description": "Centaur myth horse human"
+    },
+    {
+      "filename": "book.png",
+      "short_description": "Book",
+      "description": "Book novel"
+    },
+    {
+      "filename": "howling-wolf.png",
+      "short_description": "Howling Wolf",
+      "description": "howling wolf animal"
+    },
+    {
+      "filename": "watermelon-slice.png",
+      "short_description": "Watermelon Slice",
+      "description": "Watermelon slice fruit food tropical"
+    },
+    {
+      "filename": "bike.png",
+      "short_description": "Bike",
+      "description": "bike bicycle transportation"
+    },
+    {
+      "filename": "lawn-mower.png",
+      "short_description": "Lawn Mower",
+      "description": "Lawn Mower tools grass"
+    },
+    {
+      "filename": "dog.png",
+      "short_description": "Dog",
+      "description": "Dog pet animal"
+    },
+    {
+      "filename": "cat.png",
+      "short_description": "Cat",
+      "description": "Cat pet animal"
     },
     {
       "filename": "person-flexing.png",
@@ -137,7 +232,7 @@
     {
       "filename": "coffee.png",
       "short_description": "Coffee",
-      "description": "Coffee drink hot"
+      "description": "Coffee drink hot food"
     },
     {
       "filename": "icecream-cone.png",
@@ -195,6 +290,41 @@
       "description": "Box Truck vehicle"
     },
     {
+      "filename": "baseball-bat.png",
+      "short_description": "Baseball Bat",
+      "description": "baseball bat sports"
+    },
+    {
+      "filename": "baseball.png",
+      "short_description": "Baseball",
+      "description": "baseball sports"
+    },
+    {
+      "filename": "basketball.png",
+      "short_description": "Basketball",
+      "description": "Basketball sports"
+    },
+    {
+      "filename": "football.png",
+      "short_description": "Football",
+      "description": "Football sports"
+    },
+    {
+      "filename": "star.png",
+      "short_description": "Star",
+      "description": "Star space"
+    },
+    {
+      "filename": "moon.png",
+      "short_description": "Moon",
+      "description": "Moon space"
+    },
+    {
+      "filename": "garbage-truck.png",
+      "short_description": "Garbage Truck",
+      "description": "Garbage Truck vehicle"
+    },
+    {
       "filename": "pickup-truck.png",
       "short_description": "Pickup Truck",
       "description": "Pickup truck vehicle"
@@ -208,6 +338,66 @@
       "filename": "keyboard.png",
       "short_description": "Keyboard",
       "description": "Keyboard for computer"
+    },
+    {
+      "filename": "baby-crawling.png",
+      "short_description": "Baby Crawling",
+      "description": "baby crawling person"
+    },
+    {
+      "filename": "police-officer.png",
+      "short_description": "Baby Crawling",
+      "description": "baby crawling person"
+    },
+    {
+      "filename": "window.png",
+      "short_description": "Window",
+      "description": "window house"
+    },
+    {
+      "filename": "backpack.png",
+      "short_description": "Backpack",
+      "description": "backpack luggage"
+    },
+    {
+      "filename": "water-bottle.png",
+      "short_description": "Water Bottle",
+      "description": "Water bottle drink"
+    },
+    {
+      "filename": "church.png",
+      "short_description": "Church",
+      "description": "church worship christian christianity faith religion God"
+    },
+    {
+      "filename": "telephone.png",
+      "short_description": "Telephone",
+      "description": "phone telephone communication"
+    },
+    {
+      "filename": "cellphone.png",
+      "short_description": "Cellphone",
+      "description": "phone cellphone communication"
+    },
+    {
+      "filename": "beer.png",
+      "short_description": "Beer",
+      "description": "beer alcohol drink"
+    },
+    {
+      "filename": "martini.png",
+      "short_description": "Martini",
+      "description": "Martini alcohol drink"
+    },
+    {
+      "filename": "wine.png",
+      "short_description": "Wine",
+      "description": "Wine alcohol drink"
+    },
+    {
+      "filename": "liquor.png",
+      "short_description": "Liquor Bottle",
+      "description": "liquor bottle alcohol drink"
     }
   ]
   

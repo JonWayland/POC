@@ -404,6 +404,40 @@
         padding: 20px;
       }
     }
+
+    /* Preserve line breaks and wrapping in the address preview */
+    #preview-customer-address {
+      white-space: pre-line;
+    }
+
+    .download-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .download-buttons button {
+      background: var(--dark);
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .download-buttons button:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .download-buttons button:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+      background: #038e7e; /* Slightly darker than primary */
+    }
+
   </style>
 </head>
 <body>
@@ -717,9 +751,17 @@
       updateInvoiceNumber();
     };
     inputCustomerAddress.oninput = () => {
-      previewCustomerAddress.textContent = inputCustomerAddress.value;
+      // Use innerHTML instead of textContent to preserve line breaks
+      previewCustomerAddress.innerHTML = inputCustomerAddress.value.replace(/\n/g, '<br>');
       renderPreview();
     };
+    // Ensure the Enter key works in the customer address textarea
+    inputCustomerAddress.addEventListener('keydown', (e) => {
+      // Allow Enter key to create a new line (don't submit the form)
+      if (e.key === 'Enter') {
+        // Don't prevent default - we want the normal behavior of Enter in a textarea
+      }
+    });
     inputCustomerEmail.oninput = () => {
       previewCustomerEmail.textContent = inputCustomerEmail.value;
       renderPreview();
@@ -742,6 +784,12 @@
         const logoElement = invoiceContent.querySelector('#logo-drop');
         logoElement.textContent = '';
         logoElement.style.border = 'none';
+      }
+      
+      // Ensure address line breaks are preserved in the PDF
+      const addressElement = invoiceContent.querySelector('#preview-customer-address');
+      if (addressElement && inputCustomerAddress.value) {
+        addressElement.innerHTML = inputCustomerAddress.value.replace(/\n/g, '<br>');
       }
       
       // Add to container
