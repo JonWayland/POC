@@ -6,6 +6,8 @@ Open‑source acknowledgements
 • Inter font — SIL Open Font License v1.1 © 2016 The Inter Project Authors
   "Inter" is a trademark of Rasmus Andersson
 • tinycolor2 v1.x.x — MIT License © 2013–2025 Brian Grinstead
+• jsPDF (MIT License © James Browning et al.)
+• html2canvas (MIT License, original author & contributors)
 
 "QR Code" is a registered trademark of DENSO WAVE Incorporated.
 

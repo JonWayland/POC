@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Invoice Generator | DollarWeb</title>
   <!-- jsPDF and html2canvas via CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="libs/jspdf.umd.min.js"></script>
+  <script src="libs/html2canvas.min.js"></script>
   <style>
     @font-face {
       font-family: 'Inter';
@@ -600,22 +600,49 @@
       }, duration);
     }
     
-    // Function to generate a unique invoice number
+    // Function to generate a sequential invoice number
     function generateInvoiceNumber() {
+      // Get company name (first 3 letters)
       const companyPart = $('#input-company').value.trim() ? 
         $('#input-company').value.trim().replace(/[^A-Z0-9]/gi, '').substring(0, 3).toUpperCase() : 
         'INV';
       
-      const customerPart = $('#input-customer-name').value.trim() ?
-        $('#input-customer-name').value.trim().replace(/[^A-Z0-9]/gi, '').substring(0, 2).toUpperCase() :
-        '';
+      // Get current date in YYYYMMDD format
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = (today.getMonth() + 1).toString().padStart(2, '0');
+      const day = today.getDate().toString().padStart(2, '0');
+      const datePart = `${year}${month}${day}`;
       
-      const datePart = today.getFullYear().toString().substring(2) + 
-                      (today.getMonth() + 1).toString().padStart(2, '0');
+      // Add sequential number (always start with 001 since we can't track previous invoices)
+      const sequentialPart = "001";
       
-      const randomPart = Math.floor(Math.random() * 9000 + 1000);
+      return `${companyPart}-${datePart}${sequentialPart}`;
+    }
+
+    // Function to add the invoice note
+    function addInvoiceNote() {
+      // Create the note element
+      const invoiceNoteDiv = document.createElement('div');
+      invoiceNoteDiv.className = 'invoice-note';
+      invoiceNoteDiv.innerHTML = 'Note: For sequential invoicing, increment the last 3 digits for multiple invoices created on the same date.';
       
-      return `${companyPart}-${datePart}${randomPart}${customerPart}`;
+      // Add CSS for the note
+      const style = document.createElement('style');
+      style.textContent = `
+        .invoice-note {
+          font-size: 0.75em;
+          color: #777;
+          margin-top: 5px;
+          margin-bottom: 15px;
+          text-align: left;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Insert after the invoice-meta div
+      const invoiceMetaDiv = $('.invoice-meta');
+      invoiceMetaDiv.parentNode.insertBefore(invoiceNoteDiv, invoiceMetaDiv.nextSibling);
     }
 
     // DOM elements
@@ -925,6 +952,7 @@
     // Seed a few sample lines
     addLine('Web Design Services', '1500.00');
     addLine('Hosting (12 months)', '240.00');
+    addInvoiceNote();
   </script>
 </body>
 </html>
