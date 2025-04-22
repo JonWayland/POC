@@ -312,6 +312,21 @@
         padding: 1.5rem;
       }
     }
+
+    .footer-links {
+      margin-top: 0.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
   </style>
 </head>
 <body>
@@ -333,9 +348,9 @@
   </nav>
   
   <div class="content-wrapper">
-    <h1>PDF Splitter</h1>
     
     <div class="card">
+      <h1>PDF Splitter</h1>
       <div class="section-title">Extract Pages from PDF</div>
       
       <div class="instructions">
@@ -372,13 +387,19 @@
       <div id="status" class="status"></div>
       
       <div class="output-links" id="links"></div>
+
+      <div class="footer-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
     </div>
   </div>
   
   <!-- Status message -->
   <div id="status-message"></div>
 
-  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  
+
+  <script src="/libs/pdf-lib.min.js"></script>
   <script>
     // Utilities
     const $ = sel => document.querySelector(sel);

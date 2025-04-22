@@ -8,6 +8,7 @@ Open‑source acknowledgements
 • tinycolor2 v1.x.x — MIT License © 2013–2025 Brian Grinstead
 • jsPDF (MIT License © James Browning et al.)
 • html2canvas (MIT License, original author & contributors)
+• html2pdf.js v0.9.3 — MIT License © 2017 Erik Koopmans
 
 "QR Code" is a registered trademark of DENSO WAVE Incorporated.
 
