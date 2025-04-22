@@ -1,0 +1,16 @@
+SIL OPEN FONT LICENSE Version 1.1 – 26 February 2007
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects…
+[… paste the remainder of the OFL 1.1 text here …]
+
+1. DEFINITIONS  
+   “Font Software” refers to the set of files released by the Copyright Holder…
+2. PERMISSION & CONDITIONS  
+   Permission is hereby granted, free of charge, to any person obtaining a copy…  
+   – “Use, study, and modify the Font Software.”  
+   – “Embed the Font Software in documents.”  
+   – “Redistribute the Font Software.”  
+   **Under the condition** that the font isn’t sold by itself…
+3. DISCLAIMER OF WARRANTIES  
+   THE FONT SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED…

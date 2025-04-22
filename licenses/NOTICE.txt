@@ -1,7 +1,10 @@
-Open-source acknowledgements
+Open‑source acknowledgements
 
-• qrcode-generator v1.4.4 — MIT License © 2009-2020 Kazuhiko Arase & contributors
-• Inter font — SIL Open Font License v1.1 © 2016 The Inter Project Authors
-  "Inter" is a trademark of Rasmus Andersson
+• pdf‑lib v1.17.1 — MIT License © 2018–2025 James Browning & contributors
+• SortableJS v1.14.0 — MIT License © 2013–2025 RubaXa (Oleg Gaidarenko) & contributors
+• qrcode‑generator v1.4.4 — MIT License © 2009–2020 Kazuhiko Arase & contributors
+• Inter font — SIL Open Font License v1.1 © 2016 The Inter Project Authors
+  "Inter" is a trademark of Rasmus Andersson
 
-"QR Code" is a registered trademark of DENSO WAVE Incorporated.
+"QR Code" is a registered trademark of DENSO WAVE Incorporated.
+

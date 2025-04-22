@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Background Remover</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 10px; }
+    #originalPreview, #resultCanvas {
+      max-width: 90vw;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    #controls {
+      margin-top: 20px;
+    }
+    #downloadLink {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    #progress {
+      margin-top: 10px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Background Remover</h1>
+
+  <div id="controls">
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <!-- Original preview -->
+  <img id="originalPreview" alt="Original Image Preview" />
+
+  <!-- Hidden canvas to hold original pixels -->
+  <canvas id="originalCanvas" style="display:none;"></canvas>
+
+  <!-- Result canvas showing transparent‑background output -->
+  <canvas id="resultCanvas"></canvas>
+
+  <!-- Download link for the result -->
+  <a id="downloadLink" style="display:none;">Download PNG</a>
+
+  <div id="progress"></div>
+
+  <!-- ONNX Runtime Web (MIT) -->
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const originalPreview = document.getElementById('originalPreview');
+    const originalCanvas = document.getElementById('originalCanvas');
+    const resultCanvas   = document.getElementById('resultCanvas');
+    const downloadLink   = document.getElementById('downloadLink');
+    const progressDiv    = document.getElementById('progress');
+
+    let session;
+
+    // Load the U²‑Net ONNX model (place u2net.onnx next to this HTML)
+    async function loadModel() {
+      progressDiv.textContent = 'Loading background‑removal model…';
+      session = await ort.InferenceSession.create('u2net.onnx', { executionProviders: ['wasm'] });
+      progressDiv.textContent = '';
+    }
+    loadModel();
+
+    fileInput.addEventListener('change', async evt => {
+      const file = evt.target.files[0];
+      if (!file || !session) return;
+      const img = new Image();
+      img.onload = () => {
+        // show original
+        originalPreview.src = img.src;
+        // draw on hidden canvas
+        originalCanvas.width  = img.width;
+        originalCanvas.height = img.height;
+        originalCanvas.getContext('2d').drawImage(img, 0, 0);
+        // remove background
+        removeBackground(img);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    async function removeBackground(img) {
+      progressDiv.textContent = 'Processing… this may take a few seconds';
+      // U²‑Net expects 320×320
+      const MODEL_W = 320, MODEL_H = 320;
+      // draw resized for model
+      const off = document.createElement('canvas');
+      off.width  = MODEL_W;
+      off.height = MODEL_H;
+      const offCtx = off.getContext('2d');
+      offCtx.drawImage(img, 0, 0, MODEL_W, MODEL_H);
+
+      // get image data & normalize
+      const imgData = offCtx.getImageData(0, 0, MODEL_W, MODEL_H).data;
+      const float32 = new Float32Array(1 * 3 * MODEL_H * MODEL_W);
+      for (let y = 0; y < MODEL_H; y++) {
+        for (let x = 0; x < MODEL_W; x++) {
+          const i = (y * MODEL_W + x) * 4;
+          // normalize with ImageNet mean/std
+          float32[y * MODEL_W + x]                       = (imgData[i + 0] / 255 - 0.485) / 0.229; // R
+          float32[MODEL_W * MODEL_H + y * MODEL_W + x]   = (imgData[i + 1] / 255 - 0.456) / 0.224; // G
+          float32[2 * MODEL_W * MODEL_H + y * MODEL_W + x] = (imgData[i + 2] / 255 - 0.406) / 0.225; // B
+        }
+      }
+
+      // run inference
+      const inputTensor = new ort.Tensor('float32', float32, [1, 3, MODEL_H, MODEL_W]);
+      const outputMap = await session.run({ 'input.1': inputTensor });
+      // model output name is "out" by default
+      const maskData = outputMap.out.data; // length = 1*1*320*320
+
+      // composite at original resolution
+      const ow = img.width, oh = img.height;
+      resultCanvas.width  = ow;
+      resultCanvas.height = oh;
+      const ctxR = resultCanvas.getContext('2d');
+      const orig = originalCanvas.getContext('2d').getImageData(0, 0, ow, oh);
+      const out  = ctxR.createImageData(ow, oh);
+
+      for (let y = 0; y < oh; y++) {
+        for (let x = 0; x < ow; x++) {
+          const oIdx = (y * ow + x) * 4;
+          // nearest‑neighbor upscale of mask
+          const mx = Math.floor(x * MODEL_W / ow);
+          const my = Math.floor(y * MODEL_H / oh);
+          const mVal = maskData[my * MODEL_W + mx];
+          const alpha = mVal > 0.5 ? 255 : 0;  // threshold
+
+          out.data[oIdx + 0] = orig.data[oIdx + 0];
+          out.data[oIdx + 1] = orig.data[oIdx + 1];
+          out.data[oIdx + 2] = orig.data[oIdx + 2];
+          out.data[oIdx + 3] = alpha;
+        }
+      }
+      ctxR.putImageData(out, 0, 0);
+
+      // offer download
+      downloadLink.href = resultCanvas.toDataURL('image/png');
+      downloadLink.download = 'no-background.png';
+      downloadLink.style.display = 'block';
+      progressDiv.textContent = '';
+    }
+  </script>
+</body>
+</html>
