@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Raster → SVG Converter</title>
+  <style>
+    :root {
+      --primary: #00a896;
+      --accent: #05668d;
+      --bg: #f5f7fa;
+      --fg: #333;
+      --radius: 6px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .container {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+      padding: 1.5rem;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      text-align: center;
+      color: var(--primary);
+    }
+    .uploader {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    #imageInput {
+      display: inline-block;
+      padding: 0.5rem;
+      border: 2px dashed var(--accent);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #imageInput:hover { background: rgba(0,168,150,0.1); }
+    .preview {
+      margin: 1rem 0;
+      text-align: center;
+    }
+    .preview img,
+    .preview svg {
+      max-width: 100%;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) { background: var(--accent); }
+    #downloadLink {
+      display: block;
+      text-align: center;
+      margin-top: 1rem;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Raster → SVG</h1>
+    <div class="uploader">
+      <input type="file" id="imageInput" accept=".png,.jpg,.jpeg" />
+    </div>
+    <div class="preview" id="rasterPreview"></div>
+    <button id="convertBtn" disabled>Convert to SVG</button>
+    <div class="preview" id="svgPreview"></div>
+    <a id="downloadLink" hidden>Download SVG</a>
+  </div>
+
+  <!-- ImageTracer.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.5/imagetracer.min.js"></script>
+  <script>
+    const MAX_WIDTH = 800;
+    const imageInput = document.getElementById('imageInput');
+    const rasterPreview = document.getElementById('rasterPreview');
+    const svgPreview = document.getElementById('svgPreview');
+    const convertBtn  = document.getElementById('convertBtn');
+    const downloadLink = document.getElementById('downloadLink');
+
+    let workingCanvas = document.createElement('canvas');
+    let currentImage = null;
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        // scale down if too wide
+        const scale = Math.min(1, MAX_WIDTH / img.width);
+        workingCanvas.width  = img.width  * scale;
+        workingCanvas.height = img.height * scale;
+        const ctx = workingCanvas.getContext('2d');
+        ctx.clearRect(0,0,workingCanvas.width,workingCanvas.height);
+        ctx.drawImage(img, 0, 0, workingCanvas.width, workingCanvas.height);
+
+        // show raster preview
+        rasterPreview.innerHTML = '';
+        const previewImg = new Image();
+        previewImg.src = workingCanvas.toDataURL();
+        rasterPreview.appendChild(previewImg);
+
+        currentImage = workingCanvas;
+        convertBtn.disabled = false;
+        svgPreview.innerHTML = '';
+        downloadLink.hidden = true;
+      };
+      img.src = url;
+    });
+
+    convertBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+      convertBtn.disabled = true;
+      convertBtn.textContent = 'Converting…';
+
+      // default ImageTracer options; tweak as desired
+      const options = {
+        ltres: 1,  // linearization threshold
+        qtres: 1,  // curve threshold
+        scale: 1   // output scale
+      };
+
+      // Convert canvas to SVG string
+      ImageTracer.imageToSVG(currentImage, (svgString) => {
+        // display SVG preview
+        svgPreview.innerHTML = svgString;
+
+        // prepare download
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url  = URL.createObjectURL(blob);
+        downloadLink.href = url;
+        downloadLink.download = 'vectorized.svg';
+        downloadLink.hidden = false;
+
+        convertBtn.disabled = false;
+        convertBtn.textContent = 'Convert to SVG';
+      }, options);
+    });
+  </script>
+</body>
+</html>
