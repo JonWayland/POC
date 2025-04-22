@@ -593,6 +593,76 @@
       "filename": "lifeguard-chair.png",
       "short_description": "Lifeguard Chair",
       "description": "lifeguard chair beach ocean vacation"
+    },
+    {
+      "filename": "angel.png",
+      "short_description": "Angel",
+      "description": "angel faith heaven christianity religion God"
+    },
+    {
+      "filename": "bed.png",
+      "short_description": "Bed",
+      "description": "bed snooze sleep"
+    },
+    {
+      "filename": "crib.png",
+      "short_description": "Crib",
+      "description": "crib baby sleep snooze"
+    },
+    {
+      "filename": "lamp.png",
+      "short_description": "Lamp",
+      "description": "Lamp light electricity"
+    },
+    {
+      "filename": "Tuxedo.png",
+      "short_description": "Tuxedo",
+      "description": "Tuxedo suit dress"
+    },
+    {
+      "filename": "chicken-wing.png",
+      "short_description": "Chicken Wing",
+      "description": "Chicken wing food meat"
+    },
+    {
+      "filename": "motorcycle.png",
+      "short_description": "Motorcycle",
+      "description": "motorcycle wheel road vehicle transportation driver"
+    },
+    {
+      "filename": "school-bus.png",
+      "short_description": "School Bus",
+      "description": "school bus vehicle transportation children driver"
+    },
+    {
+      "filename": "lollipop.png",
+      "short_description": "Lollipop",
+      "description": "lollipop food candy sweets"
+    },
+    {
+      "filename": "porta-potty.png",
+      "short_description": "Porta Potty",
+      "description": "porta potty toilet bathroom"
+    },
+    {
+      "filename": "weeping-willow-tree.png",
+      "short_description": "Weeping Willow Tree",
+      "description": "weeping willow tree plant leaves"
+    },
+    {
+      "filename": "magnolia-tree.png",
+      "short_description": "Magnolia Tree",
+      "description": "magnolia tree plant leaves"
+    },
+    {
+      "filename": "muffin.png",
+      "short_description": "Muffin",
+      "description": "muffin sweets food dessert"
+    },
+    {
+      "filename": "baby-back-ribs.png",
+      "short_description": "Baby Back Ribs",
+      "description": "baby back ribs food bbq"
     }
   ]
   
