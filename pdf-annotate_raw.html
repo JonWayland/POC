@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>PDF Annotation Tool</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #toolbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #f5f5f5; padding: 8px;
+      display: flex; flex-wrap: wrap; gap: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000;
+    }
+    #toolbar * { margin: 4px; }
+    button {
+      padding: 6px 10px; border: none;
+      background: #2563eb; color: #fff;
+      border-radius: 3px; cursor: pointer;
+    }
+    button.active { background: #1d4ed8; }
+    #pages-container {
+      padding-top: 64px;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 200px;
+      border: 2px dashed #bbb;
+      transition: background 0.3s;
+    }
+    #pages-container.dragover {
+      background: rgba(200,200,200,0.2);
+    }
+    .page-container {
+      position: relative; margin: 16px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .pdf-canvas, .annotation-canvas {
+      position: absolute; top: 0; left: 0;
+    }
+    .pdf-canvas { z-index: 0; }
+    .annotation-canvas { z-index: 1; }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <input type="file" id="file-input" accept="application/pdf">
+    <button data-tool="select" class="active">Select</button>
+    <button data-tool="draw">Draw</button>
+    <button data-tool="line">Line</button>
+    <button data-tool="text">Text</button>
+    <label>Color: <input type="color" id="color-picker" value="#ff0000"></label>
+    <label>Size: <input type="range" id="size-slider" min="1" max="20" value="2"></label>
+    <label>Font Size: <input type="number" id="font-size" min="10" max="72" value="24"></label>
+    <input type="text" id="text-input" placeholder="Default text…">
+    <button id="undo-btn">Undo</button>
+    <button id="clear-btn">Clear</button>
+    <button id="save-btn">Save PDF</button>
+  </div>
+
+  <div id="pages-container">
+    <p style="color:#666; margin-top:100px;">Drag &amp; drop a PDF here, or click “Select” above.</p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    const fileInput      = document.getElementById('file-input');
+    const pagesContainer = document.getElementById('pages-container');
+    const toolButtons    = document.querySelectorAll('#toolbar button[data-tool]');
+    const colorPicker    = document.getElementById('color-picker');
+    const sizeSlider     = document.getElementById('size-slider');
+    const fontSizeInput  = document.getElementById('font-size');
+    const textInput      = document.getElementById('text-input');
+    const undoBtn        = document.getElementById('undo-btn');
+    const clearBtn       = document.getElementById('clear-btn');
+    const saveBtn        = document.getElementById('save-btn');
+
+    let currentTool       = 'select';
+    let fabricCanvases    = [];
+    let pdfCanvases       = [];
+    let lastFocusedCanvas = null;
+
+    // Tool switching
+    toolButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        toolButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTool = btn.dataset.tool;
+        updateToolMode();
+      });
+    });
+
+    function updateToolMode() {
+      fabricCanvases.forEach(fc => {
+        fc.isDrawingMode = (currentTool === 'draw');
+        fc.selection     = (currentTool === 'select');
+        fc.defaultCursor = currentTool === 'select' ? 'default' : 'crosshair';
+        fc.freeDrawingBrush.width = parseInt(sizeSlider.value,10);
+        fc.freeDrawingBrush.color = colorPicker.value;
+        fc.getObjects().forEach(o => o.selectable = (currentTool === 'select'));
+        fc.renderAll();
+      });
+    }
+
+    undoBtn.addEventListener('click', () => {
+      const fc = lastFocusedCanvas || fabricCanvases[fabricCanvases.length-1];
+      if (!fc) return;
+      const objs = fc.getObjects();
+      if (objs.length) fc.remove(objs.pop());
+    });
+
+    clearBtn.addEventListener('click', () => {
+      fabricCanvases.forEach(fc => fc.clear());
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const { jsPDF } = window.jspdf;
+      if (!pdfCanvases.length) return;
+
+      // Start with first page's size/orientation
+      const first = pdfCanvases[0];
+      const orient = first.width > first.height ? 'l' : 'p';
+      const doc = new jsPDF({ unit:'px', format:[first.width,first.height], orientation:orient });
+
+      for (let i=0; i<pdfCanvases.length; i++) {
+        const pdfC = pdfCanvases[i], fc = fabricCanvases[i];
+        if (i>0) {
+          const o = pdfC.width>pdfC.height ? 'l':'p';
+          doc.addPage([pdfC.width,pdfC.height], o);
+        }
+        doc.setPage(i+1);
+        const tmp = document.createElement('canvas');
+        tmp.width = pdfC.width; tmp.height = pdfC.height;
+        const ctx = tmp.getContext('2d');
+        ctx.drawImage(pdfC,0,0);
+        ctx.drawImage(fc.lowerCanvasEl,0,0);
+        doc.addImage(tmp.toDataURL('image/png'),'PNG',0,0,pdfC.width,pdfC.height);
+      }
+      doc.save('annotated.pdf');
+    });
+
+    colorPicker.addEventListener('change', updateToolMode);
+    sizeSlider.addEventListener('input', updateToolMode);
+
+    // File picker
+    fileInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file && file.type==='application/pdf') renderPDF(URL.createObjectURL(file));
+    });
+
+    // Drag & Drop
+    pagesContainer.addEventListener('dragover', e => {
+      e.preventDefault();
+      pagesContainer.classList.add('dragover');
+    });
+    pagesContainer.addEventListener('dragleave', () => {
+      pagesContainer.classList.remove('dragover');
+    });
+    pagesContainer.addEventListener('drop', e => {
+      e.preventDefault();
+      pagesContainer.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type==='application/pdf') renderPDF(URL.createObjectURL(file));
+      else alert('Please drop a PDF file.');
+    });
+
+    // Render PDF
+    async function renderPDF(url) {
+      pagesContainer.innerHTML = '';
+      fabricCanvases = []; pdfCanvases = []; lastFocusedCanvas = null;
+
+      const pdf = await pdfjsLib.getDocument(url).promise;
+      for (let p=1; p<=pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const vp   = page.getViewport({ scale: 1.5 });
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'page-container';
+        wrapper.style.width  = vp.width + 'px';
+        wrapper.style.height = vp.height + 'px';
+
+        // PDF layer
+        const pdfCanv = document.createElement('canvas');
+        pdfCanv.className = 'pdf-canvas';
+        pdfCanv.width  = vp.width; pdfCanv.height = vp.height;
+        wrapper.appendChild(pdfCanv);
+        await page.render({ canvasContext: pdfCanv.getContext('2d'), viewport: vp }).promise;
+        pdfCanvases.push(pdfCanv);
+
+        // Annotation layer
+        const annCanv = document.createElement('canvas');
+        annCanv.className = 'annotation-canvas';
+        annCanv.width  = vp.width; annCanv.height = vp.height;
+        wrapper.appendChild(annCanv);
+
+        pagesContainer.appendChild(wrapper);
+        const fc = new fabric.Canvas(annCanv, { selection: false });
+        fabricCanvases.push(fc);
+
+        fc.on('mouse:down', opt => {
+          lastFocusedCanvas = fc;
+          const pt = fc.getPointer(opt.e, true);
+
+          if (currentTool === 'line') {
+            fc._line = new fabric.Line([pt.x,pt.y,pt.x,pt.y], {
+              stroke: colorPicker.value,
+              strokeWidth: parseInt(sizeSlider.value,10),
+              selectable: false
+            });
+            fc.add(fc._line);
+          } else if (currentTool === 'text') {
+            const txt = new fabric.IText('', {
+              left: pt.x, top: pt.y,
+              fill: colorPicker.value,
+              fontSize: parseInt(fontSizeInput.value,10)
+            });
+            fc.add(txt).setActiveObject(txt);
+            txt.enterEditing();
+            txt.hiddenTextarea.focus();
+          }
+        });
+
+        fc.on('mouse:move', opt => {
+          if (currentTool==='line' && fc._line) {
+            const pt = fc.getPointer(opt.e, true);
+            fc._line.set({ x2:pt.x, y2:pt.y });
+            fc.renderAll();
+          }
+        });
+
+        fc.on('mouse:up', () => {
+          if (fc._line) { fc._line.setCoords(); fc._line = null; }
+        });
+      }
+
+      updateToolMode();
+    }
+  </script>
+</body>
+</html>

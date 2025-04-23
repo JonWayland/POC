@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Scatterplot Visualizer</title>
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+    <!-- Plotly.js for plotting -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { margin-bottom: 10px; }
+        #drop-zone {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            color: #aaa;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        #drop-zone.hover {
+            border-color: #333;
+            color: #333;
+        }
+        #controls {
+            margin-top: 20px;
+            display: none;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #controls select,
+        #controls input[type="text"],
+        #controls input[type="color"],
+        #controls button {
+            padding: 5px 8px;
+            font-size: 14px;
+        }
+        #plot {
+            margin-top: 20px;
+            width: 100%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV Scatterplot Visualizer</h1>
+    <div id="drop-zone">Drag &amp; drop a CSV file here, or click to select.</div>
+    <input type="file" id="file-input" accept=".csv" style="display:none">
+    <div id="controls">
+        <label>Plot Title:
+            <input type="text" id="plot-title" placeholder="Enter plot title">
+        </label>
+        <label>X-axis:
+            <select id="x-select"></select>
+        </label>
+        <label>X Label:
+            <input type="text" id="x-label-input" placeholder="Rename X-axis">
+        </label>
+        <label>Y-axis:
+            <select id="y-select"></select>
+        </label>
+        <label>Y Label:
+            <input type="text" id="y-label-input" placeholder="Rename Y-axis">
+        </label>
+        <label>Z-axis (optional):
+            <select id="z-select"></select>
+        </label>
+        <label>Z Label:
+            <input type="text" id="z-label-input" placeholder="Rename Z-axis">
+        </label>
+        <label>Label column:
+            <select id="label-select">
+                <option value="">None</option>
+            </select>
+        </label>
+        <label>Color:
+            <input type="color" id="color-picker" value="#1f77b4">
+        </label>
+        <button id="plot-btn" disabled>Plot</button>
+    </div>
+    <div id="plot"></div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        let headers = [], dataRows = [];
+
+        function showControls() {
+            document.getElementById('controls').style.display = 'flex';
+        }
+
+        function populateSelects() {
+            const selects = ['x-select', 'y-select', 'z-select'];
+            selects.forEach(id => {
+                const sel = document.getElementById(id);
+                sel.innerHTML = '<option value="">Select...</option>';
+                headers.forEach(h => sel.add(new Option(h, h)));
+            });
+            const labelSelect = document.getElementById('label-select');
+            labelSelect.innerHTML = '<option value="">None</option>';
+            headers.forEach(h => labelSelect.add(new Option(h, h)));
+        }
+
+        function updatePlotButton() {
+            const x = document.getElementById('x-select').value;
+            const y = document.getElementById('y-select').value;
+            const z = document.getElementById('z-select').value;
+            const valid = x && y && x !== y && (!z || (z !== x && z !== y));
+            document.getElementById('plot-btn').disabled = !valid;
+        }
+
+        // Drag/drop & file input
+        dropZone.addEventListener('click', () => fileInput.click());
+        ['dragover', 'dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => e.preventDefault()));
+        dropZone.addEventListener('dragover', () => dropZone.classList.add('hover'));
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hover'));
+        dropZone.addEventListener('drop', e => {
+            dropZone.classList.remove('hover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+        function handleFile(file) {
+            Papa.parse(file, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: ({ meta, data }) => {
+                    headers = meta.fields;
+                    dataRows = data;
+                    dropZone.style.display = 'none';
+                    showControls();
+                    populateSelects();
+                }
+            });
+        }
+
+        ['x-select','y-select','z-select'].forEach(id => document.getElementById(id).addEventListener('change', updatePlotButton));
+
+        document.getElementById('plot-btn').addEventListener('click', () => {
+            const titleText = document.getElementById('plot-title').value;
+            const xKey = document.getElementById('x-select').value;
+            const yKey = document.getElementById('y-select').value;
+            const zKey = document.getElementById('z-select').value;
+            const labelKey = document.getElementById('label-select').value;
+            const color = document.getElementById('color-picker').value;
+
+            const xLabel = document.getElementById('x-label-input').value || xKey;
+            const yLabel = document.getElementById('y-label-input').value || yKey;
+            const zLabel = document.getElementById('z-label-input').value || zKey;
+
+            // Filter numeric rows
+            const filtered = dataRows.filter(r => {
+                const x = r[xKey], y = r[yKey];
+                return x != null && y != null && !isNaN(x) && !isNaN(y);
+            });
+            const xData = filtered.map(r => r[xKey]);
+            const yData = filtered.map(r => r[yKey]);
+
+            let trace = {};
+            const common = {
+                x: xData,
+                y: yData,
+                mode: 'markers',
+                marker: { color: color, size: zKey ? 5 : 8 },
+                text: labelKey ? filtered.map(r => r[labelKey]) : undefined,
+                hoverinfo: labelKey ? 'text' : undefined
+            };
+            if (zKey) {
+                const zData = filtered.map(r => r[zKey]);
+                trace = { ...common, z: zData, type: 'scatter3d' };
+            } else {
+                trace = { ...common, type: 'scatter' };
+            }
+
+            const layout = {
+                title: { text: titleText || '' },
+                margin: { l: 40, r: 40, b: 40, t: 60 }
+            };
+            if (zKey) {
+                layout.scene = {
+                    xaxis: { title: xLabel },
+                    yaxis: { title: yLabel },
+                    zaxis: { title: zLabel }
+                };
+            } else {
+                layout.xaxis = { title: xLabel };
+                layout.yaxis = { title: yLabel };
+            }
+
+            Plotly.newPlot('plot', [trace], layout);
+        });
+    </script>
+</body>
+</html>

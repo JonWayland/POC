@@ -70,6 +70,17 @@
       padding-top: 70px;
     }
 
+    /* Stack container + footer vertically, don’t center them vertically */
+    body {
+      flex-direction: column;       /* now children go top-to-bottom */
+      justify-content: flex-start;  /* push content to the top */
+    }
+
+    /* Make the footer span the full width */
+    .site-footer {
+      align-self: stretch;          /* override align-items:center on body */
+    }
+
     /*=== NAVBAR (exact from index.html) ===*/
     .main-nav {
       background: white;
@@ -224,6 +235,108 @@
     }
     .footer-links a:hover { text-decoration: underline; }
     /*=== END QR PAGE STYLES ===*/
+    /* ── SITE FOOTER STYLES (scoped under .site-footer) ── */
+    .site-footer {
+      background: var(--dark);
+      padding: 40px 0 50px;
+      margin-top: 80px;
+      position: relative;
+      color: white;
+    }
+    .site-footer .footer-wave {
+      position: absolute;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+    .site-footer .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .site-footer .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      color: var(--secondary);
+    }
+    .site-footer .footer-logo svg {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+    .site-footer .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem;
+    }
+    .site-footer .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .site-footer .footer-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin: 0 30px;
+      font-size: 1.8rem;
+      transition: color 0.2s;
+    }
+    .site-footer .footer-links a:hover {
+      color: var(--secondary);
+    }
+    .site-footer .footer-social {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    .site-footer .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transition: all 0.2s;
+    }
+    .site-footer .footer-social a svg {
+      width: 40px;
+      height: 40px;
+    }
+    .site-footer .footer-social a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+    .site-footer .copyright {
+      font-size: 1.8rem;
+      color: rgba(255,255,255,0.7);
+    }
+    .site-footer .copyright-message {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.7);
+    }
+    @media (max-width: 768px) {
+      .site-footer .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .site-footer .footer-links a {
+        margin: 10px 0;
+      }
+    }
+    /* ───────────────────────────────────────────────── */
+
   </style>
 </head>
 
@@ -284,6 +397,45 @@
       </div>
     </footer>
   </div>
+  
+  <!-- ────────────────────────────────── -->
+  <!-- Universal site footer copied from index.html -->
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>The DollarWeb</span>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Twitter">
+          <!-- Twitter SVG -->
+        </a>
+        <a href="#" aria-label="Facebook">
+          <!-- Facebook SVG -->
+        </a>
+        <a href="#" aria-label="Instagram">
+          <!-- Instagram SVG -->
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 The DollarWeb</p>
+      <p class="copyright-message">
+        Professional tools that won't break the bank
+      </p>
+    </div>
+  </footer>
+  <!-- ────────────────────────────────── -->
+
 
   <script src="/libs/qrcode.js"></script>
 
@@ -535,5 +687,7 @@
       }, 100);
     });
   </script>
+
+  
 </body>
 </html>
