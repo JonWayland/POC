@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PDF Combiner | DollarWeb</title>
-  <style>
 
-    /* Inter and Montserrat Fonts */
+  <style>
+    /* === FONTS & ROOT VARS === */
     @font-face {
       font-family: 'Inter';
       font-style: normal;
@@ -25,15 +25,13 @@
       font-weight: 600;
       src: url('/fonts/inter-semibold.woff2') format('woff2');
     }
-
     @font-face {
       font-family: 'Montserrat';
       font-style: normal;
       src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
-      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-weight: 100 900;
       font-display: swap;
     }
-
     @font-face {
       font-family: 'Montserrat';
       font-style: italic;
@@ -53,54 +51,100 @@
       --warning: #f8b500;
       --error: #ff6b6b;
     }
-    
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body { 
-      font-family: 'Inter', sans-serif; 
-      margin: 0; 
-      padding: 0; 
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
       min-height: 100vh;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
       background-size: 120px;
+      /* make room for fixed navbar */
+      padding-top: 70px;
+      margin: 0;
     }
-    
-    nav {
+
+    /* === SHARED NAVBAR FROM index.html === */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      background: var(--primary);
+      z-index: 1000;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 2rem;
-      color: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      z-index: 100;
+      padding: 15px 20px;
     }
-    
-    nav .logo {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-    
-    nav a {
-      color: white;
-      text-decoration: none;
+    .nav-logo {
       display: flex;
       align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
     }
-    
-    nav svg {
-      margin-right: 8px;
+    .nav-logo:hover {
+      transform: translateY(-2px);
     }
-    
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 768px) {
+      .nav-links { gap: 15px; }
+      .nav-logo span { font-size: 1.2rem; }
+    }
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) { display: none; }
+    }
+    .secondary-text { color: var(--secondary); }
+    .tertiary-text  { color: var(--dark); }
+    /* === END NAVBAR CSS === */
+
+    /* === PDF COMBINER PAGE STYLES === */
     .container { 
       width: 90%; 
       max-width: 650px; 
@@ -108,45 +152,37 @@
       padding: 2.5rem; 
       border-radius: 16px; 
       box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
-      margin-top: 60px;
+      margin-top: 0; /* already offset by body padding */
       position: relative;
       overflow: hidden;
     }
-    
-    /* Wave decoration */
     .container::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 6px;
       background: linear-gradient(90deg, var(--primary), var(--secondary));
     }
-    
     .container::after {
       content: '';
       position: absolute;
-      bottom: -80px;
-      right: -80px;
-      width: 200px;
-      height: 200px;
+      bottom: -80px; right: -80px;
+      width: 200px; height: 200px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.05'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%2300a896'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-size: contain;
       z-index: 0;
     }
-    
     h1 { 
       text-align: center; 
       margin-bottom: 2rem; 
       font-weight: 600;
       color: var(--primary);
+      font-size: 1.8rem;
       position: relative;
       z-index: 1;
-      font-size: 1.8rem;
     }
-    
+
     .drop-area { 
       border: 2px dashed #ccc; 
       border-radius: 12px; 
@@ -344,21 +380,22 @@
   <script src="/libs/Sortable.min.js" integrity="sha384‑…" crossorigin="anonymous"></script>
 </head>
 <body>
-  <nav>
-    <a href="index.html" class="logo">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-      </svg>
-      DollarWeb
-    </a>
-    <a href="index.html">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      Back to Tools
-    </a>
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span class="tertiary-text">The&nbsp;</span>Dollar<span class="secondary-text">Web</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="#tools">Tools</a>
+        <a href="#about">About</a>
+        <a href="login.html" class="login-btn">Login</a>
+      </div>
+    </div>
   </nav>
 
   <div class="container">

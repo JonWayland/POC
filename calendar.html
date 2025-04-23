@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Calendar Generator | DollarWeb</title>
   <style>
-    /* Inter and Montserrat Fonts */
+    /* === FONTS & ROOT VARS === */
     @font-face {
       font-family: 'Inter';
       font-style: normal;
@@ -24,15 +24,13 @@
       font-weight: 600;
       src: url('/fonts/inter-semibold.woff2') format('woff2');
     }
-
     @font-face {
       font-family: 'Montserrat';
       font-style: normal;
       src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
-      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-weight: 100 900;
       font-display: swap;
     }
-
     @font-face {
       font-family: 'Montserrat';
       font-style: italic;
@@ -49,50 +47,137 @@
       --bg: #f5f9f8;
       --dark: #05668d;
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family:'Inter',sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E") 0 0/120px no-repeat;
-      min-height:100vh;
-      color:var(--text);
-      padding-bottom:40px;
+      min-height: 100vh;
+      color: var(--text);
+      padding-bottom: 40px;
+      /* make room for fixed navbar */
+      padding-top: 70px;
     }
-    nav {
-      position:fixed; top:0; left:0; right:0;
-      background:var(--primary); color:white;
-      display:flex; justify-content:space-between; align-items:center;
-      padding:1rem 2rem; box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:100;
+
+    /* === SHARED NAVBAR FROM index.html === */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
     }
-    nav .logo { font-weight:600; display:flex; align-items:center; }
-    nav a { color:white; text-decoration:none; display:flex; align-items:center }
-    nav svg { margin-right:8px }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 768px) {
+      .nav-links { gap: 15px; }
+      .nav-logo span { font-size: 1.2rem; }
+    }
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) { display: none; }
+    }
+    .secondary-text { color: var(--secondary); }
+    .tertiary-text  { color: var(--dark); }
+    /* === END NAVBAR === */
+
+    /* === CALENDAR PAGE STYLES === */
     .content-wrapper {
-      padding-top:100px;
-      max-width:1000px;
-      margin:0 auto;
-      padding:0 20px;
+      /* removed built-in top padding */
+      padding-top: 0 !important;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
     h1 {
-      text-align:center; margin-bottom:30px;
-      color:var(--primary); font-size:1.8rem; font-weight:600;
+      text-align: center;
+      margin-bottom: 30px;
+      color: var(--primary);
+      font-size: 1.8rem;
+      font-weight: 600;
     }
     #calendarTitleDisplay {
-      text-align:center; margin:20px 0;
-      font-size:1.6rem; font-weight:600; color:var(--dark);
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--dark);
     }
     .container {
-      background:white; padding:30px; border-radius:16px;
-      box-shadow:0 15px 40px rgba(0,0,0,0.08);
-      position:relative; overflow:hidden;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+      margin-top: 80px;
     }
     .container::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:6px;
-      background:linear-gradient(90deg,var(--primary),var(--secondary));
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg,var(--primary),var(--secondary));
     }
     .section-title {
-      font-weight:600; margin-bottom:15px; color:var(--dark);
-      border-bottom:1px solid #eee; padding-bottom:8px; font-size:1.1rem;
-      position:relative; z-index:1;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      font-size: 1.1rem;
+      position: relative;
+      z-index: 1;
     }
     form {
       display:flex; flex-wrap:wrap; gap:15px; margin-bottom:25px;
@@ -240,19 +325,24 @@
   </style>
 </head>
 <body>
-  <nav>
-    <a href="index.html" class="logo">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
-           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-           viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      DollarWeb
-    </a>
-    <a href="index.html">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
-           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-           viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Back to Tools
-    </a>
+  <!-- UNIVERSAL NAVBAR -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span class="tertiary-text">The&nbsp;</span>Dollar<span class="secondary-text">Web</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="#tools">Tools</a>
+        <a href="#about">About</a>
+        <a href="login.html" class="login-btn">Login</a>
+      </div>
+    </div>
   </nav>
 
   <div class="content-wrapper">
