@@ -205,6 +205,20 @@
     padding-top: 0 !important;
     }
 
+    .footer-links {
+      margin-top: 0.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
     
   </style>
 </head>
@@ -224,12 +238,9 @@
     </a>
   </nav>
 
-  <div class="page-title-container">
-    <h1>Calendar Generator</h1>
-  </div>
-
   <div class="content-wrapper">
     <div class="container" id="calendar-wrapper">
+      <h1>Calendar Generator</h1>
       <div class="section-title">Calendar Settings</div>
       <form id="controls">
         <label>
@@ -272,6 +283,9 @@
                viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download as PDF
         </button>
+      </div>
+      <div class="footer-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
       </div>
     </div>
   </div>

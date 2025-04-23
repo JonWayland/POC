@@ -1,668 +1,697 @@
 [
-    {
-      "filename": "palm-tree.png",
-      "short_description": "Sylvester Palm",
-      "description": "A palm tree that looks like a sylvester palm"
-    },
-    {
-      "filename": "palm-tree-2.png",
-      "short_description": "Queen Palm",
-      "description": "A palm tree that looks like a queen palm"
-    },
-    {
-      "filename": "adirondack-chair.png",
-      "short_description": "Adirondack Chair",
-      "description": "Adirondack Chair for sitting"
-    },
-    {
-      "filename": "palm-plant.png",
-      "short_description": "Palm Plant",
-      "description": "Majesty palm plant pot"
-    },
-    {
-      "filename": "palm-leaf.png",
-      "short_description": "Palm Leaf",
-      "description": "Palm plant leaf"
-    },
-    {
-      "filename": "sun.png",
-      "short_description": "Sun",
-      "description": "Sun sunshine"
-    },
-    {
-      "filename": "fire.png",
-      "short_description": "Fire",
-      "description": "Fire firepit"
-    },
-    {
-      "filename": "ocean-wave.png",
-      "short_description": "Wave",
-      "description": "Ocean wave"
-    },
-    {
-      "filename": "beach.png",
-      "short_description": "Beach",
-      "description": "Beach sun umbrella ocean"
-    },
-    {
-      "filename": "lime.png",
-      "short_description": "Lime",
-      "description": "Lime fruit food"
-    },
-    {
-      "filename": "sliced-lime.png",
-      "short_description": "Sliced Lime",
-      "description": "Sliced lime fruit food"
-    },
-    {
-      "filename": "pineapple.png",
-      "short_description": "Pineapple",
-      "description": "Pineapple fruit food"
-    },
-    {
-      "filename": "banana.png",
-      "short_description": "Banana",
-      "description": "Banana fruit food"
-    },
-    {
-      "filename": "cheeseburger.png",
-      "short_description": "Cheeseburger",
-      "description": "Cheeseburger food"
-    },
-    {
-      "filename": "hotdog.png",
-      "short_description": "Hot Dog",
-      "description": "Hotdog hot dog food"
-    },
-    {
-      "filename": "grapes.png",
-      "short_description": "Grapes",
-      "description": "grapes fruit food"
-    },
-    {
-      "filename": "pizza-slice.png",
-      "short_description": "Pizza Slice",
-      "description": "Pizza slice food"
-    },
-    {
-      "filename": "unicorn.png",
-      "short_description": "Unicorn",
-      "description": "Unicorn horse"
-    },
-    {
-      "filename": "flamingo.png",
-      "short_description": "Flamingo",
-      "description": "Flamingo bird"
-    },
-    {
-      "filename": "parrot.png",
-      "short_description": "Parrot",
-      "description": "Parrot bird"
-    },
-    {
-      "filename": "seagull.png",
-      "short_description": "Seagull",
-      "description": "Seagull bird"
-    },
-    {
-      "filename": "sandcastle.png",
-      "short_description": "Sand Castle",
-      "description": "Sand castle beach"
-    },
-    {
-      "filename": "flower.png",
-      "short_description": "Flower",
-      "description": "Tropical flower"
-    },
-    {
-      "filename": "propane-grill.png",
-      "short_description": "Propane Grill",
-      "description": "Propane grill"
-    },
-    {
-      "filename": "doctor-male.png",
-      "short_description": "Male Doctor",
-      "description": "Male Doctor clinical medic healthcare"
-    },
-    {
-      "filename": "doctor-female.png",
-      "short_description": "Female Doctor",
-      "description": "Female Doctor clinical medic healthcare"
-    },
-    {
-      "filename": "Hospital.png",
-      "short_description": "Hospital",
-      "description": "Hospital clinical medic healthcare"
-    },
-    {
-      "filename": "Ambulance.png",
-      "short_description": "Ambulance",
-      "description": "Ambulance medic healthcare"
-    },
-    {
-      "filename": "santa.png",
-      "short_description": "Santa Clause",
-      "description": "Santa Clause Christmas season holidays"
-    },
-    {
-      "filename": "christmas-tree.png",
-      "short_description": "Christmas Tree",
-      "description": "Christmas tree season holidays"
-    },
-    {
-      "filename": "frog.png",
-      "short_description": "Frog",
-      "description": "frog animal"
-    },
-    {
-      "filename": "deer.png",
-      "short_description": "Deer",
-      "description": "Deer animal antlers"
-    },
-    {
-      "filename": "lizard.png",
-      "short_description": "Lizard",
-      "description": "Lizard animal"
-    },
-    {
-      "filename": "sunglasses.png",
-      "short_description": "Sunglasses",
-      "description": "Sunglasses glasses sun"
-    },
-    {
-      "filename": "alligator.png",
-      "short_description": "Alligator",
-      "description": "Alligator animal"
-    },
-    {
-      "filename": "lion.png",
-      "short_description": "Lion",
-      "description": "Lion animal roar"
-    },
-    {
-      "filename": "centaur.png",
-      "short_description": "Centaur",
-      "description": "Centaur myth horse human"
-    },
-    {
-      "filename": "book.png",
-      "short_description": "Book",
-      "description": "Book novel"
-    },
-    {
-      "filename": "howling-wolf.png",
-      "short_description": "Howling Wolf",
-      "description": "howling wolf animal"
-    },
-    {
-      "filename": "watermelon-slice.png",
-      "short_description": "Watermelon Slice",
-      "description": "Watermelon slice fruit food tropical"
-    },
-    {
-      "filename": "bike.png",
-      "short_description": "Bike",
-      "description": "bike bicycle transportation"
-    },
-    {
-      "filename": "lawn-mower.png",
-      "short_description": "Lawn Mower",
-      "description": "Lawn Mower tools grass"
-    },
-    {
-      "filename": "dog.png",
-      "short_description": "Dog",
-      "description": "Dog pet animal"
-    },
-    {
-      "filename": "cat.png",
-      "short_description": "Cat",
-      "description": "Cat pet animal"
-    },
-    {
-      "filename": "person-flexing.png",
-      "short_description": "Person Flexing",
-      "description": "A stick figure person standing in a flexing position to show off their muscles"
-    },
-    {
-      "filename": "laundry.png",
-      "short_description": "Laundry",
-      "description": "A laundry washer or dryer"
-    },
-    {
-      "filename": "coffee.png",
-      "short_description": "Coffee",
-      "description": "Coffee drink hot food"
-    },
-    {
-      "filename": "icecream-cone.png",
-      "short_description": "Icecream Cone",
-      "description": "Icecream cone dessert"
-    },
-    {
-      "filename": "store-front.png",
-      "short_description": "Store Front",
-      "description": "A store front with roof, door, and window"
-    },
-    {
-      "filename": "picnic-table.png",
-      "short_description": "Picnic Table",
-      "description": "A picnic table with two benches"
-    },
-    {
-      "filename": "watch.png",
-      "short_description": "Watch",
-      "description": "Watch that tells time on the wrist"
-    },
-    {
-      "filename": "headphones.png",
-      "short_description": "Headphones",
-      "description": "Over the head headphones covering ears and playing music"
-    },
-    {
-      "filename": "rosary.png",
-      "short_description": "Rosary",
-      "description": "Rosary beads and a cross at the end of it"
-    },
-    {
-      "filename": "computer.png",
-      "short_description": "Computer",
-      "description": "Computer monitor screen for a desktop"
-    },
-    {
-      "filename": "laptop.png",
-      "short_description": "Laptop",
-      "description": "Laptop computer"
-    },
-    {
-      "filename": "shirt.png",
-      "short_description": "T-Shirt",
-      "description": "A t-shirt shirt that is short sleeve"
-    },
-    {
-      "filename": "car.png",
-      "short_description": "Car",
-      "description": "Car sedan vehicle"
-    },
-    {
-      "filename": "box-truck.png",
-      "short_description": "Box Truck",
-      "description": "Box Truck vehicle"
-    },
-    {
-      "filename": "baseball-bat.png",
-      "short_description": "Baseball Bat",
-      "description": "baseball bat sports"
-    },
-    {
-      "filename": "baseball.png",
-      "short_description": "Baseball",
-      "description": "baseball sports"
-    },
-    {
-      "filename": "basketball.png",
-      "short_description": "Basketball",
-      "description": "Basketball sports"
-    },
-    {
-      "filename": "football.png",
-      "short_description": "Football",
-      "description": "Football sports"
-    },
-    {
-      "filename": "star.png",
-      "short_description": "Star",
-      "description": "Star space"
-    },
-    {
-      "filename": "moon.png",
-      "short_description": "Moon",
-      "description": "Moon space"
-    },
-    {
-      "filename": "garbage-truck.png",
-      "short_description": "Garbage Truck",
-      "description": "Garbage Truck vehicle"
-    },
-    {
-      "filename": "pickup-truck.png",
-      "short_description": "Pickup Truck",
-      "description": "Pickup truck vehicle"
-    },
-    {
-      "filename": "flag.png",
-      "short_description": "Flag",
-      "description": "Flag"
-    },
-    {
-      "filename": "keyboard.png",
-      "short_description": "Keyboard",
-      "description": "Keyboard for computer"
-    },
-    {
-      "filename": "baby-crawling.png",
-      "short_description": "Baby Crawling",
-      "description": "baby crawling person"
-    },
-    {
-      "filename": "police-officer.png",
-      "short_description": "Baby Crawling",
-      "description": "baby crawling person"
-    },
-    {
-      "filename": "window.png",
-      "short_description": "Window",
-      "description": "window house"
-    },
-    {
-      "filename": "backpack.png",
-      "short_description": "Backpack",
-      "description": "backpack luggage"
-    },
-    {
-      "filename": "water-bottle.png",
-      "short_description": "Water Bottle",
-      "description": "Water bottle drink"
-    },
-    {
-      "filename": "church.png",
-      "short_description": "Church",
-      "description": "church worship christian christianity faith religion God"
-    },
-    {
-      "filename": "telephone.png",
-      "short_description": "Telephone",
-      "description": "phone telephone communication"
-    },
-    {
-      "filename": "cellphone.png",
-      "short_description": "Cellphone",
-      "description": "phone cellphone communication"
-    },
-    {
-      "filename": "beer.png",
-      "short_description": "Beer",
-      "description": "beer alcohol drink"
-    },
-    {
-      "filename": "martini.png",
-      "short_description": "Martini",
-      "description": "Martini alcohol drink"
-    },
-    {
-      "filename": "wine.png",
-      "short_description": "Wine",
-      "description": "Wine alcohol drink"
-    },
-    {
-      "filename": "liquor.png",
-      "short_description": "Liquor Bottle",
-      "description": "liquor bottle alcohol drink"
-    },
-    {
-      "filename": "firefighter.png",
-      "short_description": "Firefighter",
-      "description": "firefighter fire person occupation"
-    },
-    {
-      "filename": "horse.png",
-      "short_description": "Horse",
-      "description": "horse animal"
-    },
-    {
-      "filename": "tennis-racket.png",
-      "short_description": "Tennis Racket",
-      "description": "tennis racket sports"
-    },
-    {
-      "filename": "golf-club.png",
-      "short_description": "Golf Club",
-      "description": "golf club sports"
-    },
-    {
-      "filename": "basketball-hoop.png",
-      "short_description": "Basketball Hoop",
-      "description": "basketball hoop ball sports"
-    },
-    {
-      "filename": "shoes.png",
-      "short_description": "Shoes",
-      "description": "shoes clothes accessories"
-    },
-    {
-      "filename": "computer-desk.png",
-      "short_description": "Computer Desk",
-      "description": "computer desk technology"
-    },
-    {
-      "filename": "soccer-ball.png",
-      "short_description": "Soccer Ball",
-      "description": "soccerball ball sports"
-    },
-    {
-      "filename": "person-running.png",
-      "short_description": "Person Running",
-      "description": "person running"
-    },
-    {
-      "filename": "shovel.png",
-      "short_description": "Shovel",
-      "description": "Shovel tools tool"
-    },
-    {
-      "filename": "shark.png",
-      "short_description": "Shark",
-      "description": "Shark fish ocean"
-    },
-    {
-      "filename": "fish.png",
-      "short_description": "Fish",
-      "description": "fish ocean"
-    },
-    {
-      "filename": "turtle.png",
-      "short_description": "Turtle",
-      "description": "Turtle ocean"
-    },
-    {
-      "filename": "dolphin.png",
-      "short_description": "Dolphin",
-      "description": "Dolphin fish ocean"
-    },
-    {
-      "filename": "snowman.png",
-      "short_description": "Snowman",
-      "description": "Snowman winter Christmas"
-    },
-    {
-      "filename": "propane-tank.png",
-      "short_description": "Propane Tank",
-      "description": "Propane tank gas grill"
-    },
-    {
-      "filename": "sunflower.png",
-      "short_description": "Sunflower",
-      "description": "Sunflower sun flower plant"
-    },
-    {
-      "filename": "mountain.png",
-      "short_description": "Mountain",
-      "description": "mountain mountains landscape"
-    },
-    {
-      "filename": "pumpkin.png",
-      "short_description": "Pumpkin",
-      "description": "Pumpkin vegetable halloween"
-    },
-    {
-      "filename": "ghost.png",
-      "short_description": "Ghost",
-      "description": "Ghost halloween"
-    },
-    {
-      "filename": "golf-cart-clubs.png",
-      "short_description": "Golf Cart w/ Clubs",
-      "description": "golf cart bag clubs sports golfball"
-    },
-    {
-      "filename": "golf-cart.png",
-      "short_description": "Golf Cart",
-      "description": "golf cart clubs sports golfball"
-    },
-    {
-      "filename": "person-pushups.png",
-      "short_description": "Person Doing Pushups",
-      "description": "Person pushups workout exercise"
-    },
-    {
-      "filename": "kayak.png",
-      "short_description": "Kayak",
-      "description": "Kayak boat water"
-    },
-    {
-      "filename": "ceiling-fan.png",
-      "short_description": "Ceiling Fan",
-      "description": "Ceiling fan air house"
-    },
-    {
-      "filename": "baseball-glove.png",
-      "short_description": "Baseball Glove",
-      "description": "baseball glove sports"
-    },
-    {
-      "filename": "tennis-ball.png",
-      "short_description": "Tennis Ball",
-      "description": "tennis ball sports"
-    },
-    {
-      "filename": "surf-board.png",
-      "short_description": "Surf Board",
-      "description": "surf board sports"
-    },
-    {
-      "filename": "baseball-cap.png",
-      "short_description": "Baseball Cap",
-      "description": "Baseball cap hat sports"
-    },
-    {
-      "filename": "boxer.png",
-      "short_description": "Boxer",
-      "description": "Person boxing boxer"
-    },
-    {
-      "filename": "cloud.png",
-      "short_description": "Cloud",
-      "description": "Cloud sky"
-    },
-    {
-      "filename": "steak.png",
-      "short_description": "Steak",
-      "description": "Steak food meat"
-    },
-    {
-      "filename": "robot.png",
-      "short_description": "Robot",
-      "description": "robot tech ai"
-    },
-    {
-      "filename": "box.png",
-      "short_description": "Box",
-      "description": "box cardboard"
-    },
-    {
-      "filename": "lady.png",
-      "short_description": "Lady",
-      "description": "Lady woman person"
-    },
-    {
-      "filename": "boat.png",
-      "short_description": "Boat",
-      "description": "boat water ship"
-    },
-    {
-      "filename": "lightning-bolt.png",
-      "short_description": "Lightning Bolt",
-      "description": "lightning bolt weather"
-    },
-    {
-      "filename": "tornado.png",
-      "short_description": "Tornado",
-      "description": "tornado weather"
-    },
-    {
-      "filename": "lifeguard-chair.png",
-      "short_description": "Lifeguard Chair",
-      "description": "lifeguard chair beach ocean vacation"
-    },
-    {
-      "filename": "angel.png",
-      "short_description": "Angel",
-      "description": "angel faith heaven christianity religion God"
-    },
-    {
-      "filename": "bed.png",
-      "short_description": "Bed",
-      "description": "bed snooze sleep"
-    },
-    {
-      "filename": "crib.png",
-      "short_description": "Crib",
-      "description": "crib baby sleep snooze"
-    },
-    {
-      "filename": "lamp.png",
-      "short_description": "Lamp",
-      "description": "Lamp light electricity"
-    },
-    {
-      "filename": "Tuxedo.png",
-      "short_description": "Tuxedo",
-      "description": "Tuxedo suit dress"
-    },
-    {
-      "filename": "chicken-wing.png",
-      "short_description": "Chicken Wing",
-      "description": "Chicken wing food meat"
-    },
-    {
-      "filename": "motorcycle.png",
-      "short_description": "Motorcycle",
-      "description": "motorcycle wheel road vehicle transportation driver"
-    },
-    {
-      "filename": "school-bus.png",
-      "short_description": "School Bus",
-      "description": "school bus vehicle transportation children driver"
-    },
-    {
-      "filename": "lollipop.png",
-      "short_description": "Lollipop",
-      "description": "lollipop food candy sweets"
-    },
-    {
-      "filename": "porta-potty.png",
-      "short_description": "Porta Potty",
-      "description": "porta potty toilet bathroom"
-    },
-    {
-      "filename": "weeping-willow-tree.png",
-      "short_description": "Weeping Willow Tree",
-      "description": "weeping willow tree plant leaves"
-    },
-    {
-      "filename": "magnolia-tree.png",
-      "short_description": "Magnolia Tree",
-      "description": "magnolia tree plant leaves"
-    },
-    {
-      "filename": "muffin.png",
-      "short_description": "Muffin",
-      "description": "muffin sweets food dessert"
-    },
-    {
-      "filename": "baby-back-ribs.png",
-      "short_description": "Baby Back Ribs",
-      "description": "baby back ribs food bbq"
-    }
-  ]
-  
+  {
+    "filename": "palm-tree.png",
+    "short_description": "Sylvester Palm",
+    "description": "palm tree vacation tropical landscaping beach sylvester"
+  },
+  {
+    "filename": "rabbit.png",
+    "short_description": "Rabbit",
+    "description": "rabbit animal hop easter bunny"
+  },
+  {
+    "filename": "palm-tree-2.png",
+    "short_description": "Queen Palm",
+    "description": "palm tree vacation tropical landscaping beach queen"
+  },
+  {
+    "filename": "adirondack-chair.png",
+    "short_description": "Adirondack Chair",
+    "description": "adirondack chair outdoor patio deck beach vacation relaxation seating furniture"
+  },
+  {
+    "filename": "palm-plant.png",
+    "short_description": "Palm Plant",
+    "description": "palm plant indoor tropical decorative foliage pot vacation"
+  },
+  {
+    "filename": "palm-leaf.png",
+    "short_description": "Palm Leaf",
+    "description": "palm leaf tropical foliage decorative botanical nature"
+  },
+  {
+    "filename": "sun.png",
+    "short_description": "Sun",
+    "description": "sun sunshine weather summer day sky brightness"
+  },
+  {
+    "filename": "fire.png",
+    "short_description": "Fire",
+    "description": "fire heat flame bonfire campfire warmth"
+  },
+  {
+    "filename": "ocean-wave.png",
+    "short_description": "Wave",
+    "description": "ocean wave sea water beach surf"
+  },
+  {
+    "filename": "beach.png",
+    "short_description": "Beach",
+    "description": "beach sand umbrella ocean sea vacation tropical"
+  },
+  {
+    "filename": "lime.png",
+    "short_description": "Lime",
+    "description": "lime fruit citrus sour green food drink garnish"
+  },
+  {
+    "filename": "sliced-lime.png",
+    "short_description": "Sliced Lime",
+    "description": "sliced lime fruit citrus sour green food drink garnish"
+  },
+  {
+    "filename": "pineapple.png",
+    "short_description": "Pineapple",
+    "description": "pineapple fruit tropical sweet food snack healthy"
+  },
+  {
+    "filename": "banana.png",
+    "short_description": "Banana",
+    "description": "banana fruit yellow tropical food snack healthy"
+  },
+  {
+    "filename": "cheeseburger.png",
+    "short_description": "Cheeseburger",
+    "description": "cheeseburger burger food sandwich fast food grill"
+  },
+  {
+    "filename": "hotdog.png",
+    "short_description": "Hot Dog",
+    "description": "hot dog burger food sandwich bbq grill fast food"
+  },
+  {
+    "filename": "grapes.png",
+    "short_description": "Grapes",
+    "description": "grapes fruit food wine vine healthy"
+  },
+  {
+    "filename": "pizza-slice.png",
+    "short_description": "Pizza Slice",
+    "description": "pizza slice Italian food cheese slice fast food"
+  },
+  {
+    "filename": "unicorn.png",
+    "short_description": "Unicorn",
+    "description": "unicorn fantasy mythical horse magical creature"
+  },
+  {
+    "filename": "flamingo.png",
+    "short_description": "Flamingo",
+    "description": "flamingo bird tropical pink water wildlife"
+  },
+  {
+    "filename": "parrot.png",
+    "short_description": "Parrot",
+    "description": "parrot bird tropical colorful animal wildlife pet"
+  },
+  {
+    "filename": "seagull.png",
+    "short_description": "Seagull",
+    "description": "seagull bird ocean beach sea wildlife"
+  },
+  {
+    "filename": "sandcastle.png",
+    "short_description": "Sand Castle",
+    "description": "sandcastle beach sand castle vacation fun play"
+  },
+  {
+    "filename": "flower.png",
+    "short_description": "Flower",
+    "description": "flower plant floral tropical blossom nature"
+  },
+  {
+    "filename": "propane-grill.png",
+    "short_description": "Propane Grill",
+    "description": "propane grill bbq barbecue cooking outdoor appliance"
+  },
+  {
+    "filename": "doctor-male.png",
+    "short_description": "Male Doctor",
+    "description": "doctor male healthcare medical clinic professional"
+  },
+  {
+    "filename": "doctor-female.png",
+    "short_description": "Female Doctor",
+    "description": "doctor female healthcare medical clinic professional"
+  },
+  {
+    "filename": "Hospital.png",
+    "short_description": "Hospital",
+    "description": "hospital healthcare medical clinic emergency building"
+  },
+  {
+    "filename": "Ambulance.png",
+    "short_description": "Ambulance",
+    "description": "ambulance emergency medical healthcare vehicle rescue"
+  },
+  {
+    "filename": "santa.png",
+    "short_description": "Santa Clause",
+    "description": "santa claus christmas holiday winter festive gift"
+  },
+  {
+    "filename": "christmas-tree.png",
+    "short_description": "Christmas Tree",
+    "description": "christmas tree holiday winter festive decoration evergreen"
+  },
+  {
+    "filename": "frog.png",
+    "short_description": "Frog",
+    "description": "frog amphibian animal wildlife pond nature"
+  },
+  {
+    "filename": "deer.png",
+    "short_description": "Deer",
+    "description": "deer animal wildlife forest antlers mammal"
+  },
+  {
+    "filename": "lizard.png",
+    "short_description": "Lizard",
+    "description": "lizard reptile animal wildlife desert nature"
+  },
+  {
+    "filename": "sunglasses.png",
+    "short_description": "Sunglasses",
+    "description": "sunglasses eyewear sun glasses summer beach accessory"
+  },
+  {
+    "filename": "alligator.png",
+    "short_description": "Alligator",
+    "description": "alligator reptile animal wildlife swamp predator"
+  },
+  {
+    "filename": "lion.png",
+    "short_description": "Lion",
+    "description": "lion animal wildlife safari mammal king cat"
+  },
+  {
+    "filename": "centaur.png",
+    "short_description": "Centaur",
+    "description": "centaur fantasy mythical creature half horse half human"
+  },
+  {
+    "filename": "book.png",
+    "short_description": "Book",
+    "description": "book reading education literature novel paper"
+  },
+  {
+    "filename": "howling-wolf.png",
+    "short_description": "Howling Wolf",
+    "description": "howling wolf animal wildlife forest night howl"
+  },
+  {
+    "filename": "watermelon-slice.png",
+    "short_description": "Watermelon Slice",
+    "description": "watermelon slice fruit food summer tropical melon"
+  },
+  {
+    "filename": "bike.png",
+    "short_description": "Bike",
+    "description": "bike bicycle transportation cycling sport fitness"
+  },
+  {
+    "filename": "lawn-mower.png",
+    "short_description": "Lawn Mower",
+    "description": "lawn mower grass garden yard landscaping tool equipment"
+  },
+  {
+    "filename": "dog.png",
+    "short_description": "Dog",
+    "description": "dog pet animal canine companion domestic"
+  },
+  {
+    "filename": "cat.png",
+    "short_description": "Cat",
+    "description": "cat pet animal feline companion domestic"
+  },
+  {
+    "filename": "person-flexing.png",
+    "short_description": "Person Flexing",
+    "description": "person flexing fitness strength exercise muscles workout"
+  },
+  {
+    "filename": "laundry.png",
+    "short_description": "Laundry",
+    "description": "laundry washer dryer clothes cleaning appliance household"
+  },
+  {
+    "filename": "coffee.png",
+    "short_description": "Coffee",
+    "description": "coffee drink hot beverage cafe morning espresso"
+  },
+  {
+    "filename": "icecream-cone.png",
+    "short_description": "Icecream Cone",
+    "description": "ice cream cone dessert sweet cold treat"
+  },
+  {
+    "filename": "store-front.png",
+    "short_description": "Store Front",
+    "description": "store front shop building retail storefront"
+  },
+  {
+    "filename": "picnic-table.png",
+    "short_description": "Picnic Table",
+    "description": "picnic table outdoors food park seating bench"
+  },
+  {
+    "filename": "watch.png",
+    "short_description": "Watch",
+    "description": "watch timepiece wrist accessory clock analog"
+  },
+  {
+    "filename": "headphones.png",
+    "short_description": "Headphones",
+    "description": "headphones audio music headset electronics accessory"
+  },
+  {
+    "filename": "rosary.png",
+    "short_description": "Rosary",
+    "description": "rosary beads catholic prayer faith religious cross"
+  },
+  {
+    "filename": "computer.png",
+    "short_description": "Computer",
+    "description": "computer monitor desktop pc technology electronics"
+  },
+  {
+    "filename": "laptop.png",
+    "short_description": "Laptop",
+    "description": "laptop computer notebook technology electronics portable"
+  },
+  {
+    "filename": "shirt.png",
+    "short_description": "T-Shirt",
+    "description": "t-shirt shirt clothing apparel casual fashion garment"
+  },
+  {
+    "filename": "car.png",
+    "short_description": "Car",
+    "description": "car sedan vehicle transport automotive"
+  },
+  {
+    "filename": "box-truck.png",
+    "short_description": "Box Truck",
+    "description": "box truck vehicle transport delivery cargo moving"
+  },
+  {
+    "filename": "baseball-bat.png",
+    "short_description": "Baseball Bat",
+    "description": "baseball bat sports equipment baseball"
+  },
+  {
+    "filename": "baseball.png",
+    "short_description": "Baseball",
+    "description": "baseball sports ball baseball game equipment"
+  },
+  {
+    "filename": "basketball.png",
+    "short_description": "Basketball",
+    "description": "basketball sports ball basketball game hoop"
+  },
+  {
+    "filename": "football.png",
+    "short_description": "Football",
+    "description": "football sports ball american game gridiron"
+  },
+  {
+    "filename": "star.png",
+    "short_description": "Star",
+    "description": "star space sky celestial shape night"
+  },
+  {
+    "filename": "moon.png",
+    "short_description": "Moon",
+    "description": "moon space sky night celestial lunar"
+  },
+  {
+    "filename": "garbage-truck.png",
+    "short_description": "Garbage Truck",
+    "description": "garbage truck vehicle waste collection sanitation"
+  },
+  {
+    "filename": "pickup-truck.png",
+    "short_description": "Pickup Truck",
+    "description": "pickup truck vehicle transport utility truck cargo"
+  },
+  {
+    "filename": "flag.png",
+    "short_description": "Flag",
+    "description": "flag national symbol banner country cloth fabric"
+  },
+  {
+    "filename": "keyboard.png",
+    "short_description": "Keyboard",
+    "description": "keyboard computer input device electronics typing"
+  },
+  {
+    "filename": "baby-crawling.png",
+    "short_description": "Baby Crawling",
+    "description": "baby crawling infant child toddler movement development"
+  },
+  {
+    "filename": "police-officer.png",
+    "short_description": "Police Officer",
+    "description": "police officer law enforcement uniform badge security"
+  },
+  {
+    "filename": "window.png",
+    "short_description": "Window",
+    "description": "window house building glass opening architecture"
+  },
+  {
+    "filename": "backpack.png",
+    "short_description": "Backpack",
+    "description": "backpack bag travel school pack luggage"
+  },
+  {
+    "filename": "water-bottle.png",
+    "short_description": "Water Bottle",
+    "description": "water bottle hydration reusable beverage drink"
+  },
+  {
+    "filename": "church.png",
+    "short_description": "Church",
+    "description": "church building worship christian religion faith architecture"
+  },
+  {
+    "filename": "telephone.png",
+    "short_description": "Telephone",
+    "description": "telephone phone communication call device"
+  },
+  {
+    "filename": "cellphone.png",
+    "short_description": "Cellphone",
+    "description": "cellphone mobile phone communication device smartphone"
+  },
+  {
+    "filename": "beer.png",
+    "short_description": "Beer",
+    "description": "beer alcohol drink beverage lager ale pub"
+  },
+  {
+    "filename": "martini.png",
+    "short_description": "Martini",
+    "description": "martini cocktail alcohol drink beverage"
+  },
+  {
+    "filename": "wine.png",
+    "short_description": "Wine",
+    "description": "wine alcohol drink beverage grape bar"
+  },
+  {
+    "filename": "liquor.png",
+    "short_description": "Liquor Bottle",
+    "description": "liquor bottle alcohol drink spirits beverage"
+  },
+  {
+    "filename": "firefighter.png",
+    "short_description": "Firefighter",
+    "description": "firefighter fire rescue safety person occupation hero"
+  },
+  {
+    "filename": "horse.png",
+    "short_description": "Horse",
+    "description": "horse animal mammal equine farm riding"
+  },
+  {
+    "filename": "tennis-racket.png",
+    "short_description": "Tennis Racket",
+    "description": "tennis racket sports equipment tennis"
+  },
+  {
+    "filename": "golf-club.png",
+    "short_description": "Golf Club",
+    "description": "golf club sports equipment golf"
+  },
+  {
+    "filename": "basketball-hoop.png",
+    "short_description": "Basketball Hoop",
+    "description": "basketball hoop sports equipment basketball ring"
+  },
+  {
+    "filename": "shoes.png",
+    "short_description": "Shoes",
+    "description": "shoes footwear clothing apparel accessory"
+  },
+  {
+    "filename": "computer-desk.png",
+    "short_description": "Computer Desk",
+    "description": "computer desk furniture office workspace technology"
+  },
+  {
+    "filename": "soccer-ball.png",
+    "short_description": "Soccer Ball",
+    "description": "soccer ball sports equipment football game"
+  },
+  {
+    "filename": "person-running.png",
+    "short_description": "Person Running",
+    "description": "person running fitness jogging sport exercise"
+  },
+  {
+    "filename": "shovel.png",
+    "short_description": "Shovel",
+    "description": "shovel tool gardening digging equipment"
+  },
+  {
+    "filename": "shark.png",
+    "short_description": "Shark",
+    "description": "shark fish ocean sea predator marine wildlife"
+  },
+  {
+    "filename": "fish.png",
+    "short_description": "Fish",
+    "description": "fish ocean sea aquatic wildlife seafood"
+  },
+  {
+    "filename": "turtle.png",
+    "short_description": "Turtle",
+    "description": "turtle ocean sea reptile wildlife shelled creature"
+  },
+  {
+    "filename": "dolphin.png",
+    "short_description": "Dolphin",
+    "description": "dolphin marine mammal ocean sea wildlife intelligent fish"
+  },
+  {
+    "filename": "snowman.png",
+    "short_description": "Snowman",
+    "description": "snowman winter holiday snow festive cold"
+  },
+  {
+    "filename": "propane-tank.png",
+    "short_description": "Propane Tank",
+    "description": "propane tank gas fuel cylinder grill outdoor"
+  },
+  {
+    "filename": "sunflower.png",
+    "short_description": "Sunflower",
+    "description": "sunflower flower plant garden nature yellow bloom"
+  },
+  {
+    "filename": "mountain.png",
+    "short_description": "Mountain",
+    "description": "mountain landscape nature peak outdoor hiking"
+  },
+  {
+    "filename": "pumpkin.png",
+    "short_description": "Pumpkin",
+    "description": "pumpkin vegetable autumn halloween gourd squash"
+  },
+  {
+    "filename": "ghost.png",
+    "short_description": "Ghost",
+    "description": "ghost halloween spooky spirit haunted"
+  },
+  {
+    "filename": "golf-cart-clubs.png",
+    "short_description": "Golf Cart w/ Clubs",
+    "description": "golf cart bag clubs sports golf transportation"
+  },
+  {
+    "filename": "golf-cart.png",
+    "short_description": "Golf Cart",
+    "description": "golf cart vehicle transport golf course clubhouse"
+  },
+  {
+    "filename": "person-pushups.png",
+    "short_description": "Person Doing Pushups",
+    "description": "person pushups exercise fitness workout training"
+  },
+  {
+    "filename": "kayak.png",
+    "short_description": "Kayak",
+    "description": "kayak boat water sport paddle outdoor recreation"
+  },
+  {
+    "filename": "ceiling-fan.png",
+    "short_description": "Ceiling Fan",
+    "description": "ceiling fan home cooling ventilation appliance"
+  },
+  {
+    "filename": "baseball-glove.png",
+    "short_description": "Baseball Glove",
+    "description": "baseball glove sports equipment baseball mitt"
+  },
+  {
+    "filename": "tennis-ball.png",
+    "short_description": "Tennis Ball",
+    "description": "tennis ball sports equipment tennis game"
+  },
+  {
+    "filename": "surf-board.png",
+    "short_description": "Surf Board",
+    "description": "surf board sports equipment surf wave water"
+  },
+  {
+    "filename": "baseball-cap.png",
+    "short_description": "Baseball Cap",
+    "description": "baseball cap sports hat baseball headwear"
+  },
+  {
+    "filename": "boxer.png",
+    "short_description": "Boxer",
+    "description": "boxer person punching fighting sport athlete"
+  },
+  {
+    "filename": "cloud.png",
+    "short_description": "Cloud",
+    "description": "cloud sky weather fluffy nature"
+  },
+  {
+    "filename": "steak.png",
+    "short_description": "Steak",
+    "description": "steak food meat dinner grill beef"
+  },
+  {
+    "filename": "robot.png",
+    "short_description": "Robot",
+    "description": "robot tech ai machine automation electronics"
+  },
+  {
+    "filename": "box.png",
+    "short_description": "Box",
+    "description": "box cardboard container packaging storage"
+  },
+  {
+    "filename": "lady.png",
+    "short_description": "Lady",
+    "description": "lady woman person female adult people"
+  },
+  {
+    "filename": "boat.png",
+    "short_description": "Boat",
+    "description": "boat water vessel ship transport marine"
+  },
+  {
+    "filename": "lightning-bolt.png",
+    "short_description": "Lightning Bolt",
+    "description": "lightning bolt weather electricity thunder storm"
+  },
+  {
+    "filename": "tornado.png",
+    "short_description": "Tornado",
+    "description": "tornado weather wind storm disaster"
+  },
+  {
+    "filename": "lifeguard-chair.png",
+    "short_description": "Lifeguard Chair",
+    "description": "lifeguard chair beach ocean safety rescue"
+  },
+  {
+    "filename": "angel.png",
+    "short_description": "Angel",
+    "description": "angel religious faith heaven spiritual wings"
+  },
+  {  
+    "filename": "bed.png",
+    "short_description": "Bed",
+    "description": "bed furniture sleep bedroom rest mattress"
+  },
+  {
+    "filename": "crib.png",
+    "short_description": "Crib",
+    "description": "crib baby furniture nursery infant sleep"
+  },
+  {
+    "filename": "lamp.png",
+    "short_description": "Lamp",
+    "description": "lamp light lighting electricity home decor"
+  },
+  {
+    "filename": "Tuxedo.png",
+    "short_description": "Tuxedo",
+    "description": "tuxedo suit formal wear clothing"
+  },
+  {
+    "filename": "chicken-wing.png",
+    "short_description": "Chicken Wing",
+    "description": "chicken wing food meat poultry bbq"
+  },
+  {
+    "filename": "motorcycle.png",
+    "short_description": "Motorcycle",
+    "description": "motorcycle vehicle transport ride road"
+  },
+  {
+    "filename": "school-bus.png",
+    "short_description": "School Bus",
+    "description": "school bus vehicle transport children education"
+  },
+  {
+    "filename": "lollipop.png",
+    "short_description": "Lollipop",
+    "description": "lollipop candy sweet treat sugar stick"
+  },
+  {
+    "filename": "porta-potty.png",
+    "short_description": "Porta Potty",
+    "description": "porta potty toilet bathroom sanitation portable"
+  },
+  {
+    "filename": "weeping-willow-tree.png",
+    "short_description": "Weeping Willow Tree",
+    "description": "weeping willow tree plant nature landscaping"
+  },
+  {
+    "filename": "magnolia-tree.png",
+    "short_description": "Magnolia Tree",
+    "description": "magnolia tree plant flower ornamental garden"
+  },
+  {
+    "filename": "muffin.png",
+    "short_description": "Muffin",
+    "description": "muffin pastry dessert snack bakery"
+  },
+  {
+    "filename": "baby-back-ribs.png",
+    "short_description": "Baby Back Ribs",
+    "description": "baby back ribs food bbq meat pork grill"
+  },
+  {
+    "filename": "rake.png",
+    "short_description": "Rake",
+    "description": "rake tool gardening landscaping yard cleanup"
+  },
+  {
+    "filename": "eagle.png",
+    "short_description": "Eagle",
+    "description": "eagle bird wildlife sky predator raptor"
+  },
+  {
+    "filename": "dry-bar.png",
+    "short_description": "Dry Bar",
+    "description": "dry bar salon hair styling beauty service"
+  },
+  {
+    "filename": "toilet.png",
+    "short_description": "Toilet",
+    "description": "toilet bathroom restroom sanitation wc"
+  },
+  {
+    "filename": "stroller.png",
+    "short_description": "Stroller",
+    "description": "stroller baby pram transport infant carriage"
+  }
+]
