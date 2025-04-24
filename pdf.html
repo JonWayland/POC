@@ -434,7 +434,7 @@
     }
     
     #pages-container {
-      margin-top: 150px;
+      margin-top: 70px;
       padding: 40px 20px;
       display: flex;
       flex-direction: column;
@@ -496,6 +496,11 @@
       border-radius: 8px;
       overflow: hidden;
     }
+
+    .os-links a {
+      color: var(--primary); text-decoration: none; font-size: 0.9rem;
+    }
+    .os-links a:hover { text-decoration: underline; }
     
     .pdf-canvas, .annotation-canvas {
       position: absolute;
@@ -634,6 +639,7 @@
     #save-btn {
       background: var(--dark);
     }
+
   </style>
 </head>
 <body>
@@ -660,6 +666,9 @@
     <header>
       <h1>PDF Annotation Tool</h1>
       <p class="tagline">Add notes, highlights, and drawings to your PDF documents. Edit multiple PDFs at once and save your changes.</p>
+      <div class="os-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
     </header>
     
     <div id="toolbar">
@@ -858,10 +867,44 @@
         fc.freeDrawingBrush.color = colorPicker.value;
         
         // Update objects selectability
-        fc.getObjects().forEach(o => o.selectable = (currentTool === 'select'));
+        fc.getObjects().forEach(o => {
+          o.selectable = (currentTool === 'select');
+          o.evented = true; // Make sure objects respond to events
+        });
+        
+        // Important for multi-select: Enable group selection
+        if (currentTool === 'select') {
+          fc.preserveObjectStacking = true; // Maintains z-index during selection
+          fc.uniScaleTransform = false; // Allows non-uniform scaling
+        }
         
         fc.renderAll();
       });
+    }
+
+    function initializeMultiSelect() {
+      if (currentTool === 'select') {
+        fabricCanvases.forEach(fc => {
+          // Ensure selection mode is enabled
+          fc.selection = true;
+          
+          // Make sure objects can be selected
+          fc.getObjects().forEach(obj => {
+            obj.selectable = true;
+            obj.evented = true;
+          });
+          
+          // Enable multiple selection with selection boxes
+          fc.selectionFullyContained = false; // Select objects even if partly in selection
+          
+          // Ensure canvas knows when it's active
+          fc.on('mouse:down', function() {
+            lastFocusedCanvas = fc;
+          });
+          
+          fc.renderAll();
+        });
+      }
     }
 
     // Undo / Clear
@@ -1000,15 +1043,42 @@
           if (activeCanvas) {
             const activeObj = activeCanvas.getActiveObject();
             if (activeObj) {
-              // Add to undo history before deleting
-              undoHistory.push({
-                canvasIndex: fabricCanvases.indexOf(activeCanvas),
-                type: 'add',  // We're tracking the deleted object so we can add it back
-                object: activeObj
-              });
+              // For multiple object selection
+              if (activeObj.type === 'activeSelection') {
+                // Get all objects in the selection
+                const objectsToRemove = activeObj.getObjects();
+                
+                // Store each object in the undo history before removing
+                objectsToRemove.forEach(obj => {
+                  undoHistory.push({
+                    canvasIndex: fabricCanvases.indexOf(activeCanvas),
+                    type: 'add',
+                    object: obj
+                  });
+                });
+                
+                // Discarding the group selection first
+                activeCanvas.discardActiveObject();
+                
+                // Then remove each object individually
+                objectsToRemove.forEach(obj => {
+                  activeCanvas.remove(obj);
+                });
+                
+                // Update the canvas
+                activeCanvas.requestRenderAll();
+              } else {
+                // Single object deletion (existing functionality)
+                undoHistory.push({
+                  canvasIndex: fabricCanvases.indexOf(activeCanvas),
+                  type: 'add',
+                  object: activeObj
+                });
+                
+                // Remove the object
+                activeCanvas.remove(activeObj);
+              }
               
-              // Remove the object
-              activeCanvas.remove(activeObj);
               e.preventDefault(); // Prevent browser back navigation on backspace
             }
           }
@@ -1040,6 +1110,19 @@
       if (selectedPages.length === 0) {
         alert('Please select at least one page to save.');
         return;
+      }
+      
+      // Prompt the user for a filename
+      let fileName = prompt('Enter a filename for your PDF:', 'annotated.pdf');
+      
+      // If the user cancels or enters an empty string, use the default
+      if (fileName === null || fileName.trim() === '') {
+        fileName = 'annotated.pdf';
+      } else {
+        // Ensure the filename ends with .pdf
+        if (!fileName.toLowerCase().endsWith('.pdf')) {
+          fileName += '.pdf';
+        }
       }
       
       // start with first selected page's size/orientation
@@ -1078,8 +1161,8 @@
         doc.addImage(tmp.toDataURL('image/png'), 'PNG', 0, 0, pdfC.width, pdfC.height);
       }
       
-      // Save the PDF
-      doc.save('annotated.pdf');
+      // Save the PDF with the user-provided filename
+      doc.save(fileName);
     });
 
     // brush settings updates
@@ -1313,6 +1396,12 @@
           const fc = new fabric.Canvas(annCanv, { selection: false });
           fabricCanvases.push(fc);
 
+          // Selection configuration
+          fc.selectionKey = 'shiftKey';
+          fc.selectionColor = 'rgba(0, 168, 150, 0.2)';
+          fc.selectionBorderColor = 'rgba(0, 168, 150, 0.8)';
+          fc.selectionLineWidth = 1;
+
           // per-canvas handlers
           fc.on('mouse:down', opt => {
             lastFocusedCanvas = fc;
@@ -1498,6 +1587,60 @@
         }
       }
       updateToolMode();
+
+      // Add this line:
+      if (currentTool === 'select') {
+        initializeMultiSelect();
+      }
+
+      function enableMultiSelectOnAllCanvases() {
+      if (currentTool === 'select') {
+        fabricCanvases.forEach(fc => {
+          // Make sure selection is enabled
+          fc.selection = true;
+          
+          // Make sure all objects are selectable
+          fc.getObjects().forEach(o => {
+            o.selectable = true;
+            o.evented = true;
+          });
+          
+          // Update the canvas
+          fc.renderAll();
+        });
+      }
+    }
+
+    // Modify the tool switching event listener
+    // Find the existing tool switching code:
+    toolButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        toolButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTool = btn.dataset.tool;
+        updateToolMode();
+        
+        // Add this line:
+        if (currentTool === 'select') {
+          initializeMultiSelect();
+        }
+      });
+    });
+
+    // Replace it with this updated version:
+    toolButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        toolButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTool = btn.dataset.tool;
+        updateToolMode();
+        
+        // If switching to select tool, ensure multiple selection is enabled
+        if (currentTool === 'select') {
+          enableMultiSelectOnAllCanvases();
+        }
+      });
+    });
     }
   </script>
 </body>
