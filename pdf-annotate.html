@@ -463,6 +463,95 @@
     .pdf-canvas { z-index: 0; }
     .annotation-canvas { z-index: 1; }
     
+    /* Confirmation Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      width: 90%;
+      max-width: 500px;
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-container {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .modal-header h3 {
+      font-size: 1.5rem;
+      color: var(--dark);
+      margin: 0;
+    }
+    
+    .modal-body {
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .modal-btn-cancel {
+      background-color: #e9ecef;
+      color: var(--text);
+    }
+    
+    .modal-btn-cancel:hover {
+      background-color: #dee2e6;
+    }
+    
+    .modal-btn-confirm {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .modal-btn-confirm:hover {
+      background-color: #e53935;
+      transform: translateY(-2px);
+    }
+    
     label {
       display: flex;
       align-items: center;
@@ -615,6 +704,22 @@
     </div>
   </footer>
 
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirmation-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Clear All Annotations?</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to clear all annotations? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancel-clear">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="confirm-clear">Clear All</button>
+      </div>
+    </div>
+  </div>
+  
   <!-- libs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js"></script>
@@ -740,13 +845,47 @@
       }
     });
     
+    // Clear button - show confirmation modal
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const cancelClearBtn = document.getElementById('cancel-clear');
+    const confirmClearBtn = document.getElementById('confirm-clear');
+    
     clearBtn.addEventListener('click', () => {
+      // Show the confirmation modal
+      confirmationModal.classList.add('active');
+    });
+    
+    // Cancel button in modal
+    cancelClearBtn.addEventListener('click', () => {
+      confirmationModal.classList.remove('active');
+    });
+    
+    // Confirm button in modal
+    confirmClearBtn.addEventListener('click', () => {
+      // Hide the modal
+      confirmationModal.classList.remove('active');
+      
+      // Actually clear the annotations
       fabricCanvases.forEach(fc => {
         fc.clear();
         // Clear undo history for this canvas
         const canvasIndex = fabricCanvases.indexOf(fc);
         undoHistory = undoHistory.filter(entry => entry.canvasIndex !== canvasIndex);
       });
+    });
+    
+    // Close modal if clicked outside
+    confirmationModal.addEventListener('click', (e) => {
+      if (e.target === confirmationModal) {
+        confirmationModal.classList.remove('active');
+      }
+    });
+    
+    // Close modal with escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && confirmationModal.classList.contains('active')) {
+        confirmationModal.classList.remove('active');
+      }
     });
 
     // Save PDF with selected pages
