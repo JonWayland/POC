@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>PDF Annotation Tool</title>
+  <title>Multi-PDF Annotation Tool</title>
   <style>
     body { margin: 0; font-family: sans-serif; }
     #toolbar {
@@ -19,6 +19,34 @@
       border-radius: 3px; cursor: pointer;
     }
     button.active { background: #1d4ed8; }
+    #file-list-container {
+      margin-top: 64px;
+      padding: 16px;
+      background: #fafafa;
+      border-bottom: 1px solid #ddd;
+      display: none;
+      text-align: center;
+    }
+    #file-list {
+      list-style: none;
+      padding: 0;
+      margin: 8px auto;
+      max-width: 400px;
+    }
+    #file-list li {
+      padding: 8px 12px;
+      margin: 4px 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #load-btn {
+      margin-top: 8px;
+      background: #10b981;
+    }
     #pages-container {
       padding-top: 64px;
       display: flex; flex-direction: column; align-items: center;
@@ -42,7 +70,7 @@
 </head>
 <body>
   <div id="toolbar">
-    <input type="file" id="file-input" accept="application/pdf">
+    <input type="file" id="file-input" accept="application/pdf" multiple>
     <button data-tool="select" class="active">Select</button>
     <button data-tool="draw">Draw</button>
     <button data-tool="line">Line</button>
@@ -56,35 +84,56 @@
     <button id="save-btn">Save PDF</button>
   </div>
 
-  <div id="pages-container">
-    <p style="color:#666; margin-top:100px;">Drag &amp; drop a PDF here, or click “Select” above.</p>
+  <div id="file-list-container">
+    <strong>Reorder your PDFs:</strong>
+    <ul id="file-list"></ul>
+    <button id="load-btn">Load PDFs</button>
   </div>
 
+  <div id="pages-container">
+    <p style="color:#666; margin-top:100px;">
+      Drag &amp; drop PDFs here, or use the file input above.
+    </p>
+  </div>
+
+  <!-- libs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+
   <script>
+    // PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    const fileInput      = document.getElementById('file-input');
-    const pagesContainer = document.getElementById('pages-container');
-    const toolButtons    = document.querySelectorAll('#toolbar button[data-tool]');
-    const colorPicker    = document.getElementById('color-picker');
-    const sizeSlider     = document.getElementById('size-slider');
-    const fontSizeInput  = document.getElementById('font-size');
-    const textInput      = document.getElementById('text-input');
-    const undoBtn        = document.getElementById('undo-btn');
-    const clearBtn       = document.getElementById('clear-btn');
-    const saveBtn        = document.getElementById('save-btn');
+    // DOM refs
+    const fileInput        = document.getElementById('file-input');
+    const fileListCont     = document.getElementById('file-list-container');
+    const fileListEl       = document.getElementById('file-list');
+    const loadBtn          = document.getElementById('load-btn');
+    const pagesContainer   = document.getElementById('pages-container');
+    const toolButtons      = document.querySelectorAll('#toolbar button[data-tool]');
+    const colorPicker      = document.getElementById('color-picker');
+    const sizeSlider       = document.getElementById('size-slider');
+    const fontSizeInput    = document.getElementById('font-size');
+    const textInput        = document.getElementById('text-input');
+    const undoBtn          = document.getElementById('undo-btn');
+    const clearBtn         = document.getElementById('clear-btn');
+    const saveBtn          = document.getElementById('save-btn');
 
+    // state
     let currentTool       = 'select';
     let fabricCanvases    = [];
     let pdfCanvases       = [];
     let lastFocusedCanvas = null;
+    let fileBlobs         = [];
 
-    // Tool switching
+    // init Sortable on file list
+    Sortable.create(fileListEl, { animation: 150 });
+
+    // tool switching
     toolButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         toolButtons.forEach(b => b.classList.remove('active'));
@@ -99,60 +148,60 @@
         fc.isDrawingMode = (currentTool === 'draw');
         fc.selection     = (currentTool === 'select');
         fc.defaultCursor = currentTool === 'select' ? 'default' : 'crosshair';
-        fc.freeDrawingBrush.width = parseInt(sizeSlider.value,10);
+        fc.freeDrawingBrush.width = +sizeSlider.value;
         fc.freeDrawingBrush.color = colorPicker.value;
         fc.getObjects().forEach(o => o.selectable = (currentTool === 'select'));
         fc.renderAll();
       });
     }
 
+    // Undo / Clear
     undoBtn.addEventListener('click', () => {
-      const fc = lastFocusedCanvas || fabricCanvases[fabricCanvases.length-1];
+      const fc = lastFocusedCanvas || fabricCanvases.slice(-1)[0];
       if (!fc) return;
       const objs = fc.getObjects();
       if (objs.length) fc.remove(objs.pop());
     });
+    clearBtn.addEventListener('click', () => fabricCanvases.forEach(fc => fc.clear()));
 
-    clearBtn.addEventListener('click', () => {
-      fabricCanvases.forEach(fc => fc.clear());
-    });
-
+    // Save PDF
     saveBtn.addEventListener('click', async () => {
       const { jsPDF } = window.jspdf;
       if (!pdfCanvases.length) return;
-
-      // Start with first page's size/orientation
+      // start with first page's size/orientation
       const first = pdfCanvases[0];
       const orient = first.width > first.height ? 'l' : 'p';
       const doc = new jsPDF({ unit:'px', format:[first.width,first.height], orientation:orient });
 
-      for (let i=0; i<pdfCanvases.length; i++) {
+      for (let i = 0; i < pdfCanvases.length; i++) {
         const pdfC = pdfCanvases[i], fc = fabricCanvases[i];
-        if (i>0) {
-          const o = pdfC.width>pdfC.height ? 'l':'p';
-          doc.addPage([pdfC.width,pdfC.height], o);
+        if (i > 0) {
+          const o = pdfC.width > pdfC.height ? 'l' : 'p';
+          doc.addPage([pdfC.width, pdfC.height], o);
         }
-        doc.setPage(i+1);
+        doc.setPage(i + 1);
+        // composite
         const tmp = document.createElement('canvas');
         tmp.width = pdfC.width; tmp.height = pdfC.height;
         const ctx = tmp.getContext('2d');
-        ctx.drawImage(pdfC,0,0);
-        ctx.drawImage(fc.lowerCanvasEl,0,0);
-        doc.addImage(tmp.toDataURL('image/png'),'PNG',0,0,pdfC.width,pdfC.height);
+        ctx.drawImage(pdfC, 0, 0);
+        ctx.drawImage(fc.lowerCanvasEl, 0, 0);
+        doc.addImage(tmp.toDataURL('image/png'), 'PNG', 0, 0, pdfC.width, pdfC.height);
       }
       doc.save('annotated.pdf');
     });
 
+    // brush settings updates
     colorPicker.addEventListener('change', updateToolMode);
     sizeSlider.addEventListener('input', updateToolMode);
 
-    // File picker
+    // handle file input (multiple)
     fileInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (file && file.type==='application/pdf') renderPDF(URL.createObjectURL(file));
+      fileBlobs = Array.from(e.target.files).filter(f => f.type === 'application/pdf');
+      setupFileList();
     });
 
-    // Drag & Drop
+    // drag & drop to file list
     pagesContainer.addEventListener('dragover', e => {
       e.preventDefault();
       pagesContainer.classList.add('dragover');
@@ -163,80 +212,109 @@
     pagesContainer.addEventListener('drop', e => {
       e.preventDefault();
       pagesContainer.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type==='application/pdf') renderPDF(URL.createObjectURL(file));
-      else alert('Please drop a PDF file.');
+      const dropped = Array.from(e.dataTransfer.files)
+                          .filter(f => f.type === 'application/pdf');
+      if (!dropped.length) {
+        alert('Please drop PDF files only.');
+        return;
+      }
+      fileBlobs = dropped;
+      setupFileList();
     });
 
-    // Render PDF
-    async function renderPDF(url) {
+    // populate & show the file-list
+    function setupFileList() {
+      fileListEl.innerHTML = '';
+      fileBlobs.forEach((f,i) => {
+        const li = document.createElement('li');
+        li.textContent = f.name;
+        li.dataset.index = i;
+        fileListEl.appendChild(li);
+      });
+      fileListCont.style.display = 'block';
+      pagesContainer.innerHTML = '<p style="color:#666;margin-top:100px;">Reorder above then click Load PDFs.</p>';
+    }
+
+    // when user clicks Load, render in the chosen order
+    loadBtn.addEventListener('click', () => {
+      const ordered = Array.from(fileListEl.children).map(li => fileBlobs[li.dataset.index]);
+      renderMultiplePDFs(ordered);
+    });
+
+    // render 1+ PDFs in sequence
+    async function renderMultiplePDFs(files) {
       pagesContainer.innerHTML = '';
-      fabricCanvases = []; pdfCanvases = []; lastFocusedCanvas = null;
+      fabricCanvases = [];
+      pdfCanvases = [];
+      lastFocusedCanvas = null;
 
-      const pdf = await pdfjsLib.getDocument(url).promise;
-      for (let p=1; p<=pdf.numPages; p++) {
-        const page = await pdf.getPage(p);
-        const vp   = page.getViewport({ scale: 1.5 });
+      for (const file of files) {
+        const url = URL.createObjectURL(file);
+        const pdf = await pdfjsLib.getDocument(url).promise;
+        for (let p = 1; p <= pdf.numPages; p++) {
+          const page = await pdf.getPage(p);
+          const vp   = page.getViewport({ scale: 1.5 });
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'page-container';
-        wrapper.style.width  = vp.width + 'px';
-        wrapper.style.height = vp.height + 'px';
+          // container for this page
+          const wrapper = document.createElement('div');
+          wrapper.className = 'page-container';
+          wrapper.style.width  = vp.width + 'px';
+          wrapper.style.height = vp.height + 'px';
 
-        // PDF layer
-        const pdfCanv = document.createElement('canvas');
-        pdfCanv.className = 'pdf-canvas';
-        pdfCanv.width  = vp.width; pdfCanv.height = vp.height;
-        wrapper.appendChild(pdfCanv);
-        await page.render({ canvasContext: pdfCanv.getContext('2d'), viewport: vp }).promise;
-        pdfCanvases.push(pdfCanv);
+          // PDF layer
+          const pdfCanv = document.createElement('canvas');
+          pdfCanv.className = 'pdf-canvas';
+          pdfCanv.width  = vp.width;
+          pdfCanv.height = vp.height;
+          wrapper.appendChild(pdfCanv);
+          await page.render({ canvasContext: pdfCanv.getContext('2d'), viewport: vp }).promise;
+          pdfCanvases.push(pdfCanv);
 
-        // Annotation layer
-        const annCanv = document.createElement('canvas');
-        annCanv.className = 'annotation-canvas';
-        annCanv.width  = vp.width; annCanv.height = vp.height;
-        wrapper.appendChild(annCanv);
+          // annotation layer
+          const annCanv = document.createElement('canvas');
+          annCanv.className = 'annotation-canvas';
+          annCanv.width  = vp.width;
+          annCanv.height = vp.height;
+          wrapper.appendChild(annCanv);
 
-        pagesContainer.appendChild(wrapper);
-        const fc = new fabric.Canvas(annCanv, { selection: false });
-        fabricCanvases.push(fc);
+          pagesContainer.appendChild(wrapper);
+          const fc = new fabric.Canvas(annCanv, { selection: false });
+          fabricCanvases.push(fc);
 
-        fc.on('mouse:down', opt => {
-          lastFocusedCanvas = fc;
-          const pt = fc.getPointer(opt.e, true);
-
-          if (currentTool === 'line') {
-            fc._line = new fabric.Line([pt.x,pt.y,pt.x,pt.y], {
-              stroke: colorPicker.value,
-              strokeWidth: parseInt(sizeSlider.value,10),
-              selectable: false
-            });
-            fc.add(fc._line);
-          } else if (currentTool === 'text') {
-            const txt = new fabric.IText('', {
-              left: pt.x, top: pt.y,
-              fill: colorPicker.value,
-              fontSize: parseInt(fontSizeInput.value,10)
-            });
-            fc.add(txt).setActiveObject(txt);
-            txt.enterEditing();
-            txt.hiddenTextarea.focus();
-          }
-        });
-
-        fc.on('mouse:move', opt => {
-          if (currentTool==='line' && fc._line) {
+          // per-canvas handlers
+          fc.on('mouse:down', opt => {
+            lastFocusedCanvas = fc;
             const pt = fc.getPointer(opt.e, true);
-            fc._line.set({ x2:pt.x, y2:pt.y });
-            fc.renderAll();
-          }
-        });
-
-        fc.on('mouse:up', () => {
-          if (fc._line) { fc._line.setCoords(); fc._line = null; }
-        });
+            if (currentTool === 'line') {
+              fc._line = new fabric.Line([pt.x,pt.y,pt.x,pt.y], {
+                stroke: colorPicker.value,
+                strokeWidth: +sizeSlider.value,
+                selectable: false
+              });
+              fc.add(fc._line);
+            } else if (currentTool === 'text') {
+              const txt = new fabric.IText('', {
+                left: pt.x, top: pt.y,
+                fill: colorPicker.value,
+                fontSize: +fontSizeInput.value
+              });
+              fc.add(txt).setActiveObject(txt);
+              txt.enterEditing();
+              txt.hiddenTextarea.focus();
+            }
+          });
+          fc.on('mouse:move', opt => {
+            if (currentTool === 'line' && fc._line) {
+              const pt = fc.getPointer(opt.e, true);
+              fc._line.set({ x2:pt.x, y2:pt.y });
+              fc.renderAll();
+            }
+          });
+          fc.on('mouse:up', () => {
+            if (fc._line) { fc._line.setCoords(); fc._line = null; }
+          });
+        }
       }
-
       updateToolMode();
     }
   </script>
