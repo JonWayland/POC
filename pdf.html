@@ -662,6 +662,103 @@
       box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
     }
 
+    /* Reordering mode styles */
+    #pages-container.reordering .page-container {
+      cursor: grab;
+      transition: all 0.2s;
+      border: 2px dashed transparent;
+      position: relative;
+      margin-bottom: 40px; /* Add more space between pages in reordering mode */
+    }
+
+    #pages-container.reordering .page-container:hover {
+      border-color: var(--primary);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    #pages-container.reordering .page-container.dragging {
+      opacity: 0.7;
+      cursor: grabbing;
+    }
+
+    /* Page number indicator */
+    .page-order-indicator {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 168, 150, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      z-index: 10;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+    }
+
+    /* Reorder controls */
+    .reorder-controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 1000;
+    }
+
+    /* Style for the reorder button in the toolbar */
+    #reorder-pages-btn {
+      background: var(--primary);
+    }
+
+    #reorder-pages-btn:hover {
+      background: var(--dark);
+    }
+
+    #reorder-pages-btn.active {
+      background: var(--secondary);
+    }
+
+    /* Invisible overlay to make entire page draggable */
+    #pages-container.reordering .page-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 100; /* Place above canvases */
+      cursor: grab;
+      background: transparent;
+      pointer-events: auto; /* Allow interaction */
+    }
+
+    #pages-container.reordering .page-container.dragging::after {
+      cursor: grabbing;
+    }
+
+    /* Update the page-order-indicator to appear above the overlay */
+    .page-order-indicator {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 168, 150, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      z-index: 101; /* Above the ::after overlay */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+    }
+
   </style>
 </head>
 <body>
@@ -707,6 +804,7 @@
       <button id="undo-btn">Undo</button>
       <button id="clear-btn">Clear</button>
       <button id="toggle-selection-btn">Select Pages</button>
+      <button id="reorder-pages-btn">Reorder Pages</button>
       <button id="save-btn">Download</button>
     </div>
     
@@ -853,9 +951,18 @@
     let fileBlobs         = [];
     let selectionMode     = false;
     let undoHistory       = []; // Track actions for undo functionality
+    let originalPageOrder = []; // To track original page order during reordering
 
     // init Sortable on file list
     Sortable.create(fileListEl, { animation: 150 });
+
+    // Add the reorder button initialization here
+    const reorderPagesBtn = document.getElementById('reorder-pages-btn');
+    let reorderingMode = false;
+    let sortablePages = null;
+
+    // Reorder mode toggle functionality
+    reorderPagesBtn.addEventListener('click', toggleReorderMode);
 
     // tool switching
     toolButtons.forEach(btn => {
@@ -1271,14 +1378,17 @@
     });
 
     // drag & drop to file list
-    pagesContainer.addEventListener('dragover', e => {
+    // Define named event handler functions
+    const pagesContainerDragOver = function(e) {
       e.preventDefault();
       pagesContainer.classList.add('dragover');
-    });
-    pagesContainer.addEventListener('dragleave', () => {
+    };
+
+    const pagesContainerDragLeave = function() {
       pagesContainer.classList.remove('dragover');
-    });
-    pagesContainer.addEventListener('drop', e => {
+    };
+
+    const pagesContainerDrop = function(e) {
       e.preventDefault();
       pagesContainer.classList.remove('dragover');
       const dropped = Array.from(e.dataTransfer.files)
@@ -1291,7 +1401,12 @@
       // Add new files to existing files array instead of replacing
       fileBlobs = [...fileBlobs, ...dropped];
       setupFileList();
-    });
+    };
+
+    // Add event listeners using the named functions
+    pagesContainer.addEventListener('dragover', pagesContainerDragOver);
+    pagesContainer.addEventListener('dragleave', pagesContainerDragLeave);
+    pagesContainer.addEventListener('drop', pagesContainerDrop);
 
     // populate & show the file-list
     function setupFileList() {
@@ -1664,6 +1779,274 @@
       });
     });
     }
+
+    function toggleReorderMode() {
+      if (!pdfCanvases.length) {
+        alert('Please load a PDF first.');
+        return;
+      }
+
+      reorderingMode = !reorderingMode;
+      reorderPagesBtn.textContent = reorderingMode ? 'Exit Reorder Mode' : 'Reorder Pages';
+      reorderPagesBtn.style.background = reorderingMode ? 'var(--secondary)' : '';
+      
+      // Toggle reordering class on container
+      pagesContainer.classList.toggle('reordering', reorderingMode);
+      
+      if (reorderingMode) {
+        // Disable the default PDF drag and drop behavior while in reordering mode
+        pagesContainer.removeEventListener('dragover', pagesContainerDragOver);
+        pagesContainer.removeEventListener('dragleave', pagesContainerDragLeave);
+        pagesContainer.removeEventListener('drop', pagesContainerDrop);
+        
+        // Store current tool to restore later
+        previousTool = currentTool;
+        
+        // Temporarily disable other tools during reordering
+        toolButtons.forEach(btn => btn.classList.remove('active'));
+        currentTool = 'reordering';
+        
+        // Store the current order as the original order
+        originalPageOrder = [];
+        for (let i = 0; i < pdfCanvases.length; i++) {
+          originalPageOrder.push(i);
+        }
+        
+        // Add page numbers to each page
+        const pageContainers = document.querySelectorAll('.page-container');
+        pageContainers.forEach((container, index) => {
+          // Set data attribute to track original index
+          container.dataset.originalIndex = index;
+          
+          // Add page number indicator if it doesn't exist
+          if (!container.querySelector('.page-order-indicator')) {
+            const indicator = document.createElement('div');
+            indicator.className = 'page-order-indicator';
+            indicator.textContent = `Page ${index + 1}`;
+            container.appendChild(indicator);
+          } else {
+            // Update existing indicator
+            container.querySelector('.page-order-indicator').textContent = `Page ${index + 1}`;
+          }
+        });
+        
+        // Disable fabric canvas interactivity during reordering
+        fabricCanvases.forEach(fc => {
+          fc.selection = false;
+          fc.isDrawingMode = false;
+          fc.forEachObject(obj => {
+            obj.selectable = false;
+            obj.evented = false;
+          });
+          fc.renderAll();
+        });
+        
+        // Initialize Sortable.js on the pages container
+        sortablePages = new Sortable(pagesContainer, {
+          animation: 150,
+          handle: '.page-container', // This selects the entire container
+          draggable: '.page-container',
+          ghostClass: 'dragging',
+          onEnd: updatePageOrder,
+          delay: 100, // Small delay to improve drag detection
+          delayOnTouchOnly: true, // Only delay for touch devices
+          touchStartThreshold: 5, // Distance threshold before drag starts
+        });
+        
+        // Show reorder controls
+        const reorderControls = document.createElement('div');
+        reorderControls.className = 'reorder-controls';
+        reorderControls.id = 'reorder-controls';
+        
+        const applyReorderBtn = document.createElement('button');
+        applyReorderBtn.textContent = 'Apply New Order';
+        applyReorderBtn.addEventListener('click', applyPageReordering);
+        
+        const cancelReorderBtn = document.createElement('button');
+        cancelReorderBtn.textContent = 'Cancel';
+        cancelReorderBtn.className = 'secondary-btn';
+        cancelReorderBtn.addEventListener('click', cancelReordering);
+        
+        reorderControls.appendChild(applyReorderBtn);
+        reorderControls.appendChild(cancelReorderBtn);
+        document.body.appendChild(reorderControls);
+        reorderControls.style.display = 'flex';
+        
+        // Prevent default behavior to avoid the popup
+        pagesContainer.addEventListener('dragover', preventDefaultDragEvent);
+        pagesContainer.addEventListener('drop', preventDefaultDragEvent);
+      } else {
+        exitReorderMode();
+      }
+    }
+
+    function exitReorderMode() {
+      // Exit reorder mode
+      if (document.getElementById('reorder-controls')) {
+        document.getElementById('reorder-controls').remove();
+      }
+      
+      // Remove page indicators
+      document.querySelectorAll('.page-order-indicator').forEach(indicator => {
+        indicator.remove();
+      });
+      
+      // Destroy Sortable instance
+      if (sortablePages) {
+        sortablePages.destroy();
+        sortablePages = null;
+      }
+      
+      // Restore original drag-and-drop event listeners for PDF loading
+      pagesContainer.removeEventListener('dragover', preventDefaultDragEvent);
+      pagesContainer.removeEventListener('drop', preventDefaultDragEvent);
+      
+      pagesContainer.addEventListener('dragover', pagesContainerDragOver);
+      pagesContainer.addEventListener('dragleave', pagesContainerDragLeave);
+      pagesContainer.addEventListener('drop', pagesContainerDrop);
+      
+      // Restore previous tool
+      currentTool = previousTool;
+      
+      // Reactivate the appropriate tool button
+      toolButtons.forEach(btn => {
+        if (btn.dataset.tool === currentTool) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // Update tool mode
+      updateToolMode();
+    }
+
+    function cancelReordering() {
+      // Restore the original page order
+      restoreOriginalOrder();
+      
+      // Exit reorder mode
+      reorderingMode = false;
+      reorderPagesBtn.textContent = 'Reorder Pages';
+      reorderPagesBtn.style.background = '';
+      pagesContainer.classList.remove('reordering');
+      exitReorderMode();
+    }
+
+    function restoreOriginalOrder() {
+      if (originalPageOrder.length === 0) return;
+      
+      // Create temporary arrays with the original order
+      const restoredFabricCanvases = [];
+      const restoredPdfCanvases = [];
+      
+      // Populate the arrays in the original order
+      for (let i = 0; i < originalPageOrder.length; i++) {
+        const currentIndex = originalPageOrder.indexOf(i);
+        restoredFabricCanvases[i] = fabricCanvases[currentIndex];
+        restoredPdfCanvases[i] = pdfCanvases[currentIndex];
+      }
+      
+      // Replace the current arrays
+      fabricCanvases = restoredFabricCanvases;
+      pdfCanvases = restoredPdfCanvases;
+      
+      // Rebuild the DOM
+      rebuildPagesDOM();
+    }
+
+    // Function to update page numbers after drag
+    function updatePageOrder() {
+      // Update all page number indicators
+      const pageContainers = document.querySelectorAll('.page-container');
+      pageContainers.forEach((container, index) => {
+        const indicator = container.querySelector('.page-order-indicator');
+        if (indicator) {
+          indicator.textContent = `Page ${index + 1}`;
+        }
+      });
+    }
+
+    // Function to apply the new page order
+    function applyPageReordering() {
+      // Get the new order of pages
+      const pageContainers = Array.from(document.querySelectorAll('.page-container'));
+      
+      // Create temporary arrays to store the new order
+      const reorderedFabricCanvases = [];
+      const reorderedPdfCanvases = [];
+      
+      // For each container in the new order, get its original index
+      pageContainers.forEach(container => {
+        const originalIndex = parseInt(container.dataset.originalIndex);
+        reorderedFabricCanvases.push(fabricCanvases[originalIndex]);
+        reorderedPdfCanvases.push(pdfCanvases[originalIndex]);
+      });
+      
+      // Replace the original arrays with the reordered ones
+      fabricCanvases = reorderedFabricCanvases;
+      pdfCanvases = reorderedPdfCanvases;
+      
+      // Exit reorder mode
+      reorderingMode = false;
+      reorderPagesBtn.textContent = 'Reorder Pages';
+      reorderPagesBtn.style.background = '';
+      pagesContainer.classList.remove('reordering');
+      if (document.getElementById('reorder-controls')) {
+        document.getElementById('reorder-controls').remove();
+      }
+      
+      // Rebuild the DOM with the new order
+      rebuildPagesDOM();
+    }
+
+    // Function to rebuild the DOM with the current page order
+    function rebuildPagesDOM() {
+      // Save the scroll position
+      const scrollPosition = window.scrollY;
+      
+      // Clear the container
+      pagesContainer.innerHTML = '';
+      
+      // Add each page in the current order
+      for (let i = 0; i < pdfCanvases.length; i++) {
+        const pdfCanv = pdfCanvases[i];
+        const fc = fabricCanvases[i];
+        
+        // Create a container for this page
+        const wrapper = document.createElement('div');
+        wrapper.className = 'page-container';
+        wrapper.style.width = pdfCanv.width + 'px';
+        wrapper.style.height = pdfCanv.height + 'px';
+        
+        // Add the PDF canvas
+        wrapper.appendChild(pdfCanv);
+        
+        // Properly handle the fabric canvas
+        wrapper.appendChild(fc.wrapperEl);
+        
+        // Add the complete page to the document
+        pagesContainer.appendChild(wrapper);
+        
+        // Make sure fabric.js recalculates its position
+        fc.setDimensions({
+          width: pdfCanv.width,
+          height: pdfCanv.height
+        });
+        fc.calcOffset();
+        fc.requestRenderAll();
+      }
+      
+      // Restore the scroll position
+      window.scrollTo(0, scrollPosition);
+    }
+
+    // Simple function to prevent default drag events
+    function preventDefaultDragEvent(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // Store the previous tool to restore after reordering
+    let previousTool = 'select';
   </script>
 </body>
 </html>
