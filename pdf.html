@@ -605,6 +605,14 @@
       align-items: center;
       font-weight: 500;
     }
+
+    label[for="text-input"], 
+    label:has(#text-input) {
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      margin-right: 15px;
+    }
     
     input[type="text"], input[type="number"] {
       padding: 8px 12px;
@@ -640,6 +648,20 @@
       background: var(--dark);
     }
 
+    #text-input {
+      width: 200px;  /* Make it wider */
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-right: 10px;
+    }
+
+    #text-input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+    }
+
   </style>
 </head>
 <body>
@@ -665,7 +687,7 @@
   <div class="container">
     <header>
       <h1>PDF Annotation Tool</h1>
-      <p class="tagline">Add notes, highlights, and drawings to your PDF documents. Edit multiple PDFs at once and save your changes.</p>
+      <p class="tagline">Combine or split PDFs. Add notes, highlights, and drawings to your PDF documents. Edit multiple PDFs at once and save your changes.</p>
       <div class="os-links">
         <a href="/licenses.html">Open-source acknowledgements</a>
       </div>
@@ -681,7 +703,7 @@
       <label>Color: <input type="color" id="color-picker" value="#05668d"></label>
       <label>Size: <input type="range" id="size-slider" min="1" max="20" value="2"></label>
       <label>Font Size: <input type="number" id="font-size" min="10" max="72" value="24"></label>
-      <input type="text" id="text-input" placeholder="Default text…">
+      <label>Document Title: <input type="text" id="text-input" placeholder="Document title"></label>
       <button id="undo-btn">Undo</button>
       <button id="clear-btn">Clear</button>
       <button id="toggle-selection-btn">Select Pages</button>
@@ -1112,11 +1134,11 @@
         return;
       }
       
-      // Prompt the user for a filename
-      let fileName = prompt('Enter a filename for your PDF:', 'annotated.pdf');
+      // Get the document title from the text input
+      let fileName = document.getElementById('text-input').value.trim();
       
-      // If the user cancels or enters an empty string, use the default
-      if (fileName === null || fileName.trim() === '') {
+      // If no title is provided, use a default
+      if (fileName === '') {
         fileName = 'annotated.pdf';
       } else {
         // Ensure the filename ends with .pdf
@@ -1161,7 +1183,7 @@
         doc.addImage(tmp.toDataURL('image/png'), 'PNG', 0, 0, pdfC.width, pdfC.height);
       }
       
-      // Save the PDF with the user-provided filename
+      // Save the PDF with the title from the text input
       doc.save(fileName);
     });
 
@@ -1422,7 +1444,7 @@
                 object: fc._line
               });
             } else if (currentTool === 'text') {
-              const txt = new fabric.IText('', {
+              const txt = new fabric.IText('', {  // Default text to edit
                 left: pt.x, top: pt.y,
                 fill: colorPicker.value,
                 fontSize: +fontSizeInput.value
