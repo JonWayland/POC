@@ -654,6 +654,7 @@
     let lastFocusedCanvas = null;
     let fileBlobs         = [];
     let selectionMode     = false;
+    let undoHistory       = []; // Track actions for undo functionality
 
     // init Sortable on file list
     Sortable.create(fileListEl, { animation: 150 });
@@ -700,10 +701,53 @@
     undoBtn.addEventListener('click', () => {
       const fc = lastFocusedCanvas || fabricCanvases.slice(-1)[0];
       if (!fc) return;
-      const objs = fc.getObjects();
-      if (objs.length) fc.remove(objs.pop());
+      
+      // Check if there's an action in the undo history for this canvas
+      const canvasIndex = fabricCanvases.indexOf(fc);
+      const canvasHistory = undoHistory.filter(entry => entry.canvasIndex === canvasIndex);
+      
+      if (canvasHistory.length > 0) {
+        // Get the most recent action for this canvas
+        const lastAction = canvasHistory[canvasHistory.length - 1];
+        
+        // Remove this action from history
+        undoHistory = undoHistory.filter(entry => entry !== lastAction);
+        
+        // Handle different types of actions
+        if (lastAction.type === 'add') {
+          // If object was added, remove it
+          fc.remove(lastAction.object);
+        } else if (lastAction.type === 'move') {
+          // If object was moved, restore its previous position
+          lastAction.object.set({
+            left: lastAction.oldLeft,
+            top: lastAction.oldTop
+          });
+          lastAction.object.setCoords();
+          fc.renderAll();
+        } else if (lastAction.type === 'modify') {
+          // If object was modified (resized, rotated, etc.), restore its previous state
+          Object.keys(lastAction.oldState).forEach(prop => {
+            lastAction.object.set(prop, lastAction.oldState[prop]);
+          });
+          lastAction.object.setCoords();
+          fc.renderAll();
+        }
+      } else {
+        // Fall back to removing the last object if no history
+        const objs = fc.getObjects();
+        if (objs.length) fc.remove(objs.pop());
+      }
     });
-    clearBtn.addEventListener('click', () => fabricCanvases.forEach(fc => fc.clear()));
+    
+    clearBtn.addEventListener('click', () => {
+      fabricCanvases.forEach(fc => {
+        fc.clear();
+        // Clear undo history for this canvas
+        const canvasIndex = fabricCanvases.indexOf(fc);
+        undoHistory = undoHistory.filter(entry => entry.canvasIndex !== canvasIndex);
+      });
+    });
 
     // Save PDF with selected pages
     saveBtn.addEventListener('click', async () => {
@@ -948,6 +992,13 @@
                 selectable: false
               });
               fc.add(fc._line);
+              
+              // Track this action for undo
+              undoHistory.push({
+                canvasIndex: fabricCanvases.indexOf(fc),
+                type: 'add',
+                object: fc._line
+              });
             } else if (currentTool === 'text') {
               const txt = new fabric.IText('', {
                 left: pt.x, top: pt.y,
@@ -957,6 +1008,13 @@
               fc.add(txt).setActiveObject(txt);
               txt.enterEditing();
               txt.hiddenTextarea.focus();
+              
+              // Track this action for undo
+              undoHistory.push({
+                canvasIndex: fabricCanvases.indexOf(fc),
+                type: 'add',
+                object: txt
+              });
             } else if (currentTool === 'highlight') {
               // Start drawing a highlight rectangle
               fc._highlightStart = pt;
@@ -977,6 +1035,25 @@
                 selectable: true
               });
               fc.add(fc._highlight);
+              
+              // Don't add to undo history yet - will do on mouse up when the highlight is complete
+            } else if (currentTool === 'select') {
+              // Track original position of objects when selected
+              const activeObj = fc.getActiveObject();
+              if (activeObj) {
+                // Store the original position
+                activeObj._originalLeft = activeObj.left;
+                activeObj._originalTop = activeObj.top;
+                
+                // Also store original scale, angle, etc.
+                activeObj._originalState = {
+                  scaleX: activeObj.scaleX,
+                  scaleY: activeObj.scaleY,
+                  angle: activeObj.angle,
+                  width: activeObj.width,
+                  height: activeObj.height
+                };
+              }
             }
           });
           
@@ -1018,9 +1095,71 @@
               // Finalize the highlight
               fc._highlight.setCoords();
               
+              // Add to undo history now that the highlight is complete
+              undoHistory.push({
+                canvasIndex: fabricCanvases.indexOf(fc),
+                type: 'add',
+                object: fc._highlight
+              });
+              
               // Clean up temporary variables
               fc._highlight = null;
               fc._highlightStart = null;
+            }
+          });
+          
+          // Track object modifications for undo
+          fc.on('object:modified', (e) => {
+            const obj = e.target;
+            
+            if (obj._originalLeft !== undefined && obj._originalTop !== undefined) {
+              // This was a move operation
+              undoHistory.push({
+                canvasIndex: fabricCanvases.indexOf(fc),
+                type: 'move',
+                object: obj,
+                oldLeft: obj._originalLeft,
+                oldTop: obj._originalTop,
+                newLeft: obj.left,
+                newTop: obj.top
+              });
+              
+              // Clean up temp properties
+              delete obj._originalLeft;
+              delete obj._originalTop;
+            }
+            
+            if (obj._originalState) {
+              // This was a transform operation (resize, rotate, etc)
+              const newState = {
+                scaleX: obj.scaleX,
+                scaleY: obj.scaleY,
+                angle: obj.angle,
+                width: obj.width,
+                height: obj.height
+              };
+              
+              // Only add to history if something actually changed
+              let hasChanged = false;
+              for (const prop in newState) {
+                if (newState[prop] !== obj._originalState[prop]) {
+                  hasChanged = true;
+                  break;
+                }
+              }
+              
+              if (hasChanged) {
+                undoHistory.push({
+                  canvasIndex: fabricCanvases.indexOf(fc),
+                  type: 'modify',
+                  object: obj,
+                  oldState: obj._originalState,
+                  newState: newState
+                });
+              }
+              
+              // Clean up temp properties
+              delete obj._originalState;
             }
           });
         }
