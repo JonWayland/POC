@@ -381,13 +381,55 @@
       box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     
-    #load-btn {
+    .file-list-item-content {
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .remove-file-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .remove-file-btn:hover {
+      background: #ff5252;
+      transform: scale(1.1);
+    }
+    
+    .file-list-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
       margin-top: 16px;
+    }
+    
+    #load-btn {
       background: var(--secondary);
     }
     
     #load-btn:hover {
       background: #e9a800;
+    }
+    
+    .secondary-btn {
+      background: #e0e0e0;
+      color: var(--text);
+    }
+    
+    .secondary-btn:hover {
+      background: #d0d0d0;
     }
     
     #pages-container {
@@ -633,7 +675,7 @@
       <button id="undo-btn">Undo</button>
       <button id="clear-btn">Clear</button>
       <button id="toggle-selection-btn">Select Pages</button>
-      <button id="save-btn">Save PDF</button>
+      <button id="save-btn">Download</button>
     </div>
     
     <div class="page-selection-controls" id="page-selection-controls">
@@ -645,7 +687,10 @@
     <div id="file-list-container">
       <strong>Reorder your PDFs:</strong>
       <ul id="file-list"></ul>
-      <button id="load-btn">Load PDFs</button>
+      <div class="file-list-buttons">
+        <button id="load-btn">Load PDFs</button>
+        <button id="clear-files-btn" class="secondary-btn">Clear All Files</button>
+      </div>
     </div>
 
     <div id="pages-container">
@@ -704,7 +749,7 @@
     </div>
   </footer>
 
-  <!-- Confirmation Modal -->
+  <!-- Confirmation Modals -->
   <div class="modal-overlay" id="confirmation-modal">
     <div class="modal-container">
       <div class="modal-header">
@@ -716,6 +761,21 @@
       <div class="modal-footer">
         <button class="modal-btn modal-btn-cancel" id="cancel-clear">Cancel</button>
         <button class="modal-btn modal-btn-confirm" id="confirm-clear">Clear All</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="clear-files-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Clear All Files?</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to remove all PDF files from the list? This will not affect any loaded PDFs that you're currently annotating.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancel-clear-files">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="confirm-clear-files">Clear All Files</button>
       </div>
     </div>
   </div>
@@ -737,6 +797,7 @@
     const fileListCont       = document.getElementById('file-list-container');
     const fileListEl         = document.getElementById('file-list');
     const loadBtn            = document.getElementById('load-btn');
+    const clearFilesBtn      = document.getElementById('clear-files-btn');
     const pagesContainer     = document.getElementById('pages-container');
     const toolButtons        = document.querySelectorAll('#toolbar button[data-tool]');
     const colorPicker        = document.getElementById('color-picker');
@@ -881,10 +942,47 @@
       }
     });
     
-    // Close modal with escape key
+    // Clear files button - show confirmation modal
+    const clearFilesModal = document.getElementById('clear-files-modal');
+    const cancelClearFilesBtn = document.getElementById('cancel-clear-files');
+    const confirmClearFilesBtn = document.getElementById('confirm-clear-files');
+    
+    clearFilesBtn.addEventListener('click', () => {
+      // Show the confirmation modal
+      clearFilesModal.classList.add('active');
+    });
+    
+    // Cancel button in modal
+    cancelClearFilesBtn.addEventListener('click', () => {
+      clearFilesModal.classList.remove('active');
+    });
+    
+    // Confirm button in modal
+    confirmClearFilesBtn.addEventListener('click', () => {
+      // Hide the modal
+      clearFilesModal.classList.remove('active');
+      
+      // Clear all files
+      fileBlobs = [];
+      setupFileList();
+    });
+    
+    // Close modal if clicked outside
+    clearFilesModal.addEventListener('click', (e) => {
+      if (e.target === clearFilesModal) {
+        clearFilesModal.classList.remove('active');
+      }
+    });
+    
+    // Close modal with escape key (handle both modals)
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && confirmationModal.classList.contains('active')) {
-        confirmationModal.classList.remove('active');
+      if (e.key === 'Escape') {
+        if (confirmationModal.classList.contains('active')) {
+          confirmationModal.classList.remove('active');
+        }
+        if (clearFilesModal.classList.contains('active')) {
+          clearFilesModal.classList.remove('active');
+        }
       }
     });
 
@@ -1029,8 +1127,12 @@
 
     // handle file input (multiple)
     fileInput.addEventListener('change', e => {
-      fileBlobs = Array.from(e.target.files).filter(f => f.type === 'application/pdf');
-      setupFileList();
+      const newFiles = Array.from(e.target.files).filter(f => f.type === 'application/pdf');
+      if (newFiles.length > 0) {
+        // Add new files to existing files array
+        fileBlobs = [...fileBlobs, ...newFiles];
+        setupFileList();
+      }
     });
 
     // drag & drop to file list
@@ -1050,25 +1152,87 @@
         alert('Please drop PDF files only.');
         return;
       }
-      fileBlobs = dropped;
+      
+      // Add new files to existing files array instead of replacing
+      fileBlobs = [...fileBlobs, ...dropped];
       setupFileList();
     });
 
     // populate & show the file-list
     function setupFileList() {
       fileListEl.innerHTML = '';
-      fileBlobs.forEach((f,i) => {
+      fileBlobs.forEach((f, i) => {
         const li = document.createElement('li');
-        li.textContent = f.name;
+        
+        // Create wrapper for file name that can be truncated
+        const fileNameWrapper = document.createElement('div');
+        fileNameWrapper.className = 'file-list-item-content';
+        fileNameWrapper.textContent = f.name;
+        li.appendChild(fileNameWrapper);
+        
+        // Create remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-file-btn';
+        removeBtn.innerHTML = '×'; // × character
+        removeBtn.title = 'Remove this PDF';
+        removeBtn.dataset.index = i;
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent triggering sortable
+          const index = parseInt(e.target.dataset.index);
+          removePdfFile(index);
+        });
+        li.appendChild(removeBtn);
+        
         li.dataset.index = i;
         fileListEl.appendChild(li);
       });
-      fileListCont.style.display = 'block';
-      pagesContainer.innerHTML = '<p style="color:#666;margin-top:100px;text-align:center;font-size:1.2rem;">Reorder above then click Load PDFs.</p>';
+      
+      // Show the file list container if we have files
+      if (fileBlobs.length > 0) {
+        fileListCont.style.display = 'block';
+        pagesContainer.innerHTML = '<p style="color:#666;margin-top:100px;text-align:center;font-size:1.2rem;">Drag & drop more PDFs here, or Reorder above and click Load PDFs.</p>';
+      } else {
+        // Hide the container if all files were removed
+        fileListCont.style.display = 'none';
+        pagesContainer.innerHTML = '<p style="color:#666; margin-top:100px; text-align:center; font-size:1.2rem;">' +
+          'Drag & drop PDFs here, or use the file input above.<br>' +
+          '<br>' +
+          '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+          '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>' +
+          '<polyline points="14 2 14 8 20 8"></polyline>' +
+          '<line x1="12" y1="18" x2="12" y2="12"></line>' +
+          '<line x1="9" y1="15" x2="15" y2="15"></line>' +
+          '</svg>' +
+          '</p>';
+      }
+    }
+    
+    // Function to remove a PDF file from the list
+    function removePdfFile(index) {
+      // Remove the file from the array
+      fileBlobs.splice(index, 1); // Fixed: This removes one element at position 'index'
+      
+      // Update the UI
+      setupFileList();
+      
+      // Update data-index attributes on remove buttons to match new array indexes
+      document.querySelectorAll('.remove-file-btn').forEach((btn, i) => {
+        btn.dataset.index = i;
+      });
+      
+      // Update data-index attributes on list items
+      document.querySelectorAll('#file-list li').forEach((li, i) => {
+        li.dataset.index = i;
+      });
     }
 
     // when user clicks Load, render in the chosen order
     loadBtn.addEventListener('click', () => {
+      if (fileBlobs.length === 0) {
+        alert('Please add at least one PDF file before loading.');
+        return;
+      }
+      
       const ordered = Array.from(fileListEl.children).map(li => fileBlobs[li.dataset.index]);
       renderMultiplePDFs(ordered);
     });
