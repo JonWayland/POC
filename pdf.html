@@ -462,15 +462,76 @@
       display: none;
     }
     
+    /* Make the page checkbox container larger and more visible */
     .page-checkbox-container {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(255,255,255,0.8);
-      padding: 5px;
-      border-radius: 4px;
-      z-index: 2;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px;
+      border-radius: 8px;
+      z-index: 102; /* Make sure it's above other elements */
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    /* Style the checkbox itself to be larger */
+    .page-checkbox {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      accent-color: var(--primary); /* Color the checkbox with the primary theme color */
+    }
+
+    /* Add hover effect */
+    .page-checkbox-container:hover {
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05);
+      transition: all 0.2s;
+    }
+
+    /* Add a label next to the checkbox for better clarity */
+    .page-checkbox-container::after {
+      content: "Select";
+      font-size: 0.9rem;
+      margin-left: 6px;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    /* Add these styles to show selected state even when not in selection mode */
+    .page-container.selected {
+      border: 3px solid var(--primary);
+      box-shadow: 0 5px 15px rgba(0, 168, 150, 0.2);
+    }
+
+    .page-selected-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 168, 150, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      z-index: 5;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+      pointer-events: none; /* Don't interfere with interaction */
+      display: flex;
+      align-items: center;
+    }
+
+    .page-selected-indicator::before {
+      content: "✓";
+      margin-right: 5px;
+      font-weight: bold;
+    }
+
     
     .page-info {
       position: absolute;
@@ -1298,7 +1359,7 @@
     colorPicker.addEventListener('change', updateToolMode);
     sizeSlider.addEventListener('input', updateToolMode);
     
-    // Page selection mode
+    // Update the toggleSelectionBtn click handler to maintain visual selection state
     toggleSelectionBtn.addEventListener('click', () => {
       selectionMode = !selectionMode;
       toggleSelectionBtn.textContent = selectionMode ? 'Exit Selection Mode' : 'Select Pages';
@@ -1319,18 +1380,64 @@
             const cb = document.createElement('input');
             cb.type = 'checkbox';
             cb.className = 'page-checkbox';
+            cb.id = `page-checkbox-${index}`;
             cb.dataset.pageIndex = index;
-            cb.checked = true; // Default to selected
-            cb.addEventListener('change', updateSelectedCount);
+            cb.checked = container.classList.contains('selected') || true; // Default to selected or use previous state
             
-            checkbox.appendChild(cb);
+            // Update the visual indicator whenever checkbox changes
+            cb.addEventListener('change', (e) => {
+              updateSelectedCount();
+              
+              // Update the container's selected class
+              if (e.target.checked) {
+                container.classList.add('selected');
+              } else {
+                container.classList.remove('selected');
+                
+                // Remove visual indicator if present
+                const indicator = container.querySelector('.page-selected-indicator');
+                if (indicator) {
+                  indicator.remove();
+                }
+              }
+            });
+            
+            // Add label for better accessibility
+            const label = document.createElement('label');
+            label.htmlFor = `page-checkbox-${index}`;
+            label.className = 'page-checkbox-label';
+            label.appendChild(cb);
+            
+            checkbox.appendChild(label);
             container.appendChild(checkbox);
+            
+            // Add animation to draw attention
+            checkbox.style.opacity = '0';
+            checkbox.style.transform = 'scale(0.8)';
+            checkbox.style.transition = 'all 0.3s ease';
+            
+            // Force reflow to make the animation work
+            void checkbox.offsetWidth;
+            
+            // Animate in
+            checkbox.style.opacity = '1';
+            checkbox.style.transform = 'scale(1)';
             
             // Add page number indicator
             const pageInfo = document.createElement('div');
             pageInfo.className = 'page-info';
             pageInfo.textContent = `Page ${index + 1}`;
             container.appendChild(pageInfo);
+            
+            // Mark as selected initially (since checkbox is checked by default)
+            container.classList.add('selected');
+          } else {
+            // Show existing checkbox
+            checkbox.style.display = 'flex';
+            
+            // Update page info
+            const pageInfo = container.querySelector('.page-info');
+            if (pageInfo) pageInfo.style.display = 'block';
           }
         } else if (checkbox) {
           // Hide checkbox when not in selection mode
@@ -1339,6 +1446,28 @@
           // Hide page info
           const pageInfo = container.querySelector('.page-info');
           if (pageInfo) pageInfo.style.display = 'none';
+          
+          // Check if this page is selected
+          const cb = checkbox.querySelector('.page-checkbox');
+          if (cb && cb.checked) {
+            // Keep the container's selected class
+            container.classList.add('selected');
+            
+            // Add a visual indicator that this page is selected
+            if (!container.querySelector('.page-selected-indicator')) {
+              const indicator = document.createElement('div');
+              indicator.className = 'page-selected-indicator';
+              indicator.textContent = 'Selected';
+              container.appendChild(indicator);
+            }
+          } else {
+            // Remove selected class and indicator
+            container.classList.remove('selected');
+            const indicator = container.querySelector('.page-selected-indicator');
+            if (indicator) {
+              indicator.remove();
+            }
+          }
         }
       });
       
@@ -1349,6 +1478,12 @@
     selectAllBtn.addEventListener('click', () => {
       document.querySelectorAll('.page-checkbox').forEach(cb => {
         cb.checked = true;
+        
+        // Update visual state
+        const container = cb.closest('.page-container');
+        if (container) {
+          container.classList.add('selected');
+        }
       });
       updateSelectedCount();
     });
@@ -1356,6 +1491,18 @@
     deselectAllBtn.addEventListener('click', () => {
       document.querySelectorAll('.page-checkbox').forEach(cb => {
         cb.checked = false;
+        
+        // Update visual state
+        const container = cb.closest('.page-container');
+        if (container) {
+          container.classList.remove('selected');
+          
+          // Remove any selection indicators
+          const indicator = container.querySelector('.page-selected-indicator');
+          if (indicator) {
+            indicator.remove();
+          }
+        }
       });
       updateSelectedCount();
     });
