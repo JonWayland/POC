@@ -972,16 +972,16 @@
   </div>
   
   <!-- libs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+  <script src="/libs/pdf.min.js"></script>
+  <script src="/libs/pdf.worker.min.js"></script>
+  <script src="/libs/fabric.min.js"></script>
+  <script src="/libs/jspdf.umd.min.js"></script>
+  <script src="/libs/Sortable.min.js"></script>
 
   <script>
     // PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      '/libs/pdf.worker.min.js';
 
     // DOM refs
     const fileInput          = document.getElementById('file-input');
@@ -1013,6 +1013,7 @@
     let selectionMode     = false;
     let undoHistory       = []; // Track actions for undo functionality
     let originalPageOrder = []; // To track original page order during reordering
+    let objectHistory = []; // objectHistory array
 
     // init Sortable on file list
     Sortable.create(fileListEl, { animation: 150 });
@@ -1099,45 +1100,58 @@
 
     // Undo / Clear
     undoBtn.addEventListener('click', () => {
-      const fc = lastFocusedCanvas || fabricCanvases.slice(-1)[0];
-      if (!fc) return;
+      // Check if there's anything to undo
+      if (objectHistory.length === 0) return;
       
-      // Check if there's an action in the undo history for this canvas
-      const canvasIndex = fabricCanvases.indexOf(fc);
-      const canvasHistory = undoHistory.filter(entry => entry.canvasIndex === canvasIndex);
+      // Get the most recent action
+      const lastAction = objectHistory.pop();
       
-      if (canvasHistory.length > 0) {
-        // Get the most recent action for this canvas
-        const lastAction = canvasHistory[canvasHistory.length - 1];
-        
-        // Remove this action from history
-        undoHistory = undoHistory.filter(entry => entry !== lastAction);
-        
-        // Handle different types of actions
-        if (lastAction.type === 'add') {
-          // If object was added, remove it
+      // Find the corresponding canvas
+      const fc = fabricCanvases[lastAction.canvasIndex];
+      if (!fc) return; // Safety check
+      
+      // Handle the action based on its type
+      if (lastAction.type === 'add') {
+        // If the object is still on the canvas, remove it
+        if (fc.contains(lastAction.object)) {
           fc.remove(lastAction.object);
-        } else if (lastAction.type === 'move') {
-          // If object was moved, restore its previous position
-          lastAction.object.set({
-            left: lastAction.oldLeft,
-            top: lastAction.oldTop
-          });
-          lastAction.object.setCoords();
-          fc.renderAll();
-        } else if (lastAction.type === 'modify') {
-          // If object was modified (resized, rotated, etc.), restore its previous state
+        }
+      } else if (lastAction.type === 'modify') {
+        // If the object is still on the canvas, restore its previous state
+        if (lastAction.object && fc.contains(lastAction.object)) {
           Object.keys(lastAction.oldState).forEach(prop => {
             lastAction.object.set(prop, lastAction.oldState[prop]);
           });
           lastAction.object.setCoords();
-          fc.renderAll();
         }
-      } else {
-        // Fall back to removing the last object if no history
-        const objs = fc.getObjects();
-        if (objs.length) fc.remove(objs.pop());
+      } else if (lastAction.type === 'clear') {
+        // Restore objects after a clear
+        if (Array.isArray(lastAction.objects)) {
+          lastAction.objects.forEach(obj => {
+            // If the object is a serialized json object, recreate it
+            if (typeof obj === 'object' && !obj.canvas) {
+              // Recreate from serialized object
+              fabric.util.enlivenObjects([obj], function(enlivenedObjects) {
+                if (enlivenedObjects && enlivenedObjects[0]) {
+                  fc.add(enlivenedObjects[0]);
+                }
+              });
+            } else {
+              // It's a direct object reference
+              fc.add(obj);
+            }
+          });
+        }
       }
+      
+      // Render the changes
+      fc.renderAll();
+      
+      // Set this as the last focused canvas
+      lastFocusedCanvas = fc;
+      
+      // Debug the remaining history
+      console.log(`Undo performed. Remaining history items: ${objectHistory.length}`);
     });
     
     // Clear button - show confirmation modal
@@ -1160,12 +1174,28 @@
       // Hide the modal
       confirmationModal.classList.remove('active');
       
-      // Actually clear the annotations
+      // Save objects for undo before clearing
       fabricCanvases.forEach(fc => {
-        fc.clear();
-        // Clear undo history for this canvas
-        const canvasIndex = fabricCanvases.indexOf(fc);
-        undoHistory = undoHistory.filter(entry => entry.canvasIndex !== canvasIndex);
+        if (fc.getObjects().length > 0) {
+          // Store a deep clone of all objects for undo
+          const objectClones = [];
+          fc.getObjects().forEach(obj => {
+            // Create a serialized copy
+            const json = obj.toJSON();
+            objectClones.push(json);
+          });
+          
+          // Add to undo history
+          objectHistory.push({
+            canvasIndex: fabricCanvases.indexOf(fc),
+            type: 'clear',
+            objects: objectClones,
+            objectCount: fc.getObjects().length
+          });
+          
+          // Clear the canvas
+          fc.clear();
+        }
       });
     });
     
@@ -1686,51 +1716,112 @@
           fc.selectionBorderColor = 'rgba(0, 168, 150, 0.8)';
           fc.selectionLineWidth = 1;
 
+          // EVENT LISTENERS
+          // For free drawing (paths)
+          fc.on('path:created', function(e) {
+            // When a drawing path is created, add it to the history
+            objectHistory.push({
+              canvasIndex: fabricCanvases.indexOf(fc),
+              type: 'add',
+              object: e.path
+            });
+          });
+
+          // For all other object additions (text, lines, highlights, etc.)
+          fc.on('object:added', function(e) {
+            // Avoid duplicating path objects (which trigger both events)
+            if (e.target.type !== 'path' || e.target.source !== 'pencil') {
+              objectHistory.push({
+                canvasIndex: fabricCanvases.indexOf(fc),
+                type: 'add',
+                object: e.target
+              });
+            }
+          });
+
+          // For object modifications (move, resize, etc.)
+          fc.on('object:modified', function(e) {
+            objectHistory.push({
+              canvasIndex: fabricCanvases.indexOf(fc),
+              type: 'modify',
+              object: e.target,
+              oldState: e.target.originalState || {}
+            });
+          });
+
           // per-canvas handlers
           fc.on('mouse:down', opt => {
             lastFocusedCanvas = fc;
             const pt = fc.getPointer(opt.e, true);
             
             if (currentTool === 'line') {
-              fc._line = new fabric.Line([pt.x,pt.y,pt.x,pt.y], {
+              // Create a new line and add it to the canvas
+              fc._line = new fabric.Line([pt.x, pt.y, pt.x, pt.y], {
                 stroke: colorPicker.value,
                 strokeWidth: +sizeSlider.value,
-                selectable: false
+                selectable: true // Make selectable so it can be modified later
               });
               fc.add(fc._line);
               
-              // Track this action for undo
-              undoHistory.push({
-                canvasIndex: fabricCanvases.indexOf(fc),
-                type: 'add',
-                object: fc._line
-              });
+              // Note: no need to manually add to objectHistory - object:added event handles this
             } else if (currentTool === 'text') {
-              const txt = new fabric.IText('', {  // Default text to edit
-                left: pt.x, top: pt.y,
-                fill: colorPicker.value,
-                fontSize: +fontSizeInput.value
-              });
-              fc.add(txt).setActiveObject(txt);
-              txt.enterEditing();
-              txt.hiddenTextarea.focus();
-              
-              // Track this action for undo
-              undoHistory.push({
-                canvasIndex: fabricCanvases.indexOf(fc),
-                type: 'add',
-                object: txt
-              });
-            } else if (currentTool === 'highlight') {
+                        // Create a new text object with empty text
+                        const txt = new fabric.IText('', {
+                          left: pt.x, 
+                          top: pt.y,
+                          fill: colorPicker.value,
+                          fontSize: +fontSizeInput.value,
+                          selectable: true,
+                          placeholder: 'Enter text here' // Add a placeholder property
+                        });
+                        
+                        // Add to canvas and set as active object
+                        fc.add(txt);
+                        fc.setActiveObject(txt);
+                        
+                        // Enter editing mode and focus
+                        txt.enterEditing();
+                        if (txt.hiddenTextarea) {
+                          txt.hiddenTextarea.focus();
+                          
+                          // Set a temporary placeholder text that will be removed on first keystroke
+                          if (txt.text === '') {
+                            txt.text = 'Enter text here';
+                            txt._isPlaceholder = true; // Flag to identify it as placeholder
+                            
+                            // Style placeholder text differently (lighter color)
+                            const originalFill = txt.fill;
+                            txt.set('fill', 'rgba(100, 100, 100, 0.7)');
+                            fc.renderAll();
+                            
+                            // Add one-time event listener for keydown to clear placeholder
+                            txt.hiddenTextarea.addEventListener('keydown', function clearPlaceholder(e) {
+                              // Don't clear on special keys like shift, ctrl, alt, etc.
+                              if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+                                // Only clear if this is still placeholder text
+                                if (txt._isPlaceholder) {
+                                  // Clear the placeholder text before the key's character is added
+                                  txt.text = '';
+                                  txt.set('fill', originalFill); // Restore original text color
+                                  txt._isPlaceholder = false;
+                                  fc.renderAll();
+                                }
+                                
+                                // Remove this event listener after first use
+                                txt.hiddenTextarea.removeEventListener('keydown', clearPlaceholder);
+                              }
+                            }, { once: false }); // We manually remove it after use
+                          }
+                        }
+                      } else if (currentTool === 'highlight') {
               // Start drawing a highlight rectangle
               fc._highlightStart = pt;
               
               // Create a semi-transparent highlight rectangle
               const color = colorPicker.value;
-              // Convert hex to RGB and add transparency
               let opacity = 0.3; // Default highlight opacity
               
-              // Create a semi-transparent version of the selected color
+              // Create the highlight rectangle
               fc._highlight = new fabric.Rect({
                 left: pt.x,
                 top: pt.y,
@@ -1740,26 +1831,9 @@
                 opacity: opacity,
                 selectable: true
               });
-              fc.add(fc._highlight);
               
-              // Don't add to undo history yet - will do on mouse up when the highlight is complete
-            } else if (currentTool === 'select') {
-              // Track original position of objects when selected
-              const activeObj = fc.getActiveObject();
-              if (activeObj) {
-                // Store the original position
-                activeObj._originalLeft = activeObj.left;
-                activeObj._originalTop = activeObj.top;
-                
-                // Also store original scale, angle, etc.
-                activeObj._originalState = {
-                  scaleX: activeObj.scaleX,
-                  scaleY: activeObj.scaleY,
-                  angle: activeObj.angle,
-                  width: activeObj.width,
-                  height: activeObj.height
-                };
-              }
+              // Add it to the canvas
+              fc.add(fc._highlight);
             }
           });
           
@@ -1769,7 +1843,11 @@
             const pt = fc.getPointer(opt.e, true);
             
             if (currentTool === 'line' && fc._line) {
-              fc._line.set({ x2:pt.x, y2:pt.y });
+              // Update the endpoint of the line
+              fc._line.set({ 
+                x2: pt.x, 
+                y2: pt.y 
+              });
               fc.renderAll();
             } else if (currentTool === 'highlight' && fc._highlight && fc._highlightStart) {
               // Calculate width and height based on start point and current point
@@ -1780,6 +1858,7 @@
               const left = Math.min(fc._highlightStart.x, pt.x);
               const top = Math.min(fc._highlightStart.y, pt.y);
               
+              // Update the highlight rectangle
               fc._highlight.set({
                 left: left,
                 top: top,
@@ -1792,21 +1871,23 @@
           });
           
           fc.on('mouse:up', () => {
-            if (fc._line) { 
-              fc._line.setCoords(); 
-              fc._line = null; 
+            if (currentTool === 'line' && fc._line) { 
+              // Finalize the line
+              fc._line.setCoords();
+              
+              // Mark the state as modified to support undo
+              fc.fire('object:modified', { target: fc._line });
+              
+              // Clean up the temporary reference
+              fc._line = null;
             }
             
-            if (fc._highlight) {
+            if (currentTool === 'highlight' && fc._highlight) {
               // Finalize the highlight
               fc._highlight.setCoords();
               
-              // Add to undo history now that the highlight is complete
-              undoHistory.push({
-                canvasIndex: fabricCanvases.indexOf(fc),
-                type: 'add',
-                object: fc._highlight
-              });
+              // Mark the state as modified to support undo
+              fc.fire('object:modified', { target: fc._highlight });
               
               // Clean up temporary variables
               fc._highlight = null;
