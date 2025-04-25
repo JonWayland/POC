@@ -820,6 +820,27 @@
       font-size: 0.9rem;
     }
 
+    #zoom-in-btn, #zoom-out-btn, #zoom-reset-btn {
+      padding: 5px 10px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    #zoom-in-btn:hover, #zoom-out-btn:hover, #zoom-reset-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+    }
+
+    #zoom-level {
+      font-weight: 500;
+      color: var(--dark);
+    }
+
   </style>
 </head>
 <body>
@@ -864,6 +885,12 @@
       <label>Document Title: <input type="text" id="text-input" placeholder="Document title"></label>
       <button id="undo-btn">Undo</button>
       <button id="clear-btn">Clear</button>
+      <div style="display: flex; align-items: center; margin-left: 10px;">
+        <button id="zoom-out-btn" title="Zoom Out">-</button>
+        <span id="zoom-level" style="margin: 0 8px; min-width: 40px; text-align: center;">100%</span>
+        <button id="zoom-in-btn" title="Zoom In">+</button>
+        <button id="zoom-reset-btn" title="Reset Zoom" style="margin-left: 5px;">Reset</button>
+      </div>
       <button id="toggle-selection-btn">Select Pages</button>
       <button id="reorder-pages-btn">Reorder Pages</button>
       <button id="save-btn">Download</button>
@@ -1014,6 +1041,9 @@
     let undoHistory       = []; // Track actions for undo functionality
     let originalPageOrder = []; // To track original page order during reordering
     let objectHistory = []; // objectHistory array
+    // Zoom state variables
+    let currentZoomIndex = 3; // Start at 100%
+    const zoomLevels = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0];
 
     // init Sortable on file list
     Sortable.create(fileListEl, { animation: 150 });
@@ -1502,6 +1532,11 @@
       });
       
       updateSelectedCount();
+
+      // Preserve current zoom level when toggling selection mode
+      if (currentZoomIndex !== 3) { // If not at default 100%
+        applyZoom(zoomLevels[currentZoomIndex]);
+      }
     });
     
     // Select/Deselect All
@@ -1696,6 +1731,8 @@
           pdfCanv.width  = vp.width;
           pdfCanv.height = vp.height;
           wrapper.appendChild(pdfCanv);
+          // Store the PDF page reference for zoom functionality
+          pdfCanv.pdfPage = page;
           await page.render({ canvasContext: pdfCanv.getContext('2d'), viewport: vp }).promise;
           pdfCanvases.push(pdfCanv);
 
@@ -2224,6 +2261,11 @@
       
       // Rebuild the DOM with the new order
       rebuildPagesDOM();
+
+      // Preserve zoom level after reordering pages
+      if (currentZoomIndex !== 3) { // If not at default 100%
+        applyZoom(zoomLevels[currentZoomIndex]);
+      }
     }
 
     // Function to rebuild the DOM with the current page order
@@ -2275,6 +2317,169 @@
 
     // Store the previous tool to restore after reordering
     let previousTool = 'select';
+
+    // Function to apply zoom to all pages
+    function applyZoom(zoomFactor) {
+      // Update zoom level display
+      document.getElementById('zoom-level').textContent = Math.round(zoomFactor * 100) + '%';
+      
+      // Get all page containers
+      const pageContainers = document.querySelectorAll('.page-container');
+      
+      pageContainers.forEach((container, index) => {
+        const pdfCanvas = pdfCanvases[index];
+        const fabricCanvas = fabricCanvases[index];
+        
+        if (!pdfCanvas || !fabricCanvas) return;
+        
+        // Store original dimensions if not already stored
+        if (!pdfCanvas.originalWidth) {
+          pdfCanvas.originalWidth = pdfCanvas.width;
+          pdfCanvas.originalHeight = pdfCanvas.height;
+        }
+        
+        // Calculate new dimensions
+        const newWidth = Math.round(pdfCanvas.originalWidth * zoomFactor);
+        const newHeight = Math.round(pdfCanvas.originalHeight * zoomFactor);
+        
+        // Update container dimensions
+        container.style.width = newWidth + 'px';
+        container.style.height = newHeight + 'px';
+        
+        // Update PDF canvas dimensions and scale content
+        pdfCanvas.width = newWidth;
+        pdfCanvas.height = newHeight;
+        
+        // We need to redraw the PDF at the new scale
+        if (pdfCanvas.pdfPage) {
+          const viewport = pdfCanvas.pdfPage.getViewport({ scale: 1.5 * zoomFactor });
+          pdfCanvas.pdfPage.render({ 
+            canvasContext: pdfCanvas.getContext('2d'), 
+            viewport: viewport 
+          });
+        }
+        
+        // Update fabric canvas dimensions
+        fabricCanvas.setDimensions({
+          width: newWidth,
+          height: newHeight
+        });
+        
+        // Scale all objects on the fabric canvas
+        const objects = fabricCanvas.getObjects();
+        objects.forEach(obj => {
+          // If we're storing original positions and sizes
+          if (!obj.originalScaleX && zoomFactor !== 1.0) {
+            obj.originalLeft = obj.left;
+            obj.originalTop = obj.top;
+            obj.originalScaleX = obj.scaleX;
+            obj.originalScaleY = obj.scaleY;
+            if (obj.fontSize) obj.originalFontSize = obj.fontSize;
+          }
+          
+          if (zoomFactor === 1.0 && obj.originalScaleX) {
+            // Reset to original values
+            obj.set({
+              left: obj.originalLeft,
+              top: obj.originalTop,
+              scaleX: obj.originalScaleX,
+              scaleY: obj.originalScaleY
+            });
+            if (obj.originalFontSize) obj.set('fontSize', obj.originalFontSize);
+          } else if (obj.originalScaleX) {
+            // Scale based on original values and zoom factor
+            obj.set({
+              left: obj.originalLeft * zoomFactor,
+              top: obj.originalTop * zoomFactor,
+              scaleX: obj.originalScaleX * zoomFactor,
+              scaleY: obj.originalScaleY * zoomFactor
+            });
+            if (obj.originalFontSize) obj.set('fontSize', obj.originalFontSize * zoomFactor);
+          }
+        });
+        
+        fabricCanvas.renderAll();
+      });
+    }
+
+    // Add event listeners once DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get zoom control elements
+      const zoomInBtn = document.getElementById('zoom-in-btn');
+      const zoomOutBtn = document.getElementById('zoom-out-btn');
+      const zoomResetBtn = document.getElementById('zoom-reset-btn');
+      
+      // Add event listeners for zoom buttons
+      if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', () => {
+          if (currentZoomIndex < zoomLevels.length - 1) {
+            currentZoomIndex++;
+            applyZoom(zoomLevels[currentZoomIndex]);
+          }
+        });
+      }
+      
+      if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', () => {
+          if (currentZoomIndex > 0) {
+            currentZoomIndex--;
+            applyZoom(zoomLevels[currentZoomIndex]);
+          }
+        });
+      }
+      
+      if (zoomResetBtn) {
+        zoomResetBtn.addEventListener('click', () => {
+          currentZoomIndex = 3; // Reset to 100%
+          applyZoom(zoomLevels[currentZoomIndex]);
+        });
+      }
+    });
+
+    // Add keyboard shortcuts for zooming
+    document.addEventListener('keydown', (e) => {
+      // Only process if we're not in a text field
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        if (e.ctrlKey && (e.key === '=' || e.key === '+')) {
+          // Ctrl + = or Ctrl + + for zoom in
+          e.preventDefault();
+          if (currentZoomIndex < zoomLevels.length - 1) {
+            currentZoomIndex++;
+            applyZoom(zoomLevels[currentZoomIndex]);
+          }
+        } else if (e.ctrlKey && e.key === '-') {
+          // Ctrl + - for zoom out
+          e.preventDefault();
+          if (currentZoomIndex > 0) {
+            currentZoomIndex--;
+            applyZoom(zoomLevels[currentZoomIndex]);
+          }
+        } else if (e.ctrlKey && e.key === '0') {
+          // Ctrl + 0 for reset zoom
+          e.preventDefault();
+          currentZoomIndex = 3; // Reset to 100%
+          applyZoom(zoomLevels[currentZoomIndex]);
+        }
+      }
+    });
+
+    // Add mouse wheel zoom
+    document.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        
+        // Zoom in or out based on wheel direction
+        if (e.deltaY < 0 && currentZoomIndex < zoomLevels.length - 1) {
+          // Wheel up - zoom in
+          currentZoomIndex++;
+          applyZoom(zoomLevels[currentZoomIndex]);
+        } else if (e.deltaY > 0 && currentZoomIndex > 0) {
+          // Wheel down - zoom out
+          currentZoomIndex--;
+          applyZoom(zoomLevels[currentZoomIndex]);
+        }
+      }
+    }, { passive: false });
   </script>
 </body>
 </html>
