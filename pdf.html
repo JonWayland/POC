@@ -1386,23 +1386,27 @@
       const { jsPDF } = window.jspdf;
       if (!pdfCanvases.length) return;
       
+      // Get all page containers in their current display order
+      const pageContainers = Array.from(document.querySelectorAll('.page-container'));
+      
       // Get selected pages (if selection mode is active)
-      const selectedPages = [];
+      let selectedContainers = [];
       const checkboxes = document.querySelectorAll('.page-checkbox:checked');
       
       // If we have checkboxes and some are checked, use selection
       if (checkboxes.length > 0) {
         checkboxes.forEach(cb => {
-          selectedPages.push(parseInt(cb.dataset.pageIndex));
+          const container = cb.closest('.page-container');
+          if (container) {
+            selectedContainers.push(container);
+          }
         });
       } else {
-        // Otherwise include all pages
-        for (let i = 0; i < pdfCanvases.length; i++) {
-          selectedPages.push(i);
-        }
+        // Otherwise include all pages in their current order
+        selectedContainers = pageContainers;
       }
       
-      if (selectedPages.length === 0) {
+      if (selectedContainers.length === 0) {
         alert('Please select at least one page to save.');
         return;
       }
@@ -1420,44 +1424,138 @@
         }
       }
       
-      // start with first selected page's size/orientation
-      const firstIdx = selectedPages[0];
-      const first = pdfCanvases[firstIdx];
-      const orient = first.width > first.height ? 'l' : 'p';
-      const doc = new jsPDF({ unit:'px', format:[first.width,first.height], orientation:orient });
+      // Show a loading indicator
+      const loadingDiv = document.createElement('div');
+      loadingDiv.style.position = 'fixed';
+      loadingDiv.style.top = '50%';
+      loadingDiv.style.left = '50%';
+      loadingDiv.style.transform = 'translate(-50%, -50%)';
+      loadingDiv.style.padding = '20px 40px';
+      loadingDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+      loadingDiv.style.color = 'white';
+      loadingDiv.style.borderRadius = '10px';
+      loadingDiv.style.zIndex = '9999';
+      loadingDiv.style.fontSize = '18px';
+      loadingDiv.textContent = 'Creating PDF...';
+      document.body.appendChild(loadingDiv);
       
-      // First page is already added by jsPDF constructor
-      let currentPage = 1;
+      // Store current zoom index to restore later
+      const savedZoomIndex = currentZoomIndex;
       
-      for (let i = 0; i < selectedPages.length; i++) {
-        const pageIdx = selectedPages[i];
-        const pdfC = pdfCanvases[pageIdx];
-        const fc = fabricCanvases[pageIdx];
-        
-        // Add a new page for all pages after the first one
-        if (i > 0) {
-          const o = pdfC.width > pdfC.height ? 'l' : 'p';
-          doc.addPage([pdfC.width, pdfC.height], o);
-          currentPage++;
-        }
-        
-        // Set active page and render content
-        doc.setPage(currentPage);
-        
-        // Composite PDF content and annotations
-        const tmp = document.createElement('canvas');
-        tmp.width = pdfC.width; 
-        tmp.height = pdfC.height;
-        const ctx = tmp.getContext('2d');
-        ctx.drawImage(pdfC, 0, 0);
-        ctx.drawImage(fc.lowerCanvasEl, 0, 0);
-        
-        // Add the combined image to the PDF
-        doc.addImage(tmp.toDataURL('image/png'), 'PNG', 0, 0, pdfC.width, pdfC.height);
+      // Temporarily set zoom to 100% for rendering
+      if (currentZoomIndex !== 3) { // If not already at 100%
+        currentZoomIndex = 3; // Index 3 is 100%
+        applyZoom(zoomLevels[currentZoomIndex]);
       }
       
-      // Save the PDF with the title from the text input
-      doc.save(fileName);
+      // Wait for zoom changes to take effect
+      setTimeout(async () => {
+        try {
+          // Start with first selected page's size/orientation
+          const firstContainer = selectedContainers[0];
+          const firstPdfCanvas = firstContainer.querySelector('.pdf-canvas');
+          
+          // Get original dimensions (before zoom was applied)
+          const originalWidth = firstPdfCanvas.originalWidth || firstPdfCanvas.width;
+          const originalHeight = firstPdfCanvas.originalHeight || firstPdfCanvas.height;
+          
+          const orient = originalWidth > originalHeight ? 'l' : 'p';
+          const doc = new jsPDF({ 
+            unit: 'px', 
+            format: [originalWidth, originalHeight], 
+            orientation: orient 
+          });
+          
+          // First page is already added by jsPDF constructor
+          let currentPage = 1;
+          
+          for (let i = 0; i < selectedContainers.length; i++) {
+            const container = selectedContainers[i];
+            const pdfCanvas = container.querySelector('.pdf-canvas');
+            const annotationWrapper = container.querySelector('.canvas-container');
+            
+            // Find the correct fabric canvas
+            const fabricCanvas = fabricCanvases.find(fc => fc.wrapperEl === annotationWrapper);
+            
+            if (!pdfCanvas || !fabricCanvas) {
+              console.error('Could not find canvas elements for page', i);
+              continue;
+            }
+            
+            // Get original dimensions for this page
+            const pageOrigWidth = pdfCanvas.originalWidth || pdfCanvas.width;
+            const pageOrigHeight = pdfCanvas.originalHeight || pdfCanvas.height;
+            
+            // Add a new page for all pages after the first one
+            if (i > 0) {
+              const o = pageOrigWidth > pageOrigHeight ? 'l' : 'p';
+              doc.addPage([pageOrigWidth, pageOrigHeight], o);
+              currentPage++;
+            }
+            
+            // Set active page
+            doc.setPage(currentPage);
+            
+            // Create a temporary canvas for composition
+            const tmp = document.createElement('canvas');
+            tmp.width = pageOrigWidth;
+            tmp.height = pageOrigHeight;
+            const ctx = tmp.getContext('2d');
+            
+            // Draw the PDF background
+            ctx.drawImage(pdfCanvas, 0, 0, pdfCanvas.width, pdfCanvas.height, 
+                        0, 0, pageOrigWidth, pageOrigHeight);
+            
+            // Use fabric's toDataURL to render all objects correctly
+            const fabricData = fabricCanvas.toDataURL({
+              format: 'png',
+              quality: 1.0,
+              multiplier: 1.0,
+              enableRetinaScaling: true,
+              width: pageOrigWidth,
+              height: pageOrigHeight
+            });
+            
+            // Create an image from the fabric canvas data
+            const img = new Image();
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = fabricData;
+            });
+            
+            // Draw the fabric canvas on top of the PDF canvas
+            ctx.drawImage(img, 0, 0);
+            
+            // Add the combined image to the PDF
+            doc.addImage(
+              tmp.toDataURL('image/png', 1.0), 
+              'PNG', 
+              0, 0, 
+              pageOrigWidth, 
+              pageOrigHeight
+            );
+            
+            // Update loading indicator
+            loadingDiv.textContent = `Creating PDF... (Page ${i+1}/${selectedContainers.length})`;
+          }
+          
+          // Save the PDF
+          doc.save(fileName);
+        } catch (error) {
+          console.error('Error creating PDF:', error);
+          alert('There was an error creating the PDF. Please try again.');
+        } finally {
+          // Restore the original zoom
+          if (savedZoomIndex !== currentZoomIndex) {
+            currentZoomIndex = savedZoomIndex;
+            applyZoom(zoomLevels[currentZoomIndex]);
+          }
+          
+          // Remove loading indicator
+          document.body.removeChild(loadingDiv);
+        }
+      }, 500); // Longer timeout to ensure zoom changes are fully applied
     });
 
     // brush settings updates
