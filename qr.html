@@ -230,7 +230,7 @@
       overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
     }
     .footer-links { margin-top: 0.5rem; }
-    
+
     .footer-links a {
       color: var(--primary); text-decoration: none; font-size: 0.75rem;
     }
@@ -565,6 +565,14 @@
         try {
           const text = textInput.value.trim() || textInput.placeholder;
           
+          // Prompt user for a filename
+          let filename = prompt("Enter a name for your QR code:", "qr-code");
+          
+          // If user cancels or enters empty string, use default name
+          if (filename === null || filename.trim() === '') {
+            filename = "qr-code";
+          }
+          
           // Validate and constrain the size between 100 and 2000
           let size = parseInt(sizeInput.value, 10);
           if (!Number.isFinite(size) || size < 100) {
@@ -610,7 +618,7 @@
           const dataURL = canvas.toDataURL('image/png');
           const a = document.createElement('a'); 
           a.href = dataURL; 
-          a.download = 'qr-code.png'; 
+          a.download = `${filename}.png`; 
           a.click();
           
           // Clean up
@@ -624,6 +632,14 @@
       jpgBtn.addEventListener('click', async function() {
         try {
           const text = textInput.value.trim() || textInput.placeholder;
+          
+          // Prompt user for a filename
+          let filename = prompt("Enter a name for your QR code:", "qr-code");
+          
+          // If user cancels or enters empty string, use default name
+          if (filename === null || filename.trim() === '') {
+            filename = "qr-code";
+          }
           
           // Validate and constrain the size between 100 and 2000
           let size = parseInt(sizeInput.value, 10);
@@ -660,7 +676,7 @@
           const dataURL = canvas.toDataURL('image/jpeg');
           const a = document.createElement('a'); 
           a.href = dataURL; 
-          a.download = 'qr-code.jpg'; 
+          a.download = `${filename}.jpg`; 
           a.click();
           
           // Clean up
