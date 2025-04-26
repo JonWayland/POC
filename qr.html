@@ -563,7 +563,23 @@
 
       pngBtn.addEventListener('click', async function() {
         try {
-          const text = textInput.value.trim() || textInput.placeholder;
+          const text = textInput.value.trim();
+          const placeholder = textInput.placeholder;
+          
+          // Check if user is trying to download the example QR code
+          if (!text && placeholder === "https://example.com") {
+            // Show popup warning
+            if (!confirm("You're about to download the example QR code. Would you like to create your own QR code instead?\n\nClick 'OK' to add your own text/URL and generate a new QR code.\nClick 'Cancel' to download the example anyway.")) {
+              // User clicked Cancel - continue with example download
+            } else {
+              // User clicked OK - focus on the input field and exit the function
+              textInput.focus();
+              return;
+            }
+          }
+          
+          // Continue with normal download
+          const finalText = text || placeholder;
           
           // Prompt user for a filename
           let filename = prompt("Enter a name for your QR code:", "qr-code");
@@ -631,7 +647,23 @@
 
       jpgBtn.addEventListener('click', async function() {
         try {
-          const text = textInput.value.trim() || textInput.placeholder;
+          const text = textInput.value.trim();
+          const placeholder = textInput.placeholder;
+          
+          // Check if user is trying to download the example QR code
+          if (!text && placeholder === "https://example.com") {
+            // Show popup warning
+            if (!confirm("You're about to download the example QR code. Would you like to create your own QR code instead?\n\nClick 'OK' to add your own text/URL and generate a new QR code.\nClick 'Cancel' to download the example anyway.")) {
+              // User clicked Cancel - continue with example download
+            } else {
+              // User clicked OK - focus on the input field and exit the function
+              textInput.focus();
+              return;
+            }
+          }
+          
+          // Continue with normal download
+          const finalText = text || placeholder;
           
           // Prompt user for a filename
           let filename = prompt("Enter a name for your QR code:", "qr-code");
