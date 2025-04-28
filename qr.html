@@ -513,6 +513,9 @@
       const pngBtn = document.getElementById('download-png');
       const jpgBtn = document.getElementById('download-jpg');
       const downloadsDiv = document.getElementById('downloads');
+      // Initially disable download buttons
+      pngBtn.disabled = true;
+      jpgBtn.disabled = true;
       
       // CRITICAL: Make sure the input field is completely empty when page loads
       if (textInput.value !== '') {
@@ -520,6 +523,9 @@
       }
       
       function generateQR(text, size, isTransparent) {
+        // Store the qrDesc element before clearing
+        const qrDesc = document.getElementById('qr-desc');
+        
         // Clear previous QR code
         qrContainer.innerHTML = '';
         
@@ -527,7 +533,6 @@
         qrContainer.setAttribute('aria-label', `QR code for: ${text}`);
         
         // Update the hidden description for screen readers
-        const qrDesc = document.getElementById('qr-desc');
         if (qrDesc) {
           qrDesc.textContent = `QR code for: ${text}`;
         }
@@ -550,8 +555,14 @@
         // Set HTML content
         qrContainer.innerHTML = svg;
         
-        // Append the description back (it was cleared)
-        qrContainer.appendChild(qrDesc);
+        // Create a new qrDesc element since the old one was destroyed
+        const newQrDesc = document.createElement('p');
+        newQrDesc.id = 'qr-desc';
+        newQrDesc.className = 'sr-only';
+        newQrDesc.textContent = `QR code for: ${text}`;
+        
+        // Append the new description
+        qrContainer.appendChild(newQrDesc);
         
         // Get the SVG element and adjust its style
         const svgElement = qrContainer.querySelector('svg');
@@ -571,10 +582,13 @@
       }
 
       function updateJpgState() {
+        // Only handle the JPG button state for transparency
+        // But never disable PNG button
         if (transparentChk.checked) {
           jpgBtn.disabled = true;
           jpgBtn.title = "JPEG does not support transparency";
-        } else {
+        } else if (downloadsDiv.style.display === 'flex') {
+          // Only enable if downloads are visible (after generate was clicked)
           jpgBtn.disabled = false;
           jpgBtn.title = "";
         }
@@ -588,8 +602,25 @@
         // Generate display QR code
         generateQR(text, DISPLAY_SIZE, isTransparent);
         
+        // Force display and enable buttons
         downloadsDiv.style.display = 'flex';
-        updateJpgState();
+        
+        // Explicitly enable the PNG button - always
+        pngBtn.disabled = false;
+        pngBtn.style.pointerEvents = 'auto'; // Force enable clicking
+        
+        // Enable JPG button only if not transparent
+        if (!isTransparent) {
+          jpgBtn.disabled = false;
+          jpgBtn.style.pointerEvents = 'auto'; // Force enable clicking
+        } else {
+          jpgBtn.disabled = true;
+        }
+        
+        // Add console log for debugging
+        console.log('Download buttons should be enabled now:', 
+          'PNG disabled:', pngBtn.disabled, 
+          'JPG disabled:', jpgBtn.disabled);
       });
 
       function svgToCanvas(svgElement, size, isTransparent) {
@@ -790,8 +821,10 @@
         // Generate QR code from the placeholder text
         generateQR(textInput.placeholder, DISPLAY_SIZE, transparentChk.checked);
         
-        // Show download buttons
+        // Show download buttons but keep them disabled until user clicks Generate
         downloadsDiv.style.display = 'flex';
+        pngBtn.disabled = true;
+        jpgBtn.disabled = true;
         updateJpgState();
       }, 100);
     });
