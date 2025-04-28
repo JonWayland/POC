@@ -192,7 +192,7 @@
     .input-group label, .options label {
       display: block; margin-bottom: 0.6rem; font-size: 0.95rem; font-weight: 500; color: var(--dark);
     }
-    .input-group input[type="text"], .options input[type="number"] {
+    .input-group input[type="text"], .options input[type="number"], .options-grid input[type="text"] {
       width: 100%; padding: 0.9rem 1rem; border: 1px solid #e0e0e0; border-radius: 10px;
       font-size: 1rem; transition: all 0.3s; font-family: inherit;
     }
@@ -338,6 +338,56 @@
     }
     /* ───────────────────────────────────────────────── */
 
+    /* New styles for the options layout */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr; /* This makes the first column take up 2/3 and second column 1/3 */
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .option-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .option-item label {
+      margin-bottom: 0.6rem; 
+      font-size: 0.95rem; 
+      font-weight: 500; 
+      color: var(--dark);
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+    }
+    .checkbox-item input[type="checkbox"] {
+      margin-right: 0.5rem;
+      accent-color: var(--primary);
+    }
+
+    /* Make both inputs in the options-grid the same height and style */
+    .options-grid input[type="text"],
+    .options-grid input[type="number"] {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      font-family: inherit;
+      height: 50px; /* Explicitly set the same height */
+      box-sizing: border-box;
+    }
+
+    .options-grid input[type="text"]:focus,
+    .options-grid input[type="number"]:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,168,150,0.1);
+    }
+
   </style>
 </head>
 
@@ -369,9 +419,18 @@
       <input type="text" id="text" placeholder="https://example.com" value="">
     </div>
 
+    <div class="options-grid">
+      <div class="option-item">
+        <label for="qr-title">File name (optional):</label>
+        <input type="text" id="qr-title" placeholder="qr-code">
+      </div>
+      <div class="option-item">
+        <label for="size">Download size:</label>
+        <input type="number" id="size" value="200" min="100" max="2000">
+      </div>
+    </div>
     <div class="options">
       <label><input type="checkbox" id="transparent" checked> Transparent background</label>
-      <label>Download size: <input type="number" id="size" value="200" min="100" max="2000"></label>
     </div>
 
     <button id="generate">Generate QR Code</button>
@@ -447,6 +506,7 @@
       const qrContainer = document.getElementById('qr-img');
       
       const textInput = document.getElementById('text');
+      const titleInput = document.getElementById('qr-title');
       const sizeInput = document.getElementById('size');
       const transparentChk = document.getElementById('transparent');
       const generateBtn = document.getElementById('generate');
@@ -581,11 +641,11 @@
           // Continue with normal download
           const finalText = text || placeholder;
           
-          // Prompt user for a filename
-          let filename = prompt("Enter a name for your QR code:", "qr-code");
-          
-          // If user cancels or enters empty string, use default name
-          if (filename === null || filename.trim() === '') {
+          // Get filename from the title input field instead of prompting
+          let filename = titleInput.value.trim();
+
+          // If title field is empty, use default name
+          if (filename === '') {
             filename = "qr-code";
           }
           
@@ -665,11 +725,11 @@
           // Continue with normal download
           const finalText = text || placeholder;
           
-          // Prompt user for a filename
-          let filename = prompt("Enter a name for your QR code:", "qr-code");
-          
-          // If user cancels or enters empty string, use default name
-          if (filename === null || filename.trim() === '') {
+          // Get filename from the title input field instead of prompting
+          let filename = titleInput.value.trim();
+
+          // If title field is empty, use default name
+          if (filename === '') {
             filename = "qr-code";
           }
           
