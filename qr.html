@@ -431,6 +431,7 @@
     </div>
     <div class="options">
       <label><input type="checkbox" id="transparent" checked> Transparent background</label>
+      <label style="margin-left: 20px;">QR Color: <input type="color" id="qr-color" value="#000000"></label>
     </div>
 
     <button id="generate">Generate QR Code</button>
@@ -509,6 +510,7 @@
       const titleInput = document.getElementById('qr-title');
       const sizeInput = document.getElementById('size');
       const transparentChk = document.getElementById('transparent');
+      const colorInput = document.getElementById('qr-color');
       const generateBtn = document.getElementById('generate');
       const pngBtn = document.getElementById('download-png');
       const jpgBtn = document.getElementById('download-jpg');
@@ -522,64 +524,70 @@
         textInput.value = '';
       }
       
-      function generateQR(text, size, isTransparent) {
-        // Store the qrDesc element before clearing
-        const qrDesc = document.getElementById('qr-desc');
-        
-        // Clear previous QR code
-        qrContainer.innerHTML = '';
-        
-        // Set ARIA label for accessibility
-        qrContainer.setAttribute('aria-label', `QR code for: ${text}`);
-        
-        // Update the hidden description for screen readers
-        if (qrDesc) {
-          qrDesc.textContent = `QR code for: ${text}`;
-        }
-        
-        // Generate QR code using qrcode-generator (MIT license)
-        const qr = qrcode(0, 'H');
-        qr.addData(text);
-        qr.make();
-        
-        // Calculate cell size to fit the container
-        const cellSize = Math.floor(size / qr.getModuleCount());
-        
-        // Create QR code as SVG for better transparency support
-        const svg = qr.createSvgTag({
-          cellSize: cellSize,
-          margin: 0,
-          scalable: true
-        });
-        
-        // Set HTML content
-        qrContainer.innerHTML = svg;
-        
-        // Create a new qrDesc element since the old one was destroyed
-        const newQrDesc = document.createElement('p');
-        newQrDesc.id = 'qr-desc';
-        newQrDesc.className = 'sr-only';
-        newQrDesc.textContent = `QR code for: ${text}`;
-        
-        // Append the new description
-        qrContainer.appendChild(newQrDesc);
-        
-        // Get the SVG element and adjust its style
-        const svgElement = qrContainer.querySelector('svg');
-        svgElement.style.width = '100%';
-        svgElement.style.height = '100%';
-        
-        // Handle transparency
-        if (isTransparent) {
-          const rects = svgElement.querySelectorAll('rect');
-          // The first rect is usually the background
-          if (rects.length > 0) {
-            rects[0].setAttribute('fill', 'transparent');
-          }
-        }
-        
-        return svgElement;
+      function generateQR(text, size, isTransparent, color) { // Add color parameter
+      // Store the qrDesc element before clearing
+      const qrDesc = document.getElementById('qr-desc');
+      
+      // Clear previous QR code
+      qrContainer.innerHTML = '';
+      
+      // Set ARIA label for accessibility
+      qrContainer.setAttribute('aria-label', `QR code for: ${text}`);
+      
+      // Update the hidden description for screen readers
+      if (qrDesc) {
+        qrDesc.textContent = `QR code for: ${text}`;
       }
+      
+      // Generate QR code using qrcode-generator (MIT license)
+      const qr = qrcode(0, 'H');
+      qr.addData(text);
+      qr.make();
+      
+      // Calculate cell size to fit the container
+      const cellSize = Math.floor(size / qr.getModuleCount());
+      
+      // Create QR code as SVG for better transparency support
+      const svg = qr.createSvgTag({
+        cellSize: cellSize,
+        margin: 0,
+        scalable: true
+      });
+      
+      // Set HTML content
+      qrContainer.innerHTML = svg;
+      
+      // Create a new qrDesc element since the old one was destroyed
+      const newQrDesc = document.createElement('p');
+      newQrDesc.id = 'qr-desc';
+      newQrDesc.className = 'sr-only';
+      newQrDesc.textContent = `QR code for: ${text}`;
+      
+      // Append the new description
+      qrContainer.appendChild(newQrDesc);
+      
+      // Get the SVG element and adjust its style
+      const svgElement = qrContainer.querySelector('svg');
+      svgElement.style.width = '100%';
+      svgElement.style.height = '100%';
+      
+      // Handle transparency
+      if (isTransparent) {
+        const rects = svgElement.querySelectorAll('rect');
+        // The first rect is usually the background
+        if (rects.length > 0) {
+          rects[0].setAttribute('fill', 'transparent');
+        }
+      }
+      
+      // Apply custom color to QR code elements
+      const paths = svgElement.querySelectorAll('path');
+      paths.forEach(path => {
+        path.setAttribute('fill', color);
+      });
+      
+      return svgElement;
+    }
 
       function updateJpgState() {
         // Only handle the JPG button state for transparency
@@ -598,12 +606,14 @@
         const text = textInput.value.trim();
         if (!text) return alert('Please enter some text or a URL.');
         const isTransparent = transparentChk.checked;
+        const color = colorInput.value; // Get the selected color
         
         // Generate display QR code
-        generateQR(text, DISPLAY_SIZE, isTransparent);
+        generateQR(text, DISPLAY_SIZE, isTransparent, color);
         
         // Force display and enable buttons
         downloadsDiv.style.display = 'flex';
+        downloadsDiv.style.marginTop = '40px';
 
           // Show filename under the QR code
           const filenameDisplay = document.createElement('p');
@@ -733,6 +743,12 @@
           
           tempDiv.innerHTML = svg;
           const svgElement = tempDiv.querySelector('svg');
+
+          // Apply custom color to QR elements
+          const paths = svgElement.querySelectorAll('path');
+          paths.forEach(path => {
+            path.setAttribute('fill', colorInput.value);
+          });
           
           // Handle transparency for the SVG
           if (isTransparent) {
@@ -815,6 +831,12 @@
           
           tempDiv.innerHTML = svg;
           const svgElement = tempDiv.querySelector('svg');
+
+          // Apply custom color to QR elements
+          const paths = svgElement.querySelectorAll('path');
+          paths.forEach(path => {
+            path.setAttribute('fill', colorInput.value);
+          });
           
           // Convert to canvas and download (with white background)
           const canvas = await svgToCanvas(svgElement, size, false);
@@ -843,11 +865,10 @@
         textInput.value = '';
         
         // Generate QR code from the placeholder text
-        generateQR(textInput.placeholder, DISPLAY_SIZE, transparentChk.checked);
+        generateQR(textInput.placeholder, DISPLAY_SIZE, transparentChk.checked, colorInput.value);
         
         // Show download buttons but keep them disabled until user clicks Generate
         downloadsDiv.style.display = 'flex';
-        downloadsDiv.style.marginTop = '40px';
         pngBtn.disabled = true;
         jpgBtn.disabled = true;
         updateJpgState();
