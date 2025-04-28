@@ -604,6 +604,30 @@
         
         // Force display and enable buttons
         downloadsDiv.style.display = 'flex';
+
+          // Show filename under the QR code
+          const filenameDisplay = document.createElement('p');
+          filenameDisplay.style.textAlign = 'center';
+          filenameDisplay.style.marginTop = '20px'; // Space above the filename
+          filenameDisplay.style.marginBottom = '10px'; // Some space below
+          filenameDisplay.style.fontSize = '0.9rem';
+          filenameDisplay.style.color = '#555';
+          
+          // Get filename from input or use default
+          const filename = titleInput.value.trim() || 'qr-code';
+          filenameDisplay.textContent = `Filename: ${filename}`;
+          
+          // Remove any existing filename display
+          const existingFilenameDisplay = qrContainer.querySelector('.filename-display');
+          if (existingFilenameDisplay) {
+            qrContainer.removeChild(existingFilenameDisplay);
+          }
+          
+          // Add class for easy targeting later
+          filenameDisplay.className = 'filename-display';
+          
+          // Add to QR container
+          qrContainer.appendChild(filenameDisplay);
         
         // Explicitly enable the PNG button - always
         pngBtn.disabled = false;
@@ -823,6 +847,7 @@
         
         // Show download buttons but keep them disabled until user clicks Generate
         downloadsDiv.style.display = 'flex';
+        downloadsDiv.style.marginTop = '40px';
         pngBtn.disabled = true;
         jpgBtn.disabled = true;
         updateJpgState();
