@@ -1933,6 +1933,27 @@
           fc.on('mouse:down', opt => {
             lastFocusedCanvas = fc;
             const pt = fc.getPointer(opt.e, true);
+
+              // Check if we're clicking on an existing object
+              if (opt.target && opt.target.selectable) {
+                // We're clicking on a selectable object, temporarily switch to select mode
+                // regardless of current tool
+                fc._tempPreviousTool = currentTool;
+                
+                // Enable object movement
+                opt.target.set({
+                  hasControls: true,
+                  selectable: true,
+                  evented: true
+                });
+                
+                return; // Skip the rest of the function to prevent creating new objects
+              }
+              
+              // Restore previous tool if we were in temporary select mode
+              if (fc._tempPreviousTool) {
+                fc._tempPreviousTool = null;
+              }
             
             if (currentTool === 'line') {
               // Create a new line and add it to the canvas
@@ -1945,55 +1966,76 @@
               
               // Note: no need to manually add to objectHistory - object:added event handles this
             } else if (currentTool === 'text') {
-                        // Create a new text object with empty text
-                        const txt = new fabric.IText('', {
-                          left: pt.x, 
-                          top: pt.y,
-                          fill: colorPicker.value,
-                          fontSize: +fontSizeInput.value,
-                          selectable: true,
-                          placeholder: 'Enter text here' // Add a placeholder property
-                        });
-                        
-                        // Add to canvas and set as active object
-                        fc.add(txt);
-                        fc.setActiveObject(txt);
-                        
-                        // Enter editing mode and focus
-                        txt.enterEditing();
-                        if (txt.hiddenTextarea) {
-                          txt.hiddenTextarea.focus();
-                          
-                          // Set a temporary placeholder text that will be removed on first keystroke
-                          if (txt.text === '') {
-                            txt.text = 'Enter text here';
-                            txt._isPlaceholder = true; // Flag to identify it as placeholder
-                            
-                            // Style placeholder text differently (lighter color)
-                            const originalFill = txt.fill;
-                            txt.set('fill', 'rgba(100, 100, 100, 0.7)');
-                            fc.renderAll();
-                            
-                            // Add one-time event listener for keydown to clear placeholder
-                            txt.hiddenTextarea.addEventListener('keydown', function clearPlaceholder(e) {
-                              // Don't clear on special keys like shift, ctrl, alt, etc.
-                              if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
-                                // Only clear if this is still placeholder text
-                                if (txt._isPlaceholder) {
-                                  // Clear the placeholder text before the key's character is added
-                                  txt.text = '';
-                                  txt.set('fill', originalFill); // Restore original text color
-                                  txt._isPlaceholder = false;
-                                  fc.renderAll();
-                                }
-                                
-                                // Remove this event listener after first use
-                                txt.hiddenTextarea.removeEventListener('keydown', clearPlaceholder);
-                              }
-                            }, { once: false }); // We manually remove it after use
-                          }
+                // Create a new text object with empty text
+                const txt = new fabric.IText('', {
+                  left: pt.x, 
+                  top: pt.y,
+                  fill: colorPicker.value,
+                  fontSize: +fontSizeInput.value,
+                  selectable: true,
+                  placeholder: 'Enter text here' // Add a placeholder property
+                });
+                
+                // Add to canvas and set as active object
+                fc.add(txt);
+                fc.setActiveObject(txt);
+                
+                // Enter editing mode and focus
+                txt.enterEditing();
+                if (txt.hiddenTextarea) {
+                  txt.hiddenTextarea.focus();
+                  
+                  // Set a temporary placeholder text that will be removed on first keystroke
+                  if (txt.text === '') {
+                    txt.text = 'Enter text here';
+                    txt._isPlaceholder = true; // Flag to identify it as placeholder
+                    txt._isEmpty = true; // Flag to track if user has entered any text
+                    
+                    // Style placeholder text differently (lighter color)
+                    const originalFill = txt.fill;
+                    txt.set('fill', 'rgba(100, 100, 100, 0.7)');
+                    fc.renderAll();
+                    
+                    // Add one-time event listener for keydown to clear placeholder
+                    txt.hiddenTextarea.addEventListener('keydown', function clearPlaceholder(e) {
+                      // Don't clear on special keys like shift, ctrl, alt, etc.
+                      if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+                        // Only clear if this is still placeholder text
+                        if (txt._isPlaceholder) {
+                          // Clear the placeholder text before the key's character is added
+                          txt.text = '';
+                          txt.set('fill', originalFill); // Restore original text color
+                          txt._isPlaceholder = false;
+                          fc.renderAll();
                         }
-                      } else if (currentTool === 'highlight') {
+                        
+                        // Mark as not empty if user actually typed something
+                        if (e.key.length === 1) {
+                          txt._isEmpty = false;
+                        }
+                        
+                        // Remove this event listener after first use
+                        txt.hiddenTextarea.removeEventListener('keydown', clearPlaceholder);
+                      }
+                    }, { once: false }); // We manually remove it after use
+                    
+                    // Add event listener for when text editing ends
+                    txt.on('editing:exited', function() {
+                      // If text is empty or still has placeholder, remove the object
+                      if (txt._isEmpty || txt._isPlaceholder || txt.text === '' || txt.text === 'Enter text here') {
+                        // Remove from undo history if it exists there
+                        objectHistory = objectHistory.filter(item => 
+                          !(item.type === 'add' && item.object === txt)
+                        );
+                        
+                        // Remove from canvas
+                        fc.remove(txt);
+                        fc.renderAll();
+                      }
+                    });
+                  }
+                }
+              } else if (currentTool === 'highlight') {
               // Start drawing a highlight rectangle
               fc._highlightStart = pt;
               
