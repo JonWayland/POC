@@ -617,6 +617,29 @@
       color: white;
     }
 
+    /* Two-column layout */
+    .two-column-layout {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+
+    .input-column {
+      flex: 1;
+      min-width: 0; /* Allow column to shrink below content width */
+    }
+
+    .preview-column {
+      flex: 1;
+      min-width: 0; /* Allow column to shrink below content width */
+    }
+
+    /* Make preview sticky when scrolling */
+    .preview-sticky {
+      position: sticky;
+      top: 120px; /* Positioned below the secondary nav */
+    }
+
     /* Updated Content Layout */
     .content-wrapper {
       max-width: 1200px;
@@ -634,8 +657,7 @@
     }
 
     .preview-title {
-      text-align: center;
-      margin: 40px 0 20px;
+      margin: 0 0 20px;
       color: var(--dark);
       font-weight: 500;
       font-size: 1.4rem;
@@ -738,20 +760,41 @@
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* Preview Section */
-    .preview-center {
-      display: flex;
-      justify-content: center;
-      margin: 0 auto;
-    }
-
+    /* Invoice styling */
     .invoice {
-      max-width: 800px;
       width: 100%;
       padding: 40px;
       border: 1px solid #eee;
       background: #fff;
       box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    }
+
+    /* Improved Add Row Button */
+    .add-row {
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      font-weight: 500;
+      transition: all 0.3s;
+      padding: 12px 20px;
+      border-radius: 10px;
+      width: auto !important; /* Override the 100% width */
+      display: inline-block;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 168, 150, 0.2);
+    }
+
+    .add-row:hover {
+      background: var(--dark);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .add-row-container {
+      display: flex;
+      justify-content: flex-start; /* Align to the left */
+      margin-top: 5px;
     }
 
     /* Invoice sequence input */
@@ -792,6 +835,18 @@
     }
 
     /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      /* Stack columns on tablets and below */
+      .two-column-layout {
+        flex-direction: column;
+      }
+      
+      /* Remove sticky behavior on smaller screens */
+      .preview-sticky {
+        position: static;
+      }
+    }
+
     @media (max-width: 768px) {
       .form-tabs {
         flex-wrap: wrap;
@@ -799,6 +854,62 @@
       
       .invoice {
         padding: 20px;
+      }
+    }
+
+    /* Secondary Navigation Styles (only affects the secondary-nav) */
+    .secondary-nav {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 60px;
+      z-index: 900;
+      margin-bottom: 30px;
+    }
+
+    .secondary-nav .nav-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px 0 10px 0;
+      /* Keep main nav container styles intact by using more specific selector here */
+    }
+
+    .nav-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .form-tabs {
+      display: flex;
+      justify-content: center;
+      padding: 0 0 5px 0;
+      gap: 10px;
+      width: 100%;
+    }
+
+    /* Adjust the sticky position of the preview to account for taller nav */
+    .preview-sticky {
+      position: sticky;
+      top: 140px;
+    }
+
+    /* Responsive adjustments for the secondary nav */
+    @media (max-width: 768px) {
+      .secondary-nav .nav-container {
+        padding: 10px 0;
+      }
+      
+      .nav-title {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+      }
+      
+      .form-tabs {
+        flex-wrap: wrap;
       }
     }
 
@@ -824,6 +935,7 @@
   <!-- After the main-nav, add this secondary nav -->
   <nav class="secondary-nav">
     <div class="nav-container">
+      <div class="nav-title">Invoice Generator</div>
       <div class="form-tabs">
         <button class="tab-btn active" data-tab="company-details">Company Details</button>
         <button class="tab-btn" data-tab="customer-details">Customer Details</button>
@@ -833,127 +945,132 @@
     </div>
   </nav>
   
-  <div class="content-wrapper">
-    <h1>Invoice Generator</h1>
-    
-    <!-- Form Panels -->
-    <div class="form-panels">
-      <!-- Company Details Panel -->
-      <div class="form-panel active" id="company-details-panel">
-        <div class="section-title">Your Company Details</div>
-        <label>Company Name</label>
-        <input type="text" id="input-company" placeholder="Your Company Inc." />
+  <div class="content-wrapper">    
+    <!-- Two-column layout container -->
+    <div class="two-column-layout">
+      <!-- Left column for form inputs -->
+      <div class="input-column">
+        <!-- Form Panels -->
+        <div class="form-panels">
+          <!-- Company Details Panel -->
+          <div class="form-panel active" id="company-details-panel">
+            <div class="section-title">Your Company Details</div>
+            <label>Company Name</label>
+            <input type="text" id="input-company" placeholder="Your Company Inc." />
   
-        <label>Company Email</label>
-        <input type="email" id="input-email" placeholder="contact@yourcompany.com" />
-        
-        <label>Company Address</label>
-        <textarea id="input-company-address" placeholder="Your company address"></textarea>
-        
-        <label>Upload Logo (optional)</label>
-        <input type="file" id="logo-input" accept="image/*" />
-      </div>
-      
-      <!-- Customer Details Panel -->
-      <div class="form-panel" id="customer-details-panel">
-        <div class="section-title">Customer Details</div>
-        <label>Customer Name</label>
-        <input type="text" id="input-customer-name" placeholder="Customer Name (Optional)" />
-        
-        <label>Customer Address</label>
-        <textarea id="input-customer-address" placeholder="Customer Address (Optional)"></textarea>
-        
-        <label>Customer Email</label>
-        <input type="email" id="input-customer-email" placeholder="customer@example.com (Optional)" />
-      </div>
-      
-      <!-- Invoice Details Panel -->
-      <div class="form-panel" id="invoice-details-panel">
-        <div class="section-title">Invoice Details</div>
-        <label>Date</label>
-        <input type="date" id="input-date" />
-        
-        <label>Invoice Sequence Number</label>
-        <div class="sequence-input-container">
-          <input type="number" id="input-sequence-number" min="1" max="999" value="001" step="1">
-          <button id="increment-sequence" title="Increment Sequence Number">+</button>
-        </div>
-        <div class="invoice-note">Note: For sequential invoicing, increment the last 3 digits for multiple invoices created on the same date.</div>
-  
-        <label>Service Lines</label>
-        <table id="lines-table">
-          <thead>
-            <tr><th>Description</th><th>Amount ($)</th><th></th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div class="add-row-container">
-          <button class="add-row">+ Add Service Item</button>
-        </div>
-      </div>
-      
-      <!-- Custom Options Panel -->
-      <div class="form-panel" id="custom-options-panel">
-        <div class="section-title">Custom Options</div>
-        <label>Footer Message</label>
-        <textarea id="input-footer" placeholder="Custom footer message (Optional)">Thank you for your business! Payment is due within 30 days.</textarea>
-      </div>
-    </div>
-    
-    <!-- Action Buttons - centered below panels -->
-    <div class="action-buttons">
-      <div class="download-buttons">
-        <button id="btn-png">Download PNG</button>
-        <button id="btn-pdf">Download PDF</button>
-      </div>
-    </div>
-    
-    <!-- Preview section - NO CONTAINER BOX, just the invoice -->
-    <h2 class="preview-title">Preview</h2>
-    <div class="preview-center">
-      <div class="invoice" id="invoice">
-        <!-- Invoice content remains the same -->
-        <div class="invoice-header">
-          <div class="logo-container">
-            <div id="logo-drop">Drop Logo Here</div>
+            <label>Company Email</label>
+            <input type="email" id="input-email" placeholder="contact@yourcompany.com" />
+            
+            <label>Company Address</label>
+            <textarea id="input-company-address" placeholder="Your company address"></textarea>
+            
+            <label>Upload Logo (optional)</label>
+            <input type="file" id="logo-input" accept="image/*" />
           </div>
-          <div class="company-info">
-            <div id="preview-company" style="font-size:1.5em;font-weight:600;">Your Company Inc.</div>
-            <div id="preview-company-address"></div>
-            <div id="preview-email">contact@yourcompany.com</div>
+          
+          <!-- Customer Details Panel -->
+          <div class="form-panel" id="customer-details-panel">
+            <div class="section-title">Customer Details</div>
+            <label>Customer Name</label>
+            <input type="text" id="input-customer-name" placeholder="Customer Name (Optional)" />
+            
+            <label>Customer Address</label>
+            <textarea id="input-customer-address" placeholder="Customer Address (Optional)"></textarea>
+            
+            <label>Customer Email</label>
+            <input type="email" id="input-customer-email" placeholder="customer@example.com (Optional)" />
+          </div>
+          
+          <!-- Invoice Details Panel -->
+          <div class="form-panel" id="invoice-details-panel">
+            <div class="section-title">Invoice Details</div>
+            <label>Date</label>
+            <input type="date" id="input-date" />
+            
+            <label>Invoice Sequence Number</label>
+            <div class="sequence-input-container">
+              <input type="number" id="input-sequence-number" min="1" max="999" value="001" step="1">
+              <button id="increment-sequence" title="Increment Sequence Number">+</button>
+            </div>
+            <div class="invoice-note">Note: For sequential invoicing, increment the last 3 digits for multiple invoices created on the same date.</div>
+  
+            <label>Service Lines</label>
+            <table id="lines-table">
+              <thead>
+                <tr><th>Description</th><th>Amount ($)</th><th></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="add-row-container">
+              <button class="add-row">+ Add Service Item</button>
+            </div>
+          </div>
+          
+          <!-- Custom Options Panel -->
+          <div class="form-panel" id="custom-options-panel">
+            <div class="section-title">Custom Options</div>
+            <label>Footer Message</label>
+            <textarea id="input-footer" placeholder="Custom footer message (Optional)">Thank you for your business! Payment is due within 30 days.</textarea>
           </div>
         </div>
         
-        <div class="invoice-meta">
-          <div><span>Invoice:</span> <span id="preview-invoice-number">INV-25042</span></div>
-          <div><span>Date:</span> <span id="preview-date">April 18, 2025</span></div>
+        <!-- Action Buttons below the form panels -->
+        <div class="action-buttons">
+          <div class="download-buttons">
+            <button id="btn-png">Download PNG</button>
+            <button id="btn-pdf">Download PDF</button>
+          </div>
         </div>
-        
-        <div class="customer-info" id="customer-info">
-          <h3>Billed To:</h3>
-          <div id="preview-customer-name"></div>
-          <div id="preview-customer-address"></div>
-          <div id="preview-customer-email"></div>
-        </div>
-        
-        <table class="service-lines" id="preview-lines">
-          <thead>
-            <tr><th>Description</th><th>Amount ($)</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        
-        <div class="totals">
-          Total: $<span id="preview-total">0.00</span>
-        </div>
-        
-        <div class="invoice-footer" id="preview-footer">
-          Thank you for your business! Payment is due within 30 days.
-        </div>
-        
-        <!-- DollarWeb branding - always present, not customizable -->
-        <div class="dollaweb-branding">
-          Powered by <a href="https://thedollarweb.com">The Dollar Web</a>
+      </div>
+      
+      <!-- Right column for preview -->
+      <div class="preview-column">
+        <div class="preview-sticky">
+          <div class="invoice" id="invoice">
+            <!-- Invoice content remains the same -->
+            <div class="invoice-header">
+              <div class="logo-container">
+                <div id="logo-drop">Drop Logo Here</div>
+              </div>
+              <div class="company-info">
+                <div id="preview-company" style="font-size:1.5em;font-weight:600;">Your Company Inc.</div>
+                <div id="preview-company-address"></div>
+                <div id="preview-email">contact@yourcompany.com</div>
+              </div>
+            </div>
+            
+            <div class="invoice-meta">
+              <div><span>Invoice:</span> <span id="preview-invoice-number">INV-25042</span></div>
+              <div><span>Date:</span> <span id="preview-date">April 18, 2025</span></div>
+            </div>
+            
+            <div class="customer-info" id="customer-info">
+              <h3>Billed To:</h3>
+              <div id="preview-customer-name"></div>
+              <div id="preview-customer-address"></div>
+              <div id="preview-customer-email"></div>
+            </div>
+            
+            <table class="service-lines" id="preview-lines">
+              <thead>
+                <tr><th>Description</th><th>Amount ($)</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            
+            <div class="totals">
+              Total: $<span id="preview-total">0.00</span>
+            </div>
+            
+            <div class="invoice-footer" id="preview-footer">
+              Thank you for your business! Payment is due within 30 days.
+            </div>
+            
+            <!-- DollarWeb branding - always present, not customizable -->
+            <div class="dollaweb-branding">
+              Powered by <a href="https://thedollarweb.com">The Dollar Web</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
