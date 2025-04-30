@@ -804,14 +804,36 @@
     // Set up logo handling
     function handleLogoUpload(file) {
       if (!file || !file.type.startsWith('image/')) return;
+      
+      // Check file size (limit to 1MB to be safe for localStorage)
+      if (file.size > 1048576) { // 1MB in bytes
+        showStatus('Logo too large. Please use an image under 1MB.', 5000);
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onload = ev => {
-        logoDrop.style.backgroundImage = `url(${ev.target.result})`;
+        const logoDataUrl = ev.target.result;
+        logoDrop.style.backgroundImage = `url(${logoDataUrl})`;
         logoDrop.textContent = '';
         hasLogo = true;
+        
+        // Save to localStorage
+        saveLogoToLocalStorage(logoDataUrl);
       };
       reader.readAsDataURL(file);
     }
+
+    // Add a right-click context menu to clear the logo
+    logoDrop.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      if (hasLogo) {
+        if (confirm('Do you want to remove this logo?')) {
+          clearLogo();
+        }
+      }
+      return false;
+    });
 
     // Logo drag & drop in preview
     logoDrop.addEventListener('dragover', e => { e.preventDefault(); logoDrop.style.borderColor='var(--primary)'; });
@@ -838,9 +860,12 @@
     inputCompany.oninput = () => { 
       previewCompany.textContent = inputCompany.value || 'Your Company Inc.'; 
       updateInvoiceNumber();
+      saveCompanyDetailsToLocalStorage();
     };
+
     inputEmail.oninput = () => { 
       previewEmail.textContent = inputEmail.value || 'contact@yourcompany.com'; 
+      saveCompanyDetailsToLocalStorage();
     };
     inputDate.onchange = () => { 
       const d = new Date(inputDate.value);
@@ -992,6 +1017,15 @@
       }
     }
 
+    // Load the logo when the page loads (add this to your initialization code)
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load saved logo if available
+      loadLogoFromLocalStorage();
+
+      // Load saved company details if available
+      loadCompanyDetailsFromLocalStorage();
+    });
+
     // Wire up
     $('.add-row').onclick = () => { 
       addLine('', '0.00');
@@ -1010,6 +1044,91 @@
     addLine('Web Design Services', '1500.00');
     addLine('Hosting (12 months)', '240.00');
     addInvoiceNote();
+
+    // Function to save logo to localStorage
+    function saveLogoToLocalStorage(logoDataUrl) {
+      try {
+        localStorage.setItem('userLogo', logoDataUrl);
+        console.log('Logo saved to localStorage');
+      } catch (error) {
+        console.error('Error saving logo to localStorage:', error);
+        // If localStorage is full, show a friendly message
+        if (error.name === 'QuotaExceededError' || error.code === 22) {
+          showStatus('Storage limit reached. Try using a smaller logo image.', 5000);
+        }
+      }
+    }
+
+    // Function to load logo from localStorage
+    function loadLogoFromLocalStorage() {
+      try {
+        const savedLogo = localStorage.getItem('userLogo');
+        if (savedLogo) {
+          logoDrop.style.backgroundImage = `url(${savedLogo})`;
+          logoDrop.textContent = '';
+          hasLogo = true;
+          console.log('Logo loaded from localStorage');
+        }
+      } catch (error) {
+        console.error('Error loading logo from localStorage:', error);
+      }
+    }
+
+    // Function to clear logo from localStorage
+    function clearLogo() {
+      try {
+        localStorage.removeItem('userLogo');
+        logoDrop.style.backgroundImage = '';
+        logoDrop.textContent = 'Drop Logo Here';
+        hasLogo = false;
+        showStatus('Logo cleared successfully!');
+        console.log('Logo cleared from localStorage');
+      } catch (error) {
+        console.error('Error clearing logo from localStorage:', error);
+      }
+    }
+
+    // Function to save company details to localStorage
+    function saveCompanyDetailsToLocalStorage() {
+      try {
+        const companyDetails = {
+          name: inputCompany.value,
+          email: inputEmail.value
+        };
+        localStorage.setItem('companyDetails', JSON.stringify(companyDetails));
+        console.log('Company details saved to localStorage');
+      } catch (error) {
+        console.error('Error saving company details to localStorage:', error);
+      }
+    }
+
+    // Function to load company details from localStorage
+    function loadCompanyDetailsFromLocalStorage() {
+      try {
+        const savedDetails = localStorage.getItem('companyDetails');
+        if (savedDetails) {
+          const details = JSON.parse(savedDetails);
+          
+          // Update input fields
+          if (details.name) {
+            inputCompany.value = details.name;
+            previewCompany.textContent = details.name;
+          }
+          
+          if (details.email) {
+            inputEmail.value = details.email;
+            previewEmail.textContent = details.email;
+          }
+          
+          // Update invoice number based on company name
+          updateInvoiceNumber();
+          
+          console.log('Company details loaded from localStorage');
+        }
+      } catch (error) {
+        console.error('Error loading company details from localStorage:', error);
+      }
+    }
   </script>
 </body>
 </html>
