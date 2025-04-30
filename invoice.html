@@ -366,6 +366,11 @@
     .company-info { 
       text-align: right;
     }
+
+    #preview-company-address {
+      white-space: pre-line;
+      margin-bottom: 5px;
+    }
     
     .customer-info {
       margin-bottom: 25px;
@@ -510,6 +515,41 @@
       background: #038e7e; /* Slightly darker than primary */
     }
 
+    .sequence-input-container {
+      display: flex;
+      margin-bottom: 18px;
+    }
+
+    .sequence-input-container input {
+      flex: 1;
+      margin-bottom: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .sequence-input-container button {
+      width: 40px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+
+    .sequence-input-container button:hover {
+      background: var(--dark);
+    }
+
+    .invoice-note {
+      font-size: 0.75em;
+      color: #777;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+
   </style>
 </head>
 <body>
@@ -540,6 +580,9 @@
 
         <label>Company Email</label>
         <input type="email" id="input-email" placeholder="contact@yourcompany.com" />
+
+        <label>Company Address</label>
+        <textarea id="input-company-address" placeholder="Your company address"></textarea>
         
         <label>Upload Logo (optional)</label>
         <input type="file" id="logo-input" accept="image/*" />
@@ -557,6 +600,12 @@
         <div class="section-title">Invoice Details</div>
         <label>Date</label>
         <input type="date" id="input-date" />
+
+        <label>Invoice Sequence Number</label>
+        <div class="sequence-input-container">
+          <input type="number" id="input-sequence-number" min="1" max="999" value="001" step="1">
+          <button id="increment-sequence" title="Increment Sequence Number">+</button>
+        </div>
 
         <label>Service Lines</label>
         <table id="lines-table">
@@ -586,6 +635,7 @@
             </div>
             <div class="company-info">
               <div id="preview-company" style="font-size:1.5em;font-weight:600;">Your Company Inc.</div>
+              <div id="preview-company-address"></div> 
               <div id="preview-email">contact@yourcompany.com</div>
             </div>
           </div>
@@ -671,35 +721,22 @@
       const day = today.getDate().toString().padStart(2, '0');
       const datePart = `${year}${month}${day}`;
       
-      // Add sequential number (always start with 001 since we can't track previous invoices)
-      const sequentialPart = "001";
+      // Use the custom sequence number (pad to 3 digits)
+      const sequentialPart = inputSequenceNumber.value.toString().padStart(3, '0');
       
       return `${companyPart}-${datePart}${sequentialPart}`;
     }
 
     // Function to add the invoice note
     function addInvoiceNote() {
-      // Create the note element
+      // Create the note element right after the sequence input container
       const invoiceNoteDiv = document.createElement('div');
       invoiceNoteDiv.className = 'invoice-note';
-      invoiceNoteDiv.innerHTML = 'Note: For sequential invoicing, increment the last 3 digits for multiple invoices created on the same date.';
+      invoiceNoteDiv.textContent = 'Note: For sequential invoicing, increment the last 3 digits for multiple invoices created on the same date.';
       
-      // Add CSS for the note
-      const style = document.createElement('style');
-      style.textContent = `
-        .invoice-note {
-          font-size: 0.75em;
-          color: #777;
-          margin-top: 5px;
-          margin-bottom: 15px;
-          text-align: left;
-        }
-      `;
-      document.head.appendChild(style);
-      
-      // Insert after the invoice-meta div
-      const invoiceMetaDiv = $('.invoice-meta');
-      invoiceMetaDiv.parentNode.insertBefore(invoiceNoteDiv, invoiceMetaDiv.nextSibling);
+      // Insert after the sequence input container
+      const sequenceContainer = inputSequenceNumber.parentNode;
+      sequenceContainer.parentNode.insertBefore(invoiceNoteDiv, sequenceContainer.nextSibling);
     }
 
     // DOM elements
@@ -707,11 +744,15 @@
     const previewLines = $('#preview-lines tbody');
     const previewTotal = $('#preview-total');
     const inputCompany = $('#input-company');
+    const inputCompanyAddress = $('#input-company-address');
     const inputEmail = $('#input-email');
     const previewCompany = $('#preview-company');
+    const previewCompanyAddress = $('#preview-company-address');
     const previewEmail = $('#preview-email');
     const previewInvoiceNumber = $('#preview-invoice-number');
     const inputDate = $('#input-date');
+    const inputSequenceNumber = $('#input-sequence-number');
+    const incrementSequenceBtn = $('#increment-sequence');
     const previewDate = $('#preview-date');
     const inputCustomerName = $('#input-customer-name');
     const inputCustomerAddress = $('#input-customer-address');
@@ -856,10 +897,54 @@
       handleLogoUpload(file);
     });
 
+    inputSequenceNumber.addEventListener('input', function() {
+      // Ensure value is between 1-999
+      let value = parseInt(this.value);
+      if (isNaN(value) || value < 1) {
+        value = 1;
+      } else if (value > 999) {
+        value = 999;
+      }
+      
+      // Format as 3 digits
+      this.value = value.toString().padStart(3, '0');
+      
+      // Update the invoice number
+      updateInvoiceNumber();
+      
+      // Save to localStorage
+      saveCompanyDetailsToLocalStorage();
+    });
+
+    incrementSequenceBtn.addEventListener('click', function() {
+      let value = parseInt(inputSequenceNumber.value);
+      if (isNaN(value) || value < 1) {
+        value = 0;
+      }
+      
+      // Increment and handle wrapping around to 001 if over 999
+      value = (value % 999) + 1;
+      
+      // Format as 3 digits
+      inputSequenceNumber.value = value.toString().padStart(3, '0');
+      
+      // Update the invoice number
+      updateInvoiceNumber();
+      
+      // Save to localStorage
+      saveCompanyDetailsToLocalStorage();
+    });
+
     // Bind inputs
     inputCompany.oninput = () => { 
       previewCompany.textContent = inputCompany.value || 'Your Company Inc.'; 
       updateInvoiceNumber();
+      saveCompanyDetailsToLocalStorage();
+    };
+
+    inputCompanyAddress.oninput = () => {
+      // Use innerHTML instead of textContent to preserve line breaks
+      previewCompanyAddress.innerHTML = inputCompanyAddress.value.replace(/\n/g, '<br>');
       saveCompanyDetailsToLocalStorage();
     };
 
@@ -882,6 +967,13 @@
       previewCustomerAddress.innerHTML = inputCustomerAddress.value.replace(/\n/g, '<br>');
       renderPreview();
     };
+    // Ensure the Enter key works in the company address textarea
+    inputCompanyAddress.addEventListener('keydown', (e) => {
+      // Allow Enter key to create a new line (don't submit the form)
+      if (e.key === 'Enter') {
+        // Don't prevent default - we want the normal behavior of Enter in a textarea
+      }
+    });
     // Ensure the Enter key works in the customer address textarea
     inputCustomerAddress.addEventListener('keydown', (e) => {
       // Allow Enter key to create a new line (don't submit the form)
@@ -1093,7 +1185,9 @@
       try {
         const companyDetails = {
           name: inputCompany.value,
-          email: inputEmail.value
+          email: inputEmail.value,
+          address: inputCompanyAddress.value,
+          sequenceNumber: inputSequenceNumber.value
         };
         localStorage.setItem('companyDetails', JSON.stringify(companyDetails));
         console.log('Company details saved to localStorage');
@@ -1120,7 +1214,18 @@
             previewEmail.textContent = details.email;
           }
           
-          // Update invoice number based on company name
+          // Load company address if available
+          if (details.address) {
+            inputCompanyAddress.value = details.address;
+            previewCompanyAddress.innerHTML = details.address.replace(/\n/g, '<br>');
+          }
+          
+          // Load sequence number if available
+          if (details.sequenceNumber) {
+            inputSequenceNumber.value = details.sequenceNumber;
+          }
+          
+          // Update invoice number based on company name and sequence
           updateInvoiceNumber();
           
           console.log('Company details loaded from localStorage');
