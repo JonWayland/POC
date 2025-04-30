@@ -1061,6 +1061,14 @@
       }
     }
 
+    // This function helps calculate text width for centering
+    function getTextWidth(text, fontSize, fontName) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      context.font = fontSize + ' ' + fontName;
+      return context.measureText(text).width;
+    }
+
     async function downloadPDF() {
       showStatus('Generating PDF...');
       
@@ -1095,6 +1103,31 @@
           'JPEG', 
           0, 0, 
           imgWidth, imgHeight
+        );
+        
+        // Get the dollaweb-branding div for positioning reference
+        const brandingDiv = invoiceEl.querySelector('.dollaweb-branding');
+        
+        // Calculate the relative position of the branding div
+        const brandingPosition = brandingDiv.getBoundingClientRect();
+        const invoicePosition = invoiceEl.getBoundingClientRect();
+        
+        const relativeTop = (brandingPosition.top - invoicePosition.top) / invoicePosition.height;
+        
+        // Calculate PDF coordinates
+        const linkY = relativeTop * imgHeight + 5; // Add a small offset to center on the text
+        
+        // Calculate the width of the PDF page
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        
+        // Add an invisible clickable link over the "The Dollar Web" text area
+        // We don't add visible text, but instead create a clickable area over the existing rendered text
+        pdf.link(
+          pageWidth / 2 - 50, // X position (centered, with offset)
+          linkY - 5,          // Y position (slightly above text)
+          100,                // Width of clickable area
+          10,                 // Height of clickable area
+          { url: 'https://thedollarweb.com' }
         );
         
         pdf.save('invoice.pdf');
