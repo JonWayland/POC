@@ -179,21 +179,36 @@
     }
     
     .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+        position: relative;
+        z-index: 10; /* Ensure pagination is above other elements */
+    }
+
+    /* Ensure children of buttons don't interfere with clicks */
+    .pagination-btn * {
+        pointer-events: none;
     }
     
     .pagination-btn {
-      background: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
+        background: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+        position: relative;
+        z-index: 10;
+        display: block; /* Change from inline-block to block */
+        min-width: 44px;
+        min-height: 44px;
+        text-align: center;
+        /* Ensure child elements don't interfere with clicks */
+        pointer-events: auto;
     }
     
     .pagination-btn.active {
@@ -211,18 +226,23 @@
       cursor: not-allowed;
       transform: none;
     }
+    /* Ensure no elements are overlapping the pagination area */
+    #filterResults, #searchResults, #allToolsSection {
+        position: relative;
+        z-index: 5;
+    }
     
     /* Tool Card Styles */
     .tool-card {
       background: white;
       border-radius: 16px;
-      overflow: hidden;
       box-shadow: 0 10px 25px rgba(0,0,0,0.06);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: 320px;
+      min-height: 280px;
+      overflow: visible;
     }
     
     .tool-card:hover {
@@ -231,17 +251,40 @@
     }
     
     .tool-card::before {
+      content: none; /* Changed from a solid gold line to none */
+    }
+    
+    /* Popular ribbon */
+    .ribbon-popular {
+      position: absolute;
+      top: 15px;
+      left: -5px;
+      background: var(--secondary);
+      color: white;
+      padding: 5px 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 10;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      border-radius: 0 4px 4px 0;
+    }
+    
+    /* Add triangle at the bottom of the ribbon */
+    .ribbon-popular::after {
       content: '';
       position: absolute;
-      top: 0;
       left: 0;
-      right: 0;
-      height: 5px;
-      background: var(--secondary);
+      bottom: -5px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid #c68e00; /* Darker shade of the --secondary color */
+      border-left: 5px solid transparent;
     }
     
     .tool-img {
-      height: 180px;
+      height: 150px;
       background-color: var(--primary);
       display: flex;
       align-items: center;
@@ -251,6 +294,7 @@
       background-image: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
       position: relative;
       overflow: hidden;
+      border-radius: 16px 16px 0 0;
     }
     
     .tool-img::after {
@@ -266,10 +310,18 @@
     }
     
     .tool-content {
-      padding: 25px;
+      padding: 20px; /* Reduced from 25px */
       flex: 1;
       display: flex;
       flex-direction: column;
+    }
+    
+    .tool-footnote {
+      font-size: 0.75rem;
+      color: #777;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem; /* Added margin-bottom for spacing before the button */
+      font-style: italic;
     }
     
     .tool-content h3 {
@@ -307,9 +359,9 @@
     
     .tool-tag {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 6px 12px;
+      top: 15px;
+      right: 15px;
+      padding: 5px 15px;
       border-radius: 30px;
       font-size: 0.75rem;
       font-weight: 600;
@@ -325,10 +377,6 @@
     
     .tag-free {
       background-color: var(--free);
-    }
-    
-    .tag-popular {
-      background-color: var(--accent);
     }
     
     /* Filter Buttons */
@@ -642,15 +690,41 @@
     </div>
     
     <!-- Most Popular Tools Section -->
-    <div class="popular-section">
+    <div class="popular-section" id="popularSection">
       <h2 class="section-title">Most Popular</h2>
       <div class="popular-tools" id="popularTools">
         <!-- Popular tools will be populated by JavaScript -->
       </div>
     </div>
     
+    <!-- Search Results Section -->
+    <div class="search-results" id="searchResults" style="display: none;">
+      <div class="tools-grid" id="searchResultsGrid">
+        <!-- Search results will be populated by JavaScript -->
+      </div>
+      <div class="no-results" id="noSearchResults" style="display: none;">
+        No tools match your search criteria. Try a different search term.
+      </div>
+      <div class="pagination" id="searchPagination" style="display: none;">
+        <!-- Pagination buttons for search results will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Filter Results Section -->
+    <div class="filter-results" id="filterResults" style="display: none;">
+      <div class="tools-grid" id="filterResultsGrid">
+        <!-- Filter results will be populated by JavaScript -->
+      </div>
+      <div class="no-results" id="noFilterResults" style="display: none;">
+        No tools match your filter criteria. Try a different filter.
+      </div>
+      <div class="pagination" id="filterPagination" style="display: none;">
+        <!-- Pagination buttons for filter results will be populated by JavaScript -->
+      </div>
+    </div>
+    
     <!-- All Tools Section -->
-    <div class="tools-section">
+    <div class="tools-section" id="allToolsSection">
       <h2 class="section-title">All Tools</h2>
       <div class="tools-container">
         <div class="tools-grid" id="toolsGrid">
@@ -735,11 +809,14 @@
       const otherTools = tools.filter(tool => !popularToolNames.includes(tool.name));
       setupPagination(otherTools);
       
-      // Setup search functionality
-      setupSearch(tools, popularToolNames);
+      // Setup search functionality and make functions available globally
+      window.searchFunctions = setupSearch(tools, popularToolNames);
       
       // Setup filter functionality
       setupFilters(tools, popularToolNames);
+      
+      // Ensure filter results grid is initialized
+      document.getElementById('filterResultsGrid').className = 'tools-grid';
     }
     
     // Render popular tools
@@ -749,12 +826,6 @@
       
       tools.forEach(tool => {
         const card = createToolCard(tool);
-        // Add "Popular" tag
-        const popularTag = document.createElement('div');
-        popularTag.className = 'tool-tag tag-popular';
-        popularTag.textContent = 'Popular';
-        card.appendChild(popularTag);
-        
         container.appendChild(card);
       });
     }
@@ -775,19 +846,43 @@
       title.textContent = tool.name;
       
       const description = document.createElement('p');
-      description.textContent = tool.description;
+      
+      // Check if the description includes a footnote (for QR Customizer)
+      if (tool.name === "QR Customizer" && tool.description.includes("registered trademark")) {
+        // Split the description to separate the main text from the footnote
+        const parts = tool.description.split("QR Code is");
+        description.textContent = parts[0].trim();
+        
+        // Create footnote element for the trademark notice
+        const footnote = document.createElement('div');
+        footnote.className = 'tool-footnote';
+        footnote.textContent = "QR Code is" + parts[1].trim();
+        content.appendChild(title);
+        content.appendChild(description);
+        content.appendChild(footnote);
+      } else {
+        description.textContent = tool.description;
+        content.appendChild(title);
+        content.appendChild(description);
+      }
       
       const link = document.createElement('a');
       link.href = tool.url;
       link.textContent = `Use ${tool.name}`;
+      content.appendChild(link);
       
+      // Add tier tag (free/premium)
       const tierTag = document.createElement('div');
       tierTag.className = tool.tier === 'premium' ? 'tool-tag tag-premium' : 'tool-tag tag-free';
       tierTag.textContent = tool.tier;
       
-      content.appendChild(title);
-      content.appendChild(description);
-      content.appendChild(link);
+      // Add popular ribbon if the tool type is "Popular"
+      if (tool.type === "Popular") {
+        const ribbon = document.createElement('div');
+        ribbon.className = 'ribbon-popular';
+        ribbon.textContent = 'Popular';
+        card.appendChild(ribbon);
+      }
       
       card.appendChild(img);
       card.appendChild(content);
@@ -883,20 +978,28 @@
     // Setup search functionality
     function setupSearch(allTools, popularToolNames) {
       const searchInput = document.getElementById('searchInput');
-      const noResults = document.getElementById('noResults');
-      const toolsGrid = document.getElementById('toolsGrid');
-      const pagination = document.getElementById('pagination');
+      const searchResults = document.getElementById('searchResults');
+      const searchResultsGrid = document.getElementById('searchResultsGrid');
+      const noSearchResults = document.getElementById('noSearchResults');
+      const searchPagination = document.getElementById('searchPagination');
+      const filterResults = document.getElementById('filterResults');
+      const popularSection = document.getElementById('popularSection');
+      const allToolsSection = document.getElementById('allToolsSection');
+      
+      // Initialize pagination variables
+      const toolsPerPage = 6;
+      let currentSearchPage = 1;
+      let filteredSearchTools = [];
       
       searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase().trim();
         
         if (query === '') {
           // Reset to default view
-          const otherTools = allTools.filter(tool => !popularToolNames.includes(tool.name));
-          setupPagination(otherTools);
-          noResults.style.display = 'none';
-          toolsGrid.style.display = 'grid';
-          pagination.style.display = 'flex';
+          searchResults.style.display = 'none';
+          filterResults.style.display = 'none';
+          popularSection.style.display = 'block';
+          allToolsSection.style.display = 'block';
           
           // Reset active filter
           document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -910,38 +1013,139 @@
         }
         
         // Filter tools by search query
-        const filteredTools = allTools.filter(tool => {
+        filteredSearchTools = allTools.filter(tool => {
           return (
             tool.name.toLowerCase().includes(query) || 
             tool.description.toLowerCase().includes(query)
-          ) && !popularToolNames.includes(tool.name);
+          );
         });
         
-        if (filteredTools.length === 0) {
-          noResults.style.display = 'block';
-          toolsGrid.style.display = 'none';
-          pagination.style.display = 'none';
+        // Show search results, hide regular sections
+        searchResults.style.display = 'block';
+        filterResults.style.display = 'none';
+        popularSection.style.display = 'none';
+        allToolsSection.style.display = 'none';
+        
+        if (filteredSearchTools.length === 0) {
+          searchResultsGrid.style.display = 'none';
+          searchPagination.style.display = 'none';
+          noSearchResults.style.display = 'block';
         } else {
-          noResults.style.display = 'none';
-          toolsGrid.style.display = 'grid';
-          pagination.style.display = 'flex';
+          searchResultsGrid.style.display = 'grid';
+          noSearchResults.style.display = 'none';
           
-          // Render filtered tools
-          toolsGrid.innerHTML = '';
-          filteredTools.forEach(tool => {
-            const card = createToolCard(tool);
-            toolsGrid.appendChild(card);
-          });
-          pagination.style.display = 'none';
+          // Reset to first page and render
+          currentSearchPage = 1;
+          renderSearchPage(currentSearchPage);
+          renderSearchPagination();
         }
       });
+      
+      // Function to render the current page of search results
+      function renderSearchPage(page) {
+        searchResultsGrid.innerHTML = '';
+        
+        const start = (page - 1) * toolsPerPage;
+        const end = Math.min(start + toolsPerPage, filteredSearchTools.length);
+        const paginatedTools = filteredSearchTools.slice(start, end);
+        
+        paginatedTools.forEach(tool => {
+          const card = createToolCard(tool);
+          searchResultsGrid.appendChild(card);
+        });
+      }
+      
+      // Function to render pagination controls for search results
+      function renderSearchPagination() {
+        const pageCount = Math.ceil(filteredSearchTools.length / toolsPerPage);
+        
+        // Hide pagination if only one page of results
+        if (pageCount <= 1) {
+          searchPagination.style.display = 'none';
+          return;
+        }
+        
+        searchPagination.style.display = 'flex';
+        searchPagination.innerHTML = '';
+        
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pagination-btn';
+        prevBtn.textContent = 'Previous';
+        prevBtn.disabled = currentSearchPage === 1;
+        prevBtn.addEventListener('click', () => {
+          if (currentSearchPage > 1) {
+            currentSearchPage--;
+            renderSearchPage(currentSearchPage);
+            renderSearchPagination();
+          }
+        });
+        
+        // Page buttons
+        for (let i = 1; i <= pageCount; i++) {
+          const pageBtn = document.createElement('button');
+          pageBtn.className = `pagination-btn ${i === currentSearchPage ? 'active' : ''}`;
+          pageBtn.textContent = i;
+          pageBtn.addEventListener('click', () => {
+            currentSearchPage = i;
+            renderSearchPage(currentSearchPage);
+            renderSearchPagination();
+          });
+          searchPagination.appendChild(pageBtn);
+        }
+        
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pagination-btn';
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = currentSearchPage === pageCount;
+        nextBtn.addEventListener('click', () => {
+          if (currentSearchPage < pageCount) {
+            currentSearchPage++;
+            renderSearchPage(currentSearchPage);
+            renderSearchPagination();
+          }
+        });
+        
+        searchPagination.prepend(prevBtn);
+        searchPagination.appendChild(nextBtn);
+      }
+      
+      // Return current filtered tools for use with filters
+      return {
+        getFilteredSearchTools: () => filteredSearchTools,
+        getCurrentSearchPage: () => currentSearchPage,
+        resetSearchPage: () => {
+          currentSearchPage = 1;
+        },
+        setCurrentSearchPage: (page) => {
+          currentSearchPage = page;
+        }
+      };
     }
     
     // Setup filter functionality
     function setupFilters(allTools, popularToolNames) {
       const filterButtons = document.querySelectorAll('.filter-btn');
-      const otherTools = allTools.filter(tool => !popularToolNames.includes(tool.name));
-      const pagination = setupPagination(otherTools);
+      const filterResults = document.getElementById('filterResults');
+      const filterResultsGrid = document.getElementById('filterResultsGrid');
+      const noFilterResults = document.getElementById('noFilterResults');
+      const filterPagination = document.getElementById('filterPagination');
+      const popularSection = document.getElementById('popularSection');
+      const allToolsSection = document.getElementById('allToolsSection');
+      const searchInput = document.getElementById('searchInput');
+      
+      // Initialize pagination variables
+      const toolsPerPage = 6;
+      let currentFilterPage = 1;
+      let filteredTools = [];
+      
+      // Get search functionality if available
+      const searchFunctions = window.searchFunctions || { 
+        getFilteredSearchTools: () => [], 
+        getCurrentSearchPage: () => 1,
+        resetSearchPage: () => {}
+      };
       
       filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -950,39 +1154,368 @@
           btn.classList.add('active');
           
           const filter = btn.dataset.filter;
+          const query = searchInput.value.toLowerCase().trim();
           
-          // Clear search input
-          document.getElementById('searchInput').value = '';
-          
-          // Filter tools
-          let filteredTools;
-          if (filter === 'all') {
-            filteredTools = otherTools;
+          // If there's a search query, filter the search results
+          if (query !== '') {
+            const searchResultsGrid = document.getElementById('searchResultsGrid');
+            const noSearchResults = document.getElementById('noSearchResults');
+            const searchPagination = document.getElementById('searchPagination');
+            
+            // Get the current filtered search tools
+            const currentSearchTools = searchFunctions.getFilteredSearchTools();
+            
+            // Filter tools by both search query and selected filter
+            filteredTools = currentSearchTools.filter(tool => {
+              if (filter === 'all') {
+                return true;
+              } else {
+                return tool.tier === filter;
+              }
+            });
+            
+            if (filteredTools.length === 0) {
+              searchResultsGrid.style.display = 'none';
+              searchPagination.style.display = 'none';
+              noSearchResults.style.display = 'block';
+            } else {
+              searchResultsGrid.style.display = 'grid';
+              noSearchResults.style.display = 'none';
+              
+              // Reset to first page
+              searchFunctions.resetSearchPage();
+              
+              // Render first page of filtered search results
+              searchResultsGrid.innerHTML = '';
+              const paginatedTools = filteredTools.slice(0, toolsPerPage);
+              paginatedTools.forEach(tool => {
+                const card = createToolCard(tool);
+                searchResultsGrid.appendChild(card);
+              });
+              
+              // Update pagination
+              renderSearchPagination();
+            }
           } else {
-            filteredTools = otherTools.filter(tool => tool.tier === filter);
-          }
-          
-          // Update tools display
-          pagination.setTools(filteredTools);
-          
-          // Show/hide no results message
-          const noResults = document.getElementById('noResults');
-          const toolsGrid = document.getElementById('toolsGrid');
-          if (filteredTools.length === 0) {
-            noResults.style.display = 'block';
-            toolsGrid.style.display = 'none';
-            document.getElementById('pagination').style.display = 'none';
-          } else {
-            noResults.style.display = 'none';
-            toolsGrid.style.display = 'grid';
-            document.getElementById('pagination').style.display = 'flex';
+            // No search query, just apply the filter
+            
+            // If filter is 'all' and no search, return to default view
+            if (filter === 'all') {
+              filterResults.style.display = 'none';
+              popularSection.style.display = 'block';
+              allToolsSection.style.display = 'block';
+              return;
+            }
+            
+            // Filter tools by selected filter
+            filteredTools = allTools.filter(tool => tool.tier === filter);
+            
+            // Show filter results, hide regular sections
+            filterResults.style.display = 'block';
+            popularSection.style.display = 'none';
+            allToolsSection.style.display = 'none';
+            
+            if (filteredTools.length === 0) {
+              filterResultsGrid.style.display = 'none';
+              filterPagination.style.display = 'none';
+              noFilterResults.style.display = 'block';
+            } else {
+              filterResultsGrid.style.display = 'grid';
+              noFilterResults.style.display = 'none';
+              
+              // Reset to first page and render
+              currentFilterPage = 1;
+              renderFilterPage(currentFilterPage);
+              renderFilterPagination();
+            }
           }
         });
       });
+      
+      // Function to render the current page of filter results
+      function renderFilterPage(page) {
+        filterResultsGrid.innerHTML = '';
+        
+        const start = (page - 1) * toolsPerPage;
+        const end = Math.min(start + toolsPerPage, filteredTools.length);
+        const paginatedTools = filteredTools.slice(start, end);
+        
+        paginatedTools.forEach(tool => {
+          const card = createToolCard(tool);
+          filterResultsGrid.appendChild(card);
+        });
+      }
+      
+      // Function to render pagination controls for filter results
+      function renderFilterPagination() {
+        const pageCount = Math.ceil(filteredTools.length / toolsPerPage);
+        
+        // Hide pagination if only one page of results
+        if (pageCount <= 1) {
+            filterPagination.style.display = 'none';
+            return;
+        }
+        
+        filterPagination.style.display = 'flex';
+        filterPagination.innerHTML = '';
+        
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pagination-btn';
+        prevBtn.textContent = 'Previous';
+        prevBtn.disabled = currentFilterPage === 1;
+        prevBtn.addEventListener('click', () => {
+            if (currentFilterPage > 1) {
+            currentFilterPage--;
+            renderFilterPage(currentFilterPage);
+            renderFilterPagination();
+            }
+        });
+        
+        // Page buttons
+        for (let i = 1; i <= pageCount; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `pagination-btn ${i === currentFilterPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => {
+            currentFilterPage = i;
+            renderFilterPage(currentFilterPage);
+            renderFilterPagination();
+            });
+            filterPagination.appendChild(pageBtn);
+        }
+        
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pagination-btn';
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = currentFilterPage === pageCount;
+        nextBtn.addEventListener('click', () => {
+            if (currentFilterPage < pageCount) {
+            currentFilterPage++;
+            renderFilterPage(currentFilterPage);
+            renderFilterPagination();
+            }
+        });
+        
+        filterPagination.prepend(prevBtn);
+        filterPagination.appendChild(nextBtn);
+        }
+      
+      // Function to render pagination for search results (when filters are applied to search)
+      function renderSearchPagination() {
+        const searchPagination = document.getElementById('searchPagination');
+        const currentPage = searchFunctions.getCurrentSearchPage();
+        const pageCount = Math.ceil(filteredTools.length / toolsPerPage);
+        
+        // Hide pagination if only one page of results
+        if (pageCount <= 1) {
+            searchPagination.style.display = 'none';
+            return;
+        }
+        
+        searchPagination.style.display = 'flex';
+        searchPagination.innerHTML = '';
+        
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pagination-btn';
+        prevBtn.textContent = 'Previous';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+            const newPage = currentPage - 1;
+            // Update the page and refresh
+            const searchResultsGrid = document.getElementById('searchResultsGrid');
+            searchResultsGrid.innerHTML = '';
+            const start = (newPage - 1) * toolsPerPage;
+            const end = Math.min(start + toolsPerPage, filteredTools.length);
+            const paginatedTools = filteredTools.slice(start, end);
+            paginatedTools.forEach(tool => {
+                const card = createToolCard(tool);
+                searchResultsGrid.appendChild(card);
+            });
+            // Update the current page number
+            searchFunctions.setCurrentSearchPage(newPage);
+            renderSearchPagination();
+            }
+        });
+        
+        // Page buttons
+        for (let i = 1; i <= pageCount; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => {
+            // Update the page and refresh
+            const searchResultsGrid = document.getElementById('searchResultsGrid');
+            searchResultsGrid.innerHTML = '';
+            const start = (i - 1) * toolsPerPage;
+            const end = Math.min(start + toolsPerPage, filteredTools.length);
+            const paginatedTools = filteredTools.slice(start, end);
+            paginatedTools.forEach(tool => {
+                const card = createToolCard(tool);
+                searchResultsGrid.appendChild(card);
+            });
+            // Update the current page number
+            searchFunctions.setCurrentSearchPage(i);
+            renderSearchPagination();
+            });
+            searchPagination.appendChild(pageBtn);
+        }
+        
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pagination-btn';
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = currentPage === pageCount;
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < pageCount) {
+            const newPage = currentPage + 1;
+            // Update the page and refresh
+            const searchResultsGrid = document.getElementById('searchResultsGrid');
+            searchResultsGrid.innerHTML = '';
+            const start = (newPage - 1) * toolsPerPage;
+            const end = Math.min(start + toolsPerPage, filteredTools.length);
+            const paginatedTools = filteredTools.slice(start, end);
+            paginatedTools.forEach(tool => {
+                const card = createToolCard(tool);
+                searchResultsGrid.appendChild(card);
+            });
+            // Update the current page number
+            searchFunctions.setCurrentSearchPage(newPage);
+            renderSearchPagination();
+            }
+        });
+        
+        searchPagination.prepend(prevBtn);
+        searchPagination.appendChild(nextBtn);
+        }
     }
     
     // Initialize the page when DOM is loaded
     document.addEventListener('DOMContentLoaded', init);
+
+    // This function should be called after the pagination buttons are created
+    function ensureButtonsClickable() {
+    // Get all pagination buttons
+    const paginationButtons = document.querySelectorAll('.pagination-btn');
+    
+    // Add click event listeners directly to each button
+    paginationButtons.forEach(button => {
+        // Remove any existing click events to prevent duplicates
+        const buttonClone = button.cloneNode(true);
+        button.parentNode.replaceChild(buttonClone, button);
+        
+        // Get the original click handler information
+        const isNextButton = buttonClone.textContent === 'Next';
+        const isPrevButton = buttonClone.textContent === 'Previous';
+        const pageNumber = !isNextButton && !isPrevButton ? parseInt(buttonClone.textContent) : null;
+        
+        // Add a new click handler
+        buttonClone.addEventListener('click', function(e) {
+        // Stop event propagation to prevent conflicts
+        e.stopPropagation();
+        
+        // Determine which container we're in
+        const isFilterPagination = this.closest('#filterPagination') !== null;
+        const isSearchPagination = this.closest('#searchPagination') !== null;
+        
+        if (isFilterPagination) {
+            // Handle filter pagination
+            if (isNextButton && currentFilterPage < pageCount) {
+            currentFilterPage++;
+            renderFilterPage(currentFilterPage);
+            renderFilterPagination();
+            } else if (isPrevButton && currentFilterPage > 1) {
+            currentFilterPage--;
+            renderFilterPage(currentFilterPage);
+            renderFilterPagination();
+            } else if (pageNumber) {
+            currentFilterPage = pageNumber;
+            renderFilterPage(currentFilterPage);
+            renderFilterPagination();
+            }
+        } else if (isSearchPagination) {
+            // Handle search pagination
+            const searchResultsGrid = document.getElementById('searchResultsGrid');
+            if (isNextButton && currentSearchPage < searchPageCount) {
+            currentSearchPage++;
+            // Update search results
+            refreshSearchResults(currentSearchPage);
+            } else if (isPrevButton && currentSearchPage > 1) {
+            currentSearchPage--;
+            // Update search results
+            refreshSearchResults(currentSearchPage);
+            } else if (pageNumber) {
+            currentSearchPage = pageNumber;
+            // Update search results
+            refreshSearchResults(currentSearchPage);
+            }
+        } else {
+            // Handle main pagination
+            if (isNextButton && currentPage < pageCount) {
+            currentPage++;
+            renderTools(currentPage);
+            renderPagination();
+            } else if (isPrevButton && currentPage > 1) {
+            currentPage--;
+            renderTools(currentPage);
+            renderPagination();
+            } else if (pageNumber) {
+            currentPage = pageNumber;
+            renderTools(currentPage);
+            renderPagination();
+            }
+        }
+        });
+    });
+    }
+
+    // Helper function to refresh search results based on page
+    function refreshSearchResults(page) {
+    const searchResultsGrid = document.getElementById('searchResultsGrid');
+    searchResultsGrid.innerHTML = '';
+    
+    const start = (page - 1) * toolsPerPage;
+    const end = Math.min(start + toolsPerPage, filteredTools.length);
+    const paginatedTools = filteredTools.slice(start, end);
+    
+    paginatedTools.forEach(tool => {
+        const card = createToolCard(tool);
+        searchResultsGrid.appendChild(card);
+    });
+    
+    // Update pagination UI
+    renderSearchPagination();
+    }
+
+    // Modify the pagination rendering functions to call ensureButtonsClickable
+    // After the original renderFilterPagination function ends, add:
+    function modifyPaginationFunctions() {
+    // Store original functions
+    const originalRenderFilterPagination = renderFilterPagination;
+    const originalRenderSearchPagination = renderSearchPagination;
+    const originalRenderPagination = renderPagination;
+    
+    // Override with versions that ensure clickability
+    renderFilterPagination = function() {
+        originalRenderFilterPagination();
+        ensureButtonsClickable();
+    };
+    
+    renderSearchPagination = function() {
+        originalRenderSearchPagination();
+        ensureButtonsClickable();
+    };
+    
+    renderPagination = function() {
+        originalRenderPagination();
+        ensureButtonsClickable();
+    };
+    }
+
+    modifyPaginationFunctions();
   </script>
 </body>
 </html>
