@@ -4,8 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
-  <title>The Dollar Web | Productivity Suite</title>
+  <title>The Dollar Web | Affordable Productivity Suite</title>
   <style>
+    /* Section Title Styles */
+    .section-title {
+      font-size: 2rem;
+      color: var(--dark);
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background-color: var(--secondary);
+      border-radius: 2px;
+    }
+    
     /* Inter and Montserrat Fonts */
     @font-face {
       font-family: 'Inter';
@@ -30,7 +51,7 @@
       font-family: 'Montserrat';
       font-style: normal;
       src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
-      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-weight: 100 900;
       font-display: swap;
     }
 
@@ -79,7 +100,7 @@
     
     h1 {
       font-family: 'Montserrat', sans-serif;
-      font-size: 4.8rem; /* Increased from 3.2rem */
+      font-size: 4.8rem;
       color: var(--primary);
       margin-bottom: 1.2rem;
       font-weight: 700;
@@ -95,11 +116,12 @@
       font-weight: 300;
     }
     
-    .tools-grid {
+    .tools-featured {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 30px;
-      margin-top: 40px;
+      margin-top: 20px;
+      margin-bottom: 60px;
     }
     
     .tool-card {
@@ -194,15 +216,65 @@
       box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
     
-    footer {
+    .explore-more {
       text-align: center;
-      margin-top: 80px;
-      padding: 40px 0;
-      color: var(--dark);
-      font-size: 0.9rem;
-      border-top: 1px solid rgba(0,0,0,0.05);
+      margin: 60px 0;
     }
-
+    
+    .explore-btn {
+      display: inline-flex;
+      align-items: center;
+      background: var(--secondary);
+      color: #333;
+      font-size: 1.2rem;
+      font-weight: 600;
+      padding: 15px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    .free-tools-btn:hover {
+      background: #ffca39;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .arrow-icon {
+      margin-left: 10px;
+      transition: transform 0.3s ease;
+    }
+    
+    .explore-btn:hover .arrow-icon {
+      transform: translateX(5px);
+    }
+    
+    .privacy-banner {
+      background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+      border-radius: 16px;
+      padding: 40px;
+      color: white;
+      text-align: center;
+      margin: 40px auto;
+      max-width: 900px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .privacy-banner h2 {
+      font-size: 2.4rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    
+    .privacy-banner p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 0;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
     /* Navigation Bar Styles */
     .main-nav {
       background: white;
@@ -276,6 +348,12 @@
     }
 
     /* Mobile responsiveness */
+    @media (max-width: 992px) {
+      .tools-featured {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+    }
+    
     @media (max-width: 768px) {
       .nav-links {
         gap: 15px;
@@ -284,50 +362,41 @@
       .nav-logo span {
         font-size: 1.2rem;
       }
+      
+      h1 {
+        font-size: 2.4rem;
+      }
+      
+      .privacy-banner {
+        padding: 30px 20px;
+      }
+      
+      .privacy-banner h2 {
+        font-size: 1.8rem;
+      }
     }
-
+    
     @media (max-width: 576px) {
       .nav-links a:not(.login-btn) {
         display: none;
       }
     }
     
-    /* Tropical pattern at the bottom */
-    footer::before {
-      content: '';
-      display: block;
-      height: 80px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' width='1200' height='60' opacity='0.2'%3E%3Cpath d='M0,50 C200,10 400,30 600,40 C800,50 1000,20 1200,60 L1200,60 L0,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
-      background-repeat: repeat-x;
-      background-position: bottom;
-      margin-bottom: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      .tools-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      }
-      
-      h1 {
-        font-size: 2.4rem;
-      }
-    }
-
-    /* Footer Styles *//* Updated Footer Styles */
+    /* Footer Styles */
     .site-footer {
-      background: var(--dark); /* Changed to darker background */
-      padding: 40px 0 50px; /* Doubled padding */
+      background: var(--dark);
+      padding: 40px 0 50px;
       margin-top: 80px;
       position: relative;
-      color: white; /* Changed to light text */
+      color: white;
     }
 
     .footer-wave {
       position: absolute;
-      top: -120px; /* Doubled height position */
+      top: -120px;
       left: 0;
       right: 0;
-      height: 120px; /* Doubled height */
+      height: 120px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
       background-repeat: repeat-x;
       background-position: bottom;
@@ -336,7 +405,7 @@
     .footer-content {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 40px; /* Doubled padding */
+      padding: 0 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -346,104 +415,109 @@
     .footer-logo {
       display: flex;
       align-items: center;
-      margin-bottom: 40px; /* Doubled margin */
-      color: var(--secondary); /* Changed to secondary color for visibility */
-    }
-
-    .footer-logo svg {
-      width: 48px; /* Doubled size */
-      height: 48px; /* Doubled size */
-      margin-right: 16px; /* Doubled margin */
+      margin-bottom: 40px;
+      color: var(--secondary);
     }
 
     .footer-logo span {
       font-weight: 600;
-      font-size: 2.4rem; /* Doubled font size */
+      font-size: 2.4rem;
     }
 
     .footer-links {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 40px; /* Doubled margin */
+      margin-bottom: 40px;
     }
 
     .footer-links a {
-      color: var(--light); /* Changed to light color */
+      color: var(--light);
       text-decoration: none;
-      margin: 0 30px; /* Doubled margin */
-      font-size: 1.8rem; /* Doubled font size */
+      margin: 0 30px;
+      font-size: 1.8rem;
       transition: color 0.2s;
     }
 
     .footer-links a:hover {
-      color: var(--secondary); /* Changed hover color */
+      color: var(--secondary);
     }
 
     .footer-social {
       display: flex;
-      gap: 30px; /* Doubled gap */
-      margin-bottom: 40px; /* Doubled margin */
+      gap: 30px;
+      margin-bottom: 40px;
     }
 
     .footer-social a {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 72px; /* Doubled width */
-      height: 72px; /* Doubled height */
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1); /* Semi-transparent light background */
-      color: white; /* Light icon color */
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
       transition: all 0.2s;
     }
 
     .footer-social a svg {
-      width: 40px; /* Doubled size */
-      height: 40px; /* Doubled size */
+      width: 40px;
+      height: 40px;
     }
 
     .footer-social a:hover {
-      background: var(--secondary); /* Changed hover color */
-      color: var(--dark); /* Changed hover text color */
+      background: var(--secondary);
+      color: var(--dark);
       transform: translateY(-3px);
     }
 
     .copyright {
-      font-size: 1.8rem; /* Doubled font size */
-      color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .copyright-message {
-      font-size: 1.2rem; /* Doubled font size */
-      color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
     }
 
     @media (max-width: 768px) {
       .footer-links {
         flex-direction: column;
-        gap: 20px; /* Doubled gap */
+        gap: 20px;
       }
       
       .footer-links a {
-        margin: 10px 0; /* Doubled margin */
+        margin: 10px 0;
       }
     }
 
     .secondary-text {
       color: var(--secondary);
     }
+    
     .tertiary-text {
       color: var(--dark);
     }
-
+    
+    .tool-img img {
+      max-width: 100px;
+      max-height: 100px;
+      object-fit: contain;
+      background: transparent;
+      display: block;
+      margin: 0 auto;
+      padding: 10px;
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+    }
+    
     footnote {
       text-align: center;
       font-size: 0.75rem;
       color: #777;
       margin-top: 1.5rem;
     }
-
   </style>
 </head>
 
@@ -467,107 +541,68 @@
   <div class="container">
     <header>
       <h1><span class="tertiary-text">The</span><br>Dollar&nbsp;<span class="secondary-text">Web</span></h1>
-      <p class="tagline">Your digital toolbox for productivity. Simple, powerful, & affordable tools that help you get things done quickly.<br><b>Everything stays local!</b></p>
+      <p class="tagline">Simple, powerful, & affordable productivity tools that stay local. Get things done without breaking the bank.<br><br><a href="tools.html" class="free-tools-btn" style="display: inline-block; background: var(--secondary); color: #333; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">Check Out Our Free Tools!</a></p>
     </header>
     
-    <div class="tools-grid">
-
-      <div class="tool-card">
-        <div class="tool-img">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="9" y1="15" x2="15" y2="15"></line>
-          </svg>
+    <!-- Featured Popular Tools Section -->
+    <h2 class="section-title">Most Popular Tools</h2>
+    
+    <div class="tools-featured">
+      <!-- PDF Toolbox -->
+      <div class="tool-card" style="min-height: 280px;">
+        <div class="tool-img" style="height: 150px;">
+          <img src="images/pdf.png" alt="PDF Toolbox Icon">
         </div>
         <div class="tool-content">
           <h3>PDF Toolbox</h3>
-          <p>Drag, drop, rearrange, and split one or more PDF documents. Make changes with highlighting, drawing, text, and more before downloading.</p>
-          <a href="pdf.html">Combine PDFs</a>
+          <p style="font-size: 0.95rem;">Combine, split, and edit PDF files with ease. Make changes with highlighting, drawing, and text annotations before downloading.</p>
+          <a href="pdf.html">Use PDF Toolbox</a>
         </div>
       </div>
 
-      <div class="tool-card">
-        <div class="tool-img">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <rect x="7" y="7" width="10" height="10" rx="2" ry="2"></rect>
-          </svg>
+      <!-- QR Customizer -->
+      <div class="tool-card" style="min-height: 280px;">
+        <div class="tool-img" style="height: 150px;">
+          <img src="images/qr.png" alt="QR Customizer Icon">
         </div>
         <div class="tool-content">
           <h3>QR Customizer</h3>
-          <p>Create custom QR codes for websites, contact info, and more. Perfect for connecting your physical and digital worlds.
-            <footnote>
-              <br><br>QR Code is a registered trademark of DENSO WAVE Incorporated.
-            </footnote>
-          </p>
-          
-          <a href="qr.html">Generate QR Codes</a>
+          <p style="font-size: 0.95rem;">Create custom QR codes for websites, contact info, and more. Perfect for connecting your physical and digital worlds.</p>
+          <footnote style="display: block; margin-bottom: 20px;">QR Code is a registered trademark of DENSO WAVE Incorporated.</footnote>
+          <a href="qr.html">Create QR Codes</a>
         </div>
       </div>
       
-      <div class="tool-card">
-        <div class="tool-img">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-          </svg>
+      <!-- Invoice Generator -->
+      <div class="tool-card" style="min-height: 280px;">
+        <div class="tool-img" style="height: 150px;">
+          <img src="images/invoice.png" alt="Invoice Generator Icon">
         </div>
         <div class="tool-content">
           <h3>Invoice Generator</h3>
-          <p>Create professional invoices in seconds. Customize with your logo, add line items, and download as PDF or PNG.</p>
+          <p style="font-size: 0.95rem;">Create professional invoices in seconds. Customize with your logo, add line items, and download as PDF or PNG.</p>
           <a href="invoice.html">Generate Invoices</a>
         </div>
       </div>
-
-      <div class="tool-card">
-        <div class="tool-img">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Icon grid with search symbol -->
-            <rect x="3" y="3" width="6" height="6" rx="1" ry="1"></rect>
-            <rect x="15" y="3" width="6" height="6" rx="1" ry="1"></rect>
-            <rect x="3" y="15" width="6" height="6" rx="1" ry="1"></rect>
-            <rect x="15" y="15" width="6" height="6" rx="1" ry="1"></rect>
-            <circle cx="18" cy="18" r="3"></circle>
-            <line x1="20.5" y1="20.5" x2="23" y2="23"></line>
+    </div>
+    
+    <!-- Explore More Button -->
+    <div class="explore-more">
+      <a href="tools.html" class="explore-btn">
+        Explore All of Our Tools
+        <span class="arrow-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
-        </div>
-        <div class="tool-content">
-          <h3>Icon Library</h3>
-          <p>Search, preview, and download a wide collection of free icons for your designs.</p>
-          <a href="icons.html">Browse Icons</a>
-        </div>
-      </div>      
-      
-      <div class="tool-card">
-        <div class="tool-img">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="13.5" cy="6.5" r="4.5"></circle>
-            <circle cx="7" cy="17" r="4"></circle>
-            <circle cx="19" cy="17" r="4"></circle>
-          </svg>
-        </div>
-        <div class="tool-content">
-          <h3>Color Palette Generator</h3>
-          <p>Design harmonious color palettes inspired by tropical scenes. Perfect for websites, presentations, and creative projects.</p>
-          <a href="color-palette.html">Create Palettes</a>
-        </div>
-      </div>
-
-      <div class="tool-card">
-        <div class="tool-img">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-        </div>
-        <div class="tool-content">
-          <h3>Password Generator</h3>
-          <p>Create strong, secure passwords that are difficult to crack yet easy to use. Customize length and complexity to match your security needs.</p>
-          <a href="password.html">Generate Passwords</a>
-        </div>
-      </div>
-            
+        </span>
+      </a>
+    </div>
+    
+    <!-- Privacy Banner -->
+    <div class="privacy-banner">
+      <h2>Your Privacy Matters</h2>
+      <p>Every tool on The Dollar Web runs directly in your browser. Your documents never leave your device, and we never see your data. We believe in affordable solutions that respect your privacy.</p>
     </div>
   </div>
   
@@ -580,6 +615,7 @@
       </div>
       <div class="footer-links">
         <a href="index.html">Home</a>
+        <a href="tools.html">Tools</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
         <a href="privacy-policy.html">Privacy Policy</a>
