@@ -1,0 +1,123 @@
+{
+    "tools": [
+      {
+        "name": "PDF Toolbox",
+        "url": "pdf.html",
+        "description": "Combine, split, rearrange, and edit PDF files with ease. Highlight text, add annotations, and make changes before downloading.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><polyline points=\"14 2 14 8 20 8\"></polyline><line x1=\"9\" y1=\"15\" x2=\"15\" y2=\"15\"></line></svg>"
+      },
+      {
+        "name": "QR Customizer",
+        "url": "qr.html",
+        "description": "Create custom QR codes for websites, contact information, and more with colors and designs that match your brand.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"></rect><rect x=\"7\" y=\"7\" width=\"10\" height=\"10\" rx=\"2\" ry=\"2\"></rect></svg>"
+      },
+      {
+        "name": "Invoice Generator",
+        "url": "invoice.html",
+        "description": "Create professional invoices with your logo, itemized charges, and payment details. Download as PDF or send directly to clients.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"12\" y1=\"1\" x2=\"12\" y2=\"23\"></line><path d=\"M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6\"></path></svg>"
+      },
+      {
+        "name": "Icon Library",
+        "url": "icons.html",
+        "description": "Browse, search, and download free icons for your website, presentations, and documents.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"6\" height=\"6\" rx=\"1\" ry=\"1\"></rect><rect x=\"15\" y=\"3\" width=\"6\" height=\"6\" rx=\"1\" ry=\"1\"></rect><rect x=\"3\" y=\"15\" width=\"6\" height=\"6\" rx=\"1\" ry=\"1\"></rect><rect x=\"15\" y=\"15\" width=\"6\" height=\"6\" rx=\"1\" ry=\"1\"></rect><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><line x1=\"20.5\" y1=\"20.5\" x2=\"23\" y2=\"23\"></line></svg>"
+      },
+      {
+        "name": "Color Palette Generator",
+        "url": "color-palette.html",
+        "description": "Design harmonious color palettes with accessibility checking for websites, presentations, and branding projects.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"13.5\" cy=\"6.5\" r=\"4.5\"></circle><circle cx=\"7\" cy=\"17\" r=\"4\"></circle><circle cx=\"19\" cy=\"17\" r=\"4\"></circle></svg>"
+      },
+      {
+        "name": "Password Generator",
+        "url": "password.html",
+        "description": "Create strong, secure passwords with customizable length and complexity. Save and manage your passwords locally.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\" ry=\"2\"></rect><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"></path></svg>"
+      },
+      {
+        "name": "Image Resizer",
+        "url": "image-resizer.html",
+        "description": "Resize, crop, and optimize images for web, email, or social media without quality loss.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"></rect><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"></circle><polyline points=\"21 15 16 10 5 21\"></polyline></svg>"
+      },
+      {
+        "name": "Note Keeper",
+        "url": "notes.html",
+        "description": "Take, organize, and sync notes across devices. Format with markdown and organize with tags.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 20h9\"></path><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z\"></path></svg>"
+      },
+      {
+        "name": "File Converter",
+        "url": "file-converter.html",
+        "description": "Convert files between common formats like PDF, DOCX, JPG, PNG, and more without losing formatting.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z\"></path></svg>"
+      },
+      {
+        "name": "Calendar Planner",
+        "url": "calendar.html",
+        "description": "Plan events, set reminders, and organize your schedule with a simple drag-and-drop interface.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"></rect><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"></line><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"></line><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"></line></svg>"
+      },
+      {
+        "name": "CSV Editor",
+        "url": "csv-editor.html",
+        "description": "Edit, format, and analyze CSV files with a spreadsheet-like interface. Sort, filter, and visualize your data.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><polyline points=\"14 2 14 8 20 8\"></polyline><line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"></line><line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"></line><polyline points=\"10 9 9 9 8 9\"></polyline></svg>"
+      },
+      {
+        "name": "Form Builder",
+        "url": "form-builder.html",
+        "description": "Create custom forms and surveys with various question types. Collect responses without any monthly fees.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z\"></path><polyline points=\"7.5 4.21 12 6.81 16.5 4.21\"></polyline><polyline points=\"7.5 19.79 7.5 14.6 3 12\"></polyline><polyline points=\"21 12 16.5 14.6 16.5 19.79\"></polyline><polyline points=\"3.27 6.96 12 12.01 20.73 6.96\"></polyline><line x1=\"12\" y1=\"22.08\" x2=\"12\" y2=\"12\"></line></svg>"
+      },
+      {
+        "name": "Text Formatter",
+        "url": "text-formatter.html",
+        "description": "Clean, format, and transform text with case conversion, line sorting, and special character removal.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"21\" y1=\"10\" x2=\"3\" y2=\"10\"></line><line x1=\"21\" y1=\"6\" x2=\"3\" y2=\"6\"></line><line x1=\"21\" y1=\"14\" x2=\"3\" y2=\"14\"></line><line x1=\"21\" y1=\"18\" x2=\"3\" y2=\"18\"></line></svg>"
+      },
+      {
+        "name": "Screenshot Tool",
+        "url": "screenshot.html",
+        "description": "Capture, edit, and annotate screenshots directly in your browser. Share or download in multiple formats.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\" ry=\"2\"></rect><line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"></line><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"></line></svg>"
+      },
+      {
+        "name": "Markdown Editor",
+        "url": "markdown.html",
+        "description": "Write, preview, and export markdown documents for documentation, blogs, and notes.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z\"></path><path d=\"M9 11l3 3 3-3\"></path><path d=\"M12 14V8\"></path></svg>"
+      },
+      {
+        "name": "Budget Tracker",
+        "url": "budget.html",
+        "description": "Track income and expenses with categories and visualizations. Export reports and manage budget goals.",
+        "tier": "premium",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"16\"></line><line x1=\"8\" y1=\"12\" x2=\"16\" y2=\"12\"></line></svg>"
+      },
+      {
+        "name": "Timer & Stopwatch",
+        "url": "timer.html",
+        "description": "Set timers and track elapsed time with customizable alarms and interval training features.",
+        "tier": "free",
+        "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><polyline points=\"12 6 12 12 16 14\"></polyline></svg>"
+      }
+    ]
+  }

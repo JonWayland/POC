@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
+  <title>Tools | The Dollar Web</title>
+  <style>
+    /* Inter and Montserrat Fonts */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/inter-semibold.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: italic;
+      src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+      --free: #4caf50;
+      --premium: #9c27b0;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+    
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 4.8rem;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    p.tagline {
+      font-size: 1.8rem;
+      color: var(--dark);
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+    
+    /* Search bar styles */
+    .search-container {
+      max-width: 700px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(0,0,0,0.08);
+      font-size: 1.1rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      background-color: white;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+    
+    /* Most Popular Tools Section */
+    .popular-section {
+      margin-bottom: 60px;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+      color: var(--dark);
+      margin-bottom: 30px;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background-color: var(--secondary);
+      border-radius: 2px;
+    }
+    
+    .popular-tools {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    
+    /* All Tools Section */
+    .tools-section {
+      margin-bottom: 60px;
+    }
+    
+    .tools-container {
+      position: relative;
+    }
+    
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-bottom: 30px;
+      transition: opacity 0.3s ease;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    
+    .pagination-btn {
+      background: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    
+    .pagination-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .pagination-btn:hover:not(.active) {
+      background: var(--light);
+      transform: translateY(-3px);
+    }
+    
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Tool Card Styles */
+    .tool-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+    }
+    
+    .tool-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--secondary);
+    }
+    
+    .tool-img {
+      height: 180px;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 3rem;
+      background-image: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .tool-img::after {
+      content: '';
+      position: absolute;
+      right: -20px;
+      bottom: -20px;
+      width: 100px;
+      height: 100px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100' opacity='0.15'%3E%3Cpath d='M10,90 C10,90 10,60 40,60 C70,60 90,30 90,10 C90,10 70,30 50,30 C30,30 10,60 10,90 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    
+    .tool-content {
+      padding: 25px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .tool-content h3 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    .tool-content p {
+      margin-bottom: 25px;
+      font-size: 1rem;
+      line-height: 1.6;
+      flex: 1;
+      color: #555;
+    }
+    
+    .tool-content a {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .tool-content a:hover {
+      background: var(--dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    
+    .tool-tag {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 10;
+    }
+    
+    .tag-premium {
+      background-color: var(--premium);
+    }
+    
+    .tag-free {
+      background-color: var(--free);
+    }
+    
+    .tag-popular {
+      background-color: var(--accent);
+    }
+    
+    /* Filter Buttons */
+    .filter-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .filter-btn {
+      padding: 10px 20px;
+      background: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .filter-btn:hover:not(.active) {
+      background: var(--light);
+      transform: translateY(-3px);
+    }
+    
+    /* No results message */
+    .no-results {
+      text-align: center;
+      padding: 50px 0;
+      font-size: 1.2rem;
+      color: #777;
+      display: none;
+    }
+    
+    /* Navigation Bar Styles */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Adjust spacing for the fixed navbar */
+    body {
+      padding-top: 70px;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 992px) {
+      .popular-tools,
+      .tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .nav-logo span {
+        font-size: 1.2rem;
+      }
+      
+      h1 {
+        font-size: 2.4rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) {
+        display: none;
+      }
+      
+      .popular-tools,
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Footer Styles */
+    .site-footer {
+      background: var(--dark);
+      padding: 40px 0 50px;
+      margin-top: 80px;
+      position: relative;
+      color: white;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      color: var(--secondary);
+    }
+
+    .footer-logo svg {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+
+    .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .footer-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin: 0 30px;
+      font-size: 1.8rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .footer-social a svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .footer-social a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .copyright-message {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    @media (max-width: 768px) {
+      .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .footer-links a {
+        margin: 10px 0;
+      }
+    }
+
+    .secondary-text {
+      color: var(--secondary);
+    }
+    .tertiary-text {
+      color: var(--dark);
+    }
+  </style>
+</head>
+
+<!-- Navigation Bar -->
+<nav class="main-nav">
+  <div class="container nav-container">
+    <a href="index.html" class="nav-logo">
+      <img src="images/logo.svg" alt="The Dollar Web Logo" style="width: 32px; height: 32px;">
+      <span class="tertiary-text">&nbsp;The&nbsp;</span>Dollar&nbsp;<span class="secondary-text">Web</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="about.html">About</a>
+      <a href="login.html" class="login-btn">Login</a>
+    </div>
+  </div>
+</nav>
+
+<body>
+  <div class="container">
+    <header>
+      <h1><span class="tertiary-text">Our</span><br>Dollar&nbsp;<span class="secondary-text">Tools</span></h1>
+      <p class="tagline">Discover our collection of simple, powerful, and privacy-focused productivity tools.</p>
+    </header>
+    
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" class="search-input" placeholder="Search for tools..." id="searchInput">
+      <div class="search-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Filter Buttons -->
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-filter="all">All Tools</button>
+      <button class="filter-btn" data-filter="free">Free</button>
+      <button class="filter-btn" data-filter="premium">Premium</button>
+    </div>
+    
+    <!-- Most Popular Tools Section -->
+    <div class="popular-section">
+      <h2 class="section-title">Most Popular</h2>
+      <div class="popular-tools" id="popularTools">
+        <!-- Popular tools will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- All Tools Section -->
+    <div class="tools-section">
+      <h2 class="section-title">All Tools</h2>
+      <div class="tools-container">
+        <div class="tools-grid" id="toolsGrid">
+          <!-- Tools will be populated by JavaScript -->
+        </div>
+        <div class="no-results" id="noResults">
+          No tools match your search criteria. Try a different search term.
+        </div>
+      </div>
+      <div class="pagination" id="pagination">
+        <!-- Pagination buttons will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+  
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="images/logo.svg" alt="The Dollar Web Logo" style="width: 48px; height: 48px;">
+        <span>&nbsp;The Dollar Web</span>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="tools.html">Tools</a>
+        <a href="about.html">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+          </svg>
+        </a>
+        <a href="#" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+          </svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 The Dollar Web</p>
+      <p class="copyright-message">Professional tools that won't break the bank</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript for tools functionality -->
+  <script>
+    // Fetch tools data from tools.json
+    async function fetchTools() {
+      try {
+        const response = await fetch('tools.json');
+        const data = await response.json();
+        return data.tools;
+      } catch (error) {
+        console.error('Error fetching tools:', error);
+        return [];
+      }
+    }
+    
+    // Initialize the page
+    async function init() {
+      const tools = await fetchTools();
+      if (!tools || tools.length === 0) return;
+      
+      // Define popular tools
+      const popularToolNames = ['PDF Toolbox', 'QR Customizer', 'Invoice Generator'];
+      const popularTools = tools.filter(tool => popularToolNames.includes(tool.name));
+      
+      // Render popular tools
+      renderPopularTools(popularTools);
+      
+      // Render all other tools (excluding popular ones)
+      const otherTools = tools.filter(tool => !popularToolNames.includes(tool.name));
+      setupPagination(otherTools);
+      
+      // Setup search functionality
+      setupSearch(tools, popularToolNames);
+      
+      // Setup filter functionality
+      setupFilters(tools, popularToolNames);
+    }
+    
+    // Render popular tools
+    function renderPopularTools(tools) {
+      const container = document.getElementById('popularTools');
+      container.innerHTML = '';
+      
+      tools.forEach(tool => {
+        const card = createToolCard(tool);
+        // Add "Popular" tag
+        const popularTag = document.createElement('div');
+        popularTag.className = 'tool-tag tag-popular';
+        popularTag.textContent = 'Popular';
+        card.appendChild(popularTag);
+        
+        container.appendChild(card);
+      });
+    }
+    
+    // Create a tool card element
+    function createToolCard(tool) {
+      const card = document.createElement('div');
+      card.className = 'tool-card';
+      
+      const img = document.createElement('div');
+      img.className = 'tool-img';
+      img.innerHTML = tool.icon;
+      
+      const content = document.createElement('div');
+      content.className = 'tool-content';
+      
+      const title = document.createElement('h3');
+      title.textContent = tool.name;
+      
+      const description = document.createElement('p');
+      description.textContent = tool.description;
+      
+      const link = document.createElement('a');
+      link.href = tool.url;
+      link.textContent = `Use ${tool.name}`;
+      
+      const tierTag = document.createElement('div');
+      tierTag.className = tool.tier === 'premium' ? 'tool-tag tag-premium' : 'tool-tag tag-free';
+      tierTag.textContent = tool.tier;
+      
+      content.appendChild(title);
+      content.appendChild(description);
+      content.appendChild(link);
+      
+      card.appendChild(img);
+      card.appendChild(content);
+      card.appendChild(tierTag);
+      
+      return card;
+    }
+    
+    // Setup pagination
+    function setupPagination(tools) {
+      const toolsPerPage = 6;
+      const pageCount = Math.ceil(tools.length / toolsPerPage);
+      let currentPage = 1;
+      
+      function renderTools(page) {
+        const container = document.getElementById('toolsGrid');
+        container.innerHTML = '';
+        
+        const start = (page - 1) * toolsPerPage;
+        const end = start + toolsPerPage;
+        const paginatedTools = tools.slice(start, end);
+        
+        paginatedTools.forEach(tool => {
+          const card = createToolCard(tool);
+          container.appendChild(card);
+        });
+      }
+      
+      function renderPagination() {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'pagination-btn';
+        prevBtn.textContent = 'Previous';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderTools(currentPage);
+            renderPagination();
+          }
+        });
+        
+        // Page buttons
+        for (let i = 1; i <= pageCount; i++) {
+          const pageBtn = document.createElement('button');
+          pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+          pageBtn.textContent = i;
+          pageBtn.addEventListener('click', () => {
+            currentPage = i;
+            renderTools(currentPage);
+            renderPagination();
+          });
+          pagination.appendChild(pageBtn);
+        }
+        
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'pagination-btn';
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = currentPage === pageCount;
+        nextBtn.addEventListener('click', () => {
+          if (currentPage < pageCount) {
+            currentPage++;
+            renderTools(currentPage);
+            renderPagination();
+          }
+        });
+        
+        pagination.prepend(prevBtn);
+        pagination.appendChild(nextBtn);
+      }
+      
+      // Initial render
+      renderTools(currentPage);
+      renderPagination();
+      
+      // Return functions for search and filter
+      return {
+        renderTools,
+        renderPagination,
+        setTools: (newTools) => {
+          tools = newTools;
+          currentPage = 1;
+          renderTools(currentPage);
+          renderPagination();
+        }
+      };
+    }
+    
+    // Setup search functionality
+    function setupSearch(allTools, popularToolNames) {
+      const searchInput = document.getElementById('searchInput');
+      const noResults = document.getElementById('noResults');
+      const toolsGrid = document.getElementById('toolsGrid');
+      const pagination = document.getElementById('pagination');
+      
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        
+        if (query === '') {
+          // Reset to default view
+          const otherTools = allTools.filter(tool => !popularToolNames.includes(tool.name));
+          setupPagination(otherTools);
+          noResults.style.display = 'none';
+          toolsGrid.style.display = 'grid';
+          pagination.style.display = 'flex';
+          
+          // Reset active filter
+          document.querySelectorAll('.filter-btn').forEach(btn => {
+            if (btn.dataset.filter === 'all') {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+          return;
+        }
+        
+        // Filter tools by search query
+        const filteredTools = allTools.filter(tool => {
+          return (
+            tool.name.toLowerCase().includes(query) || 
+            tool.description.toLowerCase().includes(query)
+          ) && !popularToolNames.includes(tool.name);
+        });
+        
+        if (filteredTools.length === 0) {
+          noResults.style.display = 'block';
+          toolsGrid.style.display = 'none';
+          pagination.style.display = 'none';
+        } else {
+          noResults.style.display = 'none';
+          toolsGrid.style.display = 'grid';
+          pagination.style.display = 'flex';
+          
+          // Render filtered tools
+          toolsGrid.innerHTML = '';
+          filteredTools.forEach(tool => {
+            const card = createToolCard(tool);
+            toolsGrid.appendChild(card);
+          });
+          pagination.style.display = 'none';
+        }
+      });
+    }
+    
+    // Setup filter functionality
+    function setupFilters(allTools, popularToolNames) {
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const otherTools = allTools.filter(tool => !popularToolNames.includes(tool.name));
+      const pagination = setupPagination(otherTools);
+      
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Update active button
+          filterButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          const filter = btn.dataset.filter;
+          
+          // Clear search input
+          document.getElementById('searchInput').value = '';
+          
+          // Filter tools
+          let filteredTools;
+          if (filter === 'all') {
+            filteredTools = otherTools;
+          } else {
+            filteredTools = otherTools.filter(tool => tool.tier === filter);
+          }
+          
+          // Update tools display
+          pagination.setTools(filteredTools);
+          
+          // Show/hide no results message
+          const noResults = document.getElementById('noResults');
+          const toolsGrid = document.getElementById('toolsGrid');
+          if (filteredTools.length === 0) {
+            noResults.style.display = 'block';
+            toolsGrid.style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+          } else {
+            noResults.style.display = 'none';
+            toolsGrid.style.display = 'grid';
+            document.getElementById('pagination').style.display = 'flex';
+          }
+        });
+      });
+    }
+    
+    // Initialize the page when DOM is loaded
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
