@@ -645,6 +645,17 @@
     .tertiary-text {
       color: var(--dark);
     }
+
+    .tool-img img {
+      max-width: 100px;
+      max-height: 100px;
+      object-fit: contain;
+      background: transparent;
+      display: block;
+      margin: 0 auto;
+      padding: 10px; /* Add padding around the image */
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3)); /* Optional: adds a subtle white glow */
+    }
   </style>
 </head>
 
@@ -667,7 +678,7 @@
 <body>
   <div class="container">
     <header>
-      <h1><span class="tertiary-text">Our</span><br>Dollar&nbsp;<span class="secondary-text">Tools</span></h1>
+      <h1><span class="tertiary-text">The</span><br>Dollar&nbsp;<span class="secondary-text">Tools</span></h1>
       <p class="tagline">Discover our collection of simple, powerful, and privacy-focused productivity tools.</p>
     </header>
     
@@ -837,8 +848,30 @@
       
       const img = document.createElement('div');
       img.className = 'tool-img';
-      img.innerHTML = tool.icon;
       
+      // Check if the icon path is a URL or an SVG string
+      if (tool.icon.startsWith('/') || tool.icon.startsWith('http')) {
+        // It's a URL to an image file
+        const iconImg = document.createElement('img');
+        iconImg.src = tool.icon;
+        iconImg.alt = `${tool.name} icon`;
+        iconImg.style.maxWidth = '100px'; // Increased from 64px
+        iconImg.style.maxHeight = '100px'; // Increased from 64px
+        iconImg.style.background = 'transparent'; // Ensure transparent background
+        iconImg.style.objectFit = 'contain'; // Maintain aspect ratio
+        img.appendChild(iconImg);
+        
+        // Set the background to match the gradient of SVG icons
+        img.style.backgroundImage = 'linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%)';
+        img.style.display = 'flex';
+        img.style.alignItems = 'center';
+        img.style.justifyContent = 'center';
+      } else {
+        // It's an SVG string
+        img.innerHTML = tool.icon;
+      }
+      
+      // Rest of your existing function...
       const content = document.createElement('div');
       content.className = 'tool-content';
       
