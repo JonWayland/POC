@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Table → Markdown Converter | DollarWeb</title>
+<style>
+  /* === FONTS & ROOT VARS === */
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/inter-regular.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    src: url('/fonts/inter-medium.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    src: url('/fonts/inter-semibold.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: italic;
+    src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype-variations');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  :root {
+    --primary: #00a896;
+    --secondary: #f8b500;
+    --accent: #ff6b6b;
+    --light: #f8f9fa;
+    --dark: #05668d;
+    --text: #333;
+    --bg: #f5f9f8;
+    --border: #ddd;
+    --radius: 6px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    padding-top: 70px; /* make room for fixed navbar */
+    margin: 0;
+    min-height: 100vh;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+    background-size: 120px;
+  }
+  
+  /* === SHARED NAVBAR FROM index.html === */
+  .main-nav {
+    background: white;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1.5rem;
+    transition: all 0.2s;
+  }
+  .nav-logo:hover {
+    transform: translateY(-2px);
+  }
+  .nav-logo svg {
+    margin-right: 10px;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+  .nav-links a {
+    color: var(--dark);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover {
+    color: var(--primary);
+  }
+  .login-btn {
+    background: var(--primary);
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.2s !important;
+  }
+  .login-btn:hover {
+    background: var(--dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  @media (max-width: 768px) {
+    .nav-links { gap: 15px; }
+    .nav-logo span { font-size: 1.2rem; }
+  }
+  @media (max-width: 576px) {
+    .nav-links a:not(.login-btn) { display: none; }
+  }
+  .secondary-text { color: var(--secondary); }
+  .tertiary-text  { color: var(--dark); }
+  /* === END NAVBAR === */
+
+  /* === FOOTER STYLES FROM index.html === */
+  .site-footer {
+    background: var(--dark);
+    padding: 40px 0 50px;
+    margin-top: 80px;
+    position: relative;
+    color: white;
+    text-align: center;
+  }
+
+  .footer-wave {
+    position: absolute;
+    top: -120px;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-position: bottom;
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    color: var(--secondary);
+  }
+
+  .footer-logo span {
+    font-weight: 600;
+    font-size: 2.4rem;
+  }
+
+  .footer-links-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    margin-bottom: 40px;
+    gap: 50px;
+  }
+
+  .footer-links-nav a {
+    color: var(--light);
+    text-decoration: none;
+    font-size: 1.8rem;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  .footer-links-nav a:hover {
+    color: var(--secondary);
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .footer-social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: all 0.2s;
+  }
+
+  .footer-social a svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .footer-social a:hover {
+    background: var(--secondary);
+    color: var(--dark);
+    transform: translateY(-3px);
+  }
+
+  .copyright {
+    font-size: 1.8rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .copyright-message {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  @media (max-width: 768px) {
+    .footer-links-nav {
+      flex-direction: row;
+      gap: 15px;
+    }
+    
+    .footer-links-nav a {
+      margin: 0;
+    }
+  }
+  /* === END FOOTER STYLES === */
+
+  /* === TABLE-MARKDOWN PAGE STYLES === */
+  .container {
+    width: 800px;
+    max-width: 90%;
+    margin: 80px auto;
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+  }
+  
+  h1 {
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 1.8rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .instructions {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .toolbar button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    min-width: 130px;
+  }
+  
+  .toolbar button.remove-btn {
+    background: #ff6b6b;
+  }
+  
+  .toolbar button.generate-btn {
+    background: #05668d;
+  }
+
+  .reset-btn {
+    background-color: #f8b500 !important;
+    color: #000;
+    border: 1px solid #000;
+    border-radius: 0px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+  }
+
+  .reset-btn:hover {
+    background-color: #e0a500 !important;
+  }
+  
+  .toolbar button:hover {
+    background: var(--dark);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .toolbar button.remove-btn:hover {
+    background: #e05c5c;
+  }
+  
+  .toolbar button.reset-btn:hover {
+    background: #e0a500;
+  }
+  
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal h3 {
+    margin-top: 0;
+    color: var(--dark);
+  }
+  
+  .modal p {
+    margin-bottom: 20px;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .modal-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .modal-buttons .cancel-btn {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .modal-buttons .confirm-btn {
+    background-color: var(--accent);
+    color: white;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+  }
+  
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    min-width: 80px;
+  }
+  
+  th {
+    background: #f1f1f1;
+  }
+  
+  th[contenteditable], td[contenteditable] {
+    outline: none;
+    cursor: text;
+  }
+  
+  textarea {
+    width: 100%;
+    height: 180px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    resize: vertical;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .footer-links {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+  
+  .footer-links a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.75rem;
+  }
+  
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
+
+  /* Add this CSS rule with !important flags to override other styles */
+  #reset-table {
+    background-color: #f8b500 !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    padding: 4px 8px !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+    margin-top: 10px !important;
+    display: inline-block !important;
+    min-width: auto !important;
+    box-shadow: none !important;
+    transform: none !important;
+    font-weight: normal !important;
+  }
+
+  #reset-table:hover {
+    background-color: #f8b500 !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+</style>
+</head>
+<body>
+<!-- UPDATED NAVBAR from index.html -->
+<nav class="main-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">
+      <img src="images/logo.svg" alt="The Dollar Web Logo" style="width: 32px; height: 32px;">
+      <span class="tertiary-text">&nbsp;The&nbsp;</span>Dollar&nbsp;<span class="secondary-text">Web</span>
+    </a>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="tools.html">Tools</a>
+        <a href="about.html">About</a>
+        <a href="login.html" class="login-btn">Login</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Table → Markdown</h1>
+  <p class="instructions">
+    Click any cell to edit. Use the buttons below to add or remove rows/columns, generate Markdown, or copy it to your clipboard.
+  </p>
+  <div class="toolbar">
+    <button id="add-row">Add Row</button>
+    <button id="remove-row" class="remove-btn">Remove Row</button>
+    <button id="add-col">Add Column</button>
+    <button id="remove-col" class="remove-btn">Remove Column</button>
+    <button id="generate-md" class="generate-btn">Generate Markdown</button>
+    <button id="copy-md">Copy Markdown</button>
+  </div>
+  <div class="table-container">
+    <table id="input-table">
+      <thead>
+        <tr>
+          <th contenteditable="true"></th>
+          <th contenteditable="true"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td contenteditable="true"></td>
+          <td contenteditable="true"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <textarea id="markdown-output" readonly placeholder="Your Markdown will appear here…"></textarea>
+  
+  <button id="reset-table" style="background-color: #f8b500; color: #000; border: 1px solid #000; border-radius: 0; padding: 4px 8px; font-size: 0.9rem; transform: none; box-shadow: none;">Reset Table</button>
+  
+  <div id="reset-modal" class="modal">
+    <div class="modal-content">
+      <h3>Reset Table</h3>
+      <p>Are you sure you want to reset the table? This action cannot be undone.</p>
+      <div class="modal-buttons">
+        <button class="cancel-btn" id="cancel-reset">Cancel</button>
+        <button class="confirm-btn" id="confirm-reset">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-links">
+    <a href="/licenses.html">Open-source acknowledgements</a>
+  </div>
+</div>
+
+<!-- ADDED FOOTER from index.html -->
+<footer class="site-footer">
+  <div class="footer-wave"></div>
+  <div class="footer-content">
+    <div class="footer-logo">
+      <img src="images/logo.svg" alt="The Dollar Web Logo" style="width: 48px; height: 48px;">
+      <span>&nbsp;The Dollar Web</span>
+    </div>
+    <nav class="footer-links-nav">
+      <a href="index.html">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="terms-of-service.html">Terms of Service</a>
+    </nav>
+    <div class="footer-social">
+      <a href="#" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+        </svg>
+      </a>
+      <a href="#" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+        </svg>
+      </a>
+      <a href="#" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+      </a>
+    </div>
+    <p class="copyright">&copy; 2025 The Dollar Web</p>
+    <p class="copyright-message">Professional tools that won't break the bank</p>
+  </div>
+</footer>
+
+<script>
+  const table = document.getElementById('input-table');
+  const tbody = table.querySelector('tbody');
+  const theadRow = table.querySelector('thead tr');
+  const output = document.getElementById('markdown-output');
+  const resetModal = document.getElementById('reset-modal');
+
+  document.getElementById('add-row').onclick = () => {
+    const cols = theadRow.children.length;
+    const tr = document.createElement('tr');
+    for (let i = 0; i < cols; i++) {
+      const td = document.createElement('td');
+      td.contentEditable = 'true';
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  };
+
+  document.getElementById('remove-row').onclick = () => {
+    const rows = tbody.querySelectorAll('tr');
+    if (rows.length > 1) {
+      // Remove the last row if there's more than one row
+      tbody.removeChild(rows[rows.length - 1]);
+    }
+  };
+
+  document.getElementById('add-col').onclick = () => {
+    // add header cell
+    const th = document.createElement('th');
+    th.contentEditable = 'true';
+    theadRow.appendChild(th);
+    // add a cell to each existing row
+    tbody.querySelectorAll('tr').forEach(row => {
+      const td = document.createElement('td');
+      td.contentEditable = 'true';
+      row.appendChild(td);
+    });
+  };
+
+  document.getElementById('remove-col').onclick = () => {
+    const headerCells = theadRow.children;
+    if (headerCells.length > 1) {
+      // Remove the last column if there's more than one column
+      theadRow.removeChild(headerCells[headerCells.length - 1]);
+      // Remove the last cell from each row
+      tbody.querySelectorAll('tr').forEach(row => {
+        const cells = row.children;
+        if (cells.length > 0) {
+          row.removeChild(cells[cells.length - 1]);
+        }
+      });
+    }
+  };
+
+  document.getElementById('generate-md').onclick = () => {
+    const headers = Array.from(theadRow.children)
+      .map(th => th.innerText.trim());
+    const headerLine = '| ' + headers.join(' | ') + ' |';
+    const separator = '| ' + headers.map(_ => '---').join(' | ') + ' |';
+
+    const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => {
+      const cells = Array.from(tr.children)
+        .map(td => td.innerText.trim());
+      return '| ' + cells.join(' | ') + ' |';
+    });
+
+    output.value = [headerLine, separator, ...rows].join('\n');
+    
+    // Scroll to the output area, but not all the way to the bottom
+    const outputRect = output.getBoundingClientRect();
+    const scrollY = window.scrollY + outputRect.top - 200; // 200px above the output
+    window.scrollTo({
+      top: scrollY,
+      behavior: 'smooth'
+    });
+  };
+
+  document.getElementById('copy-md').onclick = () => {
+    if (!output.value) return;
+    navigator.clipboard.writeText(output.value).then(() => {
+      const btn = document.getElementById('copy-md');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = original, 1500);
+    });
+  };
+  
+  // Reset table functionality
+  document.getElementById('reset-table').onclick = () => {
+    resetModal.style.display = 'flex';
+  };
+  
+  document.getElementById('cancel-reset').onclick = () => {
+    resetModal.style.display = 'none';
+  };
+  
+  document.getElementById('confirm-reset').onclick = () => {
+    // Reset the table to initial state (2x2)
+    while (theadRow.children.length > 1) {
+      theadRow.removeChild(theadRow.lastChild);
+    }
+    
+    while (tbody.children.length > 1) {
+      tbody.removeChild(tbody.lastChild);
+    }
+    
+    const firstRow = tbody.querySelector('tr');
+    while (firstRow.children.length > 1) {
+      firstRow.removeChild(firstRow.lastChild);
+    }
+    
+    // Clear all cell contents
+    theadRow.querySelectorAll('th').forEach(th => th.innerText = '');
+    tbody.querySelectorAll('td').forEach(td => td.innerText = '');
+    
+    // Clear output
+    output.value = '';
+    
+    // Hide modal
+    resetModal.style.display = 'none';
+  };
+  
+  // Close modal when clicking outside
+  window.onclick = (event) => {
+    if (event.target === resetModal) {
+      resetModal.style.display = 'none';
+    }
+  };
+</script>
+</body>
+</html>

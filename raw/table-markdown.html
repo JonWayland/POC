@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Table → Markdown Converter</title>
+  <style>
+    :root {
+      --primary: #6200ea;
+      --primary-dark: #3700b3;
+      --bg: #f4f4f4;
+      --surface: #ffffff;
+      --border: #ddd;
+      --radius: 6px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      font-family: var(--font);
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 30px;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    .instructions {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .toolbar button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toolbar button:hover {
+      background: var(--primary-dark);
+    }
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      min-width: 80px;
+    }
+    th {
+      background: #f1f1f1;
+    }
+    th[contenteditable], td[contenteditable] {
+      outline: none;
+      cursor: text;
+    }
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Table → Markdown</h1>
+    <p class="instructions">
+      Click any cell to edit. Use the buttons below to add rows/columns, generate Markdown, or copy it to your clipboard.
+    </p>
+    <div class="toolbar">
+      <button id="add-row">Add Row</button>
+      <button id="add-col">Add Column</button>
+      <button id="generate-md">Generate Markdown</button>
+      <button id="copy-md">Copy Markdown</button>
+    </div>
+    <div class="table-container">
+      <table id="input-table">
+        <thead>
+          <tr>
+            <th contenteditable="true"></th>
+            <th contenteditable="true"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <textarea id="markdown-output" readonly placeholder="Your Markdown will appear here…"></textarea>
+  </div>
+
+  <script>
+    const table = document.getElementById('input-table');
+    const tbody = table.querySelector('tbody');
+    const theadRow = table.querySelector('thead tr');
+    const output = document.getElementById('markdown-output');
+
+    document.getElementById('add-row').onclick = () => {
+      const cols = theadRow.children.length;
+      const tr = document.createElement('tr');
+      for (let i = 0; i < cols; i++) {
+        const td = document.createElement('td');
+        td.contentEditable = 'true';
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    };
+
+    document.getElementById('add-col').onclick = () => {
+      // add header cell
+      const th = document.createElement('th');
+      th.contentEditable = 'true';
+      theadRow.appendChild(th);
+      // add a cell to each existing row
+      tbody.querySelectorAll('tr').forEach(row => {
+        const td = document.createElement('td');
+        td.contentEditable = 'true';
+        row.appendChild(td);
+      });
+    };
+
+    document.getElementById('generate-md').onclick = () => {
+      const headers = Array.from(theadRow.children)
+        .map(th => th.innerText.trim());
+      const headerLine = '| ' + headers.join(' | ') + ' |';
+      const separator = '| ' + headers.map(_ => '---').join(' | ') + ' |';
+
+      const rows = Array.from(tbody.querySelectorAll('tr')).map(tr => {
+        const cells = Array.from(tr.children)
+          .map(td => td.innerText.trim());
+        return '| ' + cells.join(' | ') + ' |';
+      });
+
+      output.value = [headerLine, separator, ...rows].join('\n');
+      output.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    document.getElementById('copy-md').onclick = () => {
+      if (!output.value) return;
+      navigator.clipboard.writeText(output.value).then(() => {
+        const btn = document.getElementById('copy-md');
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = original, 1500);
+      });
+    };
+  </script>
+</body>
+</html>

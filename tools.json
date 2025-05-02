@@ -47,6 +47,30 @@
         "tier": "free",
         "type": "",
         "icon": "/images/pw.png"
+      },
+      {
+        "name": "PDF Splitter",
+        "url": "pdf-splitter.html",
+        "description": "Upload a PDF and split it by specifying page numbers. Download the result.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/pdf-split.png"
+      },
+      {
+        "name": "PDF Combiner",
+        "url": "pdf-combiner.html",
+        "description": "Upload multiple PDF documents, reorder them, and combine them into one. Download the result.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/pdf-combine.png"
+      },
+      {
+        "name": "Table to Markdown",
+        "url": "table-markdown.html",
+        "description": "Create a table in the UI and get Markdown you can simply copy and paste.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/table-markdown.png"
       }
     ]
   }
