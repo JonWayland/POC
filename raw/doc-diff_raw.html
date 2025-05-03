@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Diff Tool</title>
+  <!-- diff2html styles -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      display: flex; flex-direction: column; height: 100vh;
+    }
+    header {
+      padding: 1rem;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .controls {
+      display: flex;
+      padding: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel label {
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    .panel input {
+      margin-bottom: 0.5rem;
+    }
+    .panel textarea {
+      flex: 1;
+      padding: 0.5rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+      min-height: 200px;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      align-self: center;
+      height: 40px;
+    }
+    button:hover {
+      background: #0069d9;
+    }
+    #diff {
+      flex: 1;
+      overflow: auto;
+      background: #fff;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Document Diff Tool</h1>
+  </header>
+  <main>
+    <div class="controls">
+      <div class="panel">
+        <label for="file1">Original Document</label>
+        <input type="file" id="file1"
+               accept=".txt,.pdf,.docx,.r,.py,.sql" />
+        <textarea id="text1" placeholder="…or paste text here"></textarea>
+      </div>
+      <div class="panel">
+        <label for="file2">Modified Document</label>
+        <input type="file" id="file2"
+               accept=".txt,.pdf,.docx,.r,.py,.sql" />
+        <textarea id="text2" placeholder="…or paste text here"></textarea>
+      </div>
+      <button id="compareBtn">Compare</button>
+    </div>
+    <div id="diff"></div>
+  </main>
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.12/mammoth.browser.min.js"></script>
+  <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+
+  <script>
+    // Configure pdf.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+    async function readFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (ext === 'pdf') {
+        // Extract text from PDF
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ') + '\n\n';
+        }
+        return text;
+      }
+      else if (ext === 'docx') {
+        // Extract text from DOCX
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        return result.value;
+      }
+      else {
+        // Plain text / code files
+        return await file.text();
+      }
+    }
+
+    // When user loads file1…
+    document.getElementById('file1').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const ta = document.getElementById('text1');
+      ta.value = 'Loading…';
+      ta.value = await readFile(file);
+    });
+
+    // When user loads file2…
+    document.getElementById('file2').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const ta = document.getElementById('text2');
+      ta.value = 'Loading…';
+      ta.value = await readFile(file);
+    });
+
+    // Compare button
+    document.getElementById('compareBtn').addEventListener('click', () => {
+      const oldText = document.getElementById('text1').value;
+      const newText = document.getElementById('text2').value;
+      // Create a unified diff string
+      const diffStr = Diff.createPatch('Document', oldText, newText);
+      // Render side-by-side HTML
+      const diffHtml = Diff2Html.html(diffStr, {
+        drawFileList: false,
+        matching: 'lines',
+        outputFormat: 'side-by-side'
+      });
+      document.getElementById('diff').innerHTML = diffHtml;
+    });
+  </script>
+</body>
+</html>
