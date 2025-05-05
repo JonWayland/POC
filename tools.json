@@ -89,12 +89,20 @@
         "icon": "/images/watermark.png"
       },
       {
-        "name": "Image to SVG",
+        "name": "Image to SVG (Beta)",
         "url": "../tools/image-to-svg.html",
         "description": "Transform raster images (PNG, JPG) into scalable vector graphics (SVG). Perfect for logos, icons, and illustrations that need to be resized without losing quality.",
         "tier": "free",
         "type": "",
         "icon": "/images/image.png"
+      },
+      {
+        "name": "Sitemap Generator",
+        "url": "../tools/sitemap-generator.html",
+        "description": "Create and manage your website's sitemap in a few clicks. Generate, edit, and export XML sitemaps to improve your site's SEO visibility with search engines.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/sitemap.png"
       }
     ]
   }

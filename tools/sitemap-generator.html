@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
+  <title>Sitemap Generator | The Dollar Web</title>
+  <style>
+    /* Inter and Montserrat Fonts */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/inter-semibold.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: italic;
+      src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      padding-top: 70px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 40px 0 0px;
+    }
+    
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 3.2rem;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-top: 80px;
+    }
+    
+    p.tagline {
+      font-size: 1.3rem;
+      color: var(--dark);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Navigation Bar Styles */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer Styles */
+    .site-footer {
+      background: var(--dark);
+      padding: 40px 0 50px;
+      margin-top: 80px;
+      position: relative;
+      color: white;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      color: var(--secondary);
+    }
+
+    .footer-logo svg {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+
+    .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .footer-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin: 0 30px;
+      font-size: 1.8rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .footer-social a svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .footer-social a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .copyright-message {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .secondary-text {
+      color: var(--secondary);
+    }
+    
+    .tertiary-text {
+      color: var(--dark);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .nav-logo span {
+        font-size: 1.2rem;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .footer-links a {
+        margin: 10px 0;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) {
+        display: none;
+      }
+    }
+
+    /* Sitemap Generator Specific Styles */
+    .tool-panel {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      padding: 30px;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tool-panel h2 {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--dark);
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    table th, table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    table th {
+      background: var(--light);
+      color: var(--dark);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    table tr:hover {
+      background-color: rgba(0, 168, 150, 0.05);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+      outline: none;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    button.primary:hover {
+      background: var(--dark);
+    }
+
+    button.secondary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    button.secondary:hover {
+      background: #e9a800;
+    }
+
+    button.danger {
+      background: var(--accent);
+      color: white;
+    }
+
+    button.danger:hover {
+      background: #ff5252;
+    }
+
+    .remove-btn {
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-top: 20px;
+      resize: vertical;
+      transition: all 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+      outline: none;
+    }
+
+    .output-panel {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      padding: 30px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .output-panel h2 {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--dark);
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .action-buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 0;
+      color: #888;
+    }
+
+    .empty-state svg {
+      margin-bottom: 20px;
+      opacity: 0.6;
+    }
+
+    .empty-state p {
+      font-size: 1.1rem;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .info-box {
+      background: rgba(0, 168, 150, 0.05);
+      border-left: 4px solid var(--primary);
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .info-box h3 {
+      color: var(--primary);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .info-box p {
+      margin: 0;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .change-frequency {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .change-frequency:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+      outline: none;
+    }
+
+    .last-modified {
+      max-width: 180px;
+    }
+
+    .os-links a {
+      color: var(--primary); 
+      text-decoration: none; 
+      font-size: 0.9rem;
+    }
+    
+    .os-links a:hover { 
+      text-decoration: underline; 
+    }
+
+    .success-message {
+      background-color: rgba(46, 204, 113, 0.1);
+      border-left: 4px solid #2ecc71;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .success-message p {
+      color: #2ecc71;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    /* Confirmation modal styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      width: 90%;
+      max-width: 500px;
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-container {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .modal-header h3 {
+      font-size: 1.5rem;
+      color: var(--dark);
+      margin: 0;
+    }
+    
+    .modal-body {
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .modal-btn-cancel {
+      background-color: #e9ecef;
+      color: var(--text);
+    }
+    
+    .modal-btn-cancel:hover {
+      background-color: #dee2e6;
+    }
+    
+    .modal-btn-confirm {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .modal-btn-confirm:hover {
+      background-color: #e53935;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="main-nav">
+    <div class="container nav-container">
+      <a href="../index.html" class="nav-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 32px; height: 32px;">
+        <span class="tertiary-text">&nbsp;The&nbsp;</span>Dollar&nbsp;<span class="secondary-text">Web</span>
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../tools.html">Tools</a>
+        <a href="../about.html">About</a>
+        <a href="../login.html" class="login-btn">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>Sitemap Generator</h1>
+      <p class="tagline">Create and manage your website's sitemap in a few clicks. Generate, edit, and export XML sitemaps to improve your site's SEO visibility with search engines.</p>
+      <div class="os-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
+    </header>
+
+    <div class="tool-panel">
+      <div class="info-box">
+        <h3>What is a sitemap?</h3>
+        <p>A sitemap is an XML file that lists all the pages on your website to help search engines discover and understand your content structure. Adding priority values helps search engines determine the relative importance of each page.</p>
+      </div>
+
+      <table id="pagesTable">
+        <thead>
+          <tr>
+            <th>Page URL</th>
+            <th style="width: 150px;">Priority (0.0 – 1.0)</th>
+            <th style="width: 150px;">Change Frequency</th>
+            <th style="width: 180px;" class="last-modified">Last Modified</th>
+            <th style="width: 100px; text-align:center;">Include?</th>
+            <th style="width: 80px;">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="emptyState" class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <path d="M10 12h4"></path>
+          <path d="M10 16h4"></path>
+          <path d="M10 8h1"></path>
+        </svg>
+        <p>No pages added yet. Start by adding your website's pages using the button below.</p>
+      </div>
+
+      <button id="addRowBtn" class="secondary">Add Page</button>
+      <button id="addCommonPagesBtn" class="secondary">Add Common Pages</button>
+      <button id="clearAllBtn" class="danger">Clear All</button>
+      <button id="generateBtn" class="primary">Generate Sitemap XML</button>
+    </div>
+
+    <div id="outputPanel" class="output-panel">
+      <h2>Your Generated Sitemap</h2>
+      <textarea id="output" readonly></textarea>
+      <div class="action-buttons">
+        <button id="downloadBtn" class="primary">Download XML</button>
+        <button id="copyBtn" class="primary">Copy to Clipboard</button>
+        <button id="backBtn" class="secondary">Go Back to Editor</button>
+      </div>
+      <div id="successMessage" class="success-message">
+        <p>Sitemap XML copied to clipboard!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirmation-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Clear All Pages?</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to clear all the pages? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancel-clear">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="confirm-clear">Clear All</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 48px; height: 48px;">
+        <span>&nbsp;The Dollar Web</span>
+      </div>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../privacy.html">Privacy Policy</a>
+        <a href="../terms.html">Terms of Service</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://x.com/thedollarweb" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/thedollarwebpro/" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/the-dollar-web" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+            <rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 The DollarWeb</p>
+      <p class="copyright-message">Professional tools that won't break the bank</p>
+    </div>
+  </footer>
+
+  <script>
+    // DOM elements
+    const pagesTable = document.getElementById('pagesTable');
+    const tableBody = pagesTable.querySelector('tbody');
+    const addRowBtn = document.getElementById('addRowBtn');
+    const addCommonPagesBtn = document.getElementById('addCommonPagesBtn');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const outputPanel = document.getElementById('outputPanel');
+    const outputTextarea = document.getElementById('output');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const backBtn = document.getElementById('backBtn');
+    const emptyState = document.getElementById('emptyState');
+    const successMessage = document.getElementById('successMessage');
+    
+    // Confirmation modal elements
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const cancelClearBtn = document.getElementById('cancel-clear');
+    const confirmClearBtn = document.getElementById('confirm-clear');
+    
+    // Get today's date in ISO format for the "Last Modified" date input
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check if there are pages in localStorage
+    let savedPages = localStorage.getItem('sitemapPages');
+    if (savedPages) {
+      try {
+        const pages = JSON.parse(savedPages);
+        pages.forEach(page => {
+          addRow(page.url, page.priority, page.changefreq, page.lastmod, page.include);
+        });
+        updateTableVisibility();
+      } catch (e) {
+        console.error('Error loading saved pages:', e);
+        localStorage.removeItem('sitemapPages');
+      }
+    }
+    
+    // Add a new row to the table
+    function addRow(url = '', priority = '0.5', changefreq = 'monthly', lastmod = today, include = true) {
+      const row = document.createElement('tr');
+      
+      row.innerHTML = `
+        <td><input type="text" class="url-input" placeholder="https://example.com/page" value="${url}"></td>
+        <td><input type="number" class="priority-input" min="0.0" max="1.0" step="0.1" value="${priority}"></td>
+        <td>
+          <select class="change-frequency">
+            <option value="always" ${changefreq === 'always' ? 'selected' : ''}>Always</option>
+            <option value="hourly" ${changefreq === 'hourly' ? 'selected' : ''}>Hourly</option>
+            <option value="daily" ${changefreq === 'daily' ? 'selected' : ''}>Daily</option>
+            <option value="weekly" ${changefreq === 'weekly' ? 'selected' : ''}>Weekly</option>
+            <option value="monthly" ${changefreq === 'monthly' ? 'selected' : ''}>Monthly</option>
+            <option value="yearly" ${changefreq === 'yearly' ? 'selected' : ''}>Yearly</option>
+            <option value="never" ${changefreq === 'never' ? 'selected' : ''}>Never</option>
+          </select>
+        </td>
+        <td><input type="date" class="lastmod-input" value="${lastmod}" max="${today}"></td>
+        <td style="text-align:center;"><input type="checkbox" class="include-input" ${include ? 'checked' : ''}></td>
+        <td><button class="danger remove-btn">Remove</button></td>
+      `;
+      
+      tableBody.appendChild(row);
+      
+      // Add event listener to the remove button
+      const removeBtn = row.querySelector('.remove-btn');
+      removeBtn.addEventListener('click', function() {
+        row.remove();
+        updateTableVisibility();
+        savePages();
+      });
+      
+      // Add input change listeners for auto-save
+      const inputs = row.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('change', savePages);
+      });
+      
+      updateTableVisibility();
+    }
+    
+    // Function to check if the table is empty and toggle empty state visibility
+    function updateTableVisibility() {
+      const rowCount = tableBody.querySelectorAll('tr').length;
+      
+      if (rowCount === 0) {
+        emptyState.style.display = 'block';
+        pagesTable.style.display = 'none';
+      } else {
+        emptyState.style.display = 'none';
+        pagesTable.style.display = 'table';
+      }
+    }
+    
+    // Save pages to localStorage
+    function savePages() {
+      const rows = tableBody.querySelectorAll('tr');
+      const pages = [];
+      
+      rows.forEach(row => {
+        const url = row.querySelector('.url-input').value.trim();
+        const priority = row.querySelector('.priority-input').value;
+        const changefreq = row.querySelector('.change-frequency').value;
+        const lastmod = row.querySelector('.lastmod-input').value;
+        const include = row.querySelector('.include-input').checked;
+        
+        pages.push({ url, priority, changefreq, lastmod, include });
+      });
+      
+      localStorage.setItem('sitemapPages', JSON.stringify(pages));
+    }
+    
+    // Escape XML-sensitive characters
+    function escapeXML(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' };
+      return text.replace(/[&<>"']/g, (m) => map[m]);
+    }
+    
+    // Add a new row when the "Add Page" button is clicked
+    addRowBtn.addEventListener('click', () => {
+      addRow();
+      savePages();
+    });
+    
+    // Add common website pages
+    addCommonPagesBtn.addEventListener('click', () => {
+      // Get the domain from any existing URL, or use a placeholder
+      let domain = '';
+      const existingUrls = tableBody.querySelectorAll('.url-input');
+      for (let i = 0; i < existingUrls.length; i++) {
+        const url = existingUrls[i].value.trim();
+        if (url) {
+          try {
+            domain = new URL(url).origin;
+            break;
+          } catch (e) {
+            // Invalid URL, continue to next one
+          }
+        }
+      }
+      
+      // If no valid domain found, ask the user
+      if (!domain) {
+        domain = prompt('Please enter your website domain (e.g., https://example.com):', 'https://');
+        if (!domain) return; // User cancelled
+        
+        // Validate the domain
+        try {
+          new URL(domain);
+        } catch (e) {
+          alert('Please enter a valid URL with https:// or http:// prefix.');
+          return;
+        }
+      }
+      
+      // Common pages to add
+      const commonPages = [
+        { path: '/', priority: '1.0', changefreq: 'weekly' },
+        { path: '/about', priority: '0.8', changefreq: 'monthly' },
+        { path: '/contact', priority: '0.8', changefreq: 'monthly' },
+        { path: '/services', priority: '0.9', changefreq: 'weekly' },
+        { path: '/blog', priority: '0.9', changefreq: 'daily' },
+        { path: '/faq', priority: '0.7', changefreq: 'monthly' },
+        { path: '/terms', priority: '0.5', changefreq: 'yearly' },
+        { path: '/privacy', priority: '0.5', changefreq: 'yearly' }
+      ];
+      
+      // Add each common page if it doesn't already exist
+      commonPages.forEach(page => {
+        const fullUrl = domain + page.path;
+        
+        // Check if this URL already exists
+        let exists = false;
+        const existingUrls = tableBody.querySelectorAll('.url-input');
+        for (let i = 0; i < existingUrls.length; i++) {
+          if (existingUrls[i].value.trim() === fullUrl) {
+            exists = true;
+            break;
+          }
+        }
+        
+        // Add the page if it doesn't exist
+        if (!exists) {
+          addRow(fullUrl, page.priority, page.changefreq, today, true);
+        }
+      });
+      
+      savePages();
+    });
+    
+    // Clear all pages (show confirmation modal first)
+    clearAllBtn.addEventListener('click', () => {
+      if (tableBody.querySelectorAll('tr').length === 0) {
+        alert('There are no pages to clear.');
+        return;
+      }
+      
+      // Show the confirmation modal
+      confirmationModal.classList.add('active');
+    });
+    
+    // Cancel button in modal
+    cancelClearBtn.addEventListener('click', () => {
+      confirmationModal.classList.remove('active');
+    });
+    
+    // Confirm button in modal
+    confirmClearBtn.addEventListener('click', () => {
+      // Clear the table
+      tableBody.innerHTML = '';
+      updateTableVisibility();
+      savePages();
+      
+      // Hide the modal
+      confirmationModal.classList.remove('active');
+    });
+    
+    // Close modal if clicked outside
+    confirmationModal.addEventListener('click', (e) => {
+      if (e.target === confirmationModal) {
+        confirmationModal.classList.remove('active');
+      }
+    });
+    
+    // Generate the sitemap XML when the button is clicked
+    generateBtn.addEventListener('click', () => {
+      const rows = tableBody.querySelectorAll('tr');
+      const includedPages = [];
+      
+      rows.forEach(row => {
+        const include = row.querySelector('.include-input').checked;
+        if (!include) return; // Skip this row if not included
+        
+        const url = row.querySelector('.url-input').value.trim();
+        if (!url) return; // Skip if URL is empty
+        
+        const priority = row.querySelector('.priority-input').value;
+        const changefreq = row.querySelector('.change-frequency').value;
+        const lastmod = row.querySelector('.lastmod-input').value;
+        
+        includedPages.push({ url, priority, changefreq, lastmod });
+      });
+      
+      if (includedPages.length === 0) {
+        alert('Please add at least one page and make sure it\'s checked to include.');
+        return;
+      }
+      
+      // Generate the XML
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+      
+      includedPages.forEach(page => {
+        xml += '  <url>\n';
+        xml += `    <loc>${escapeXML(page.url)}</loc>\n`;
+        xml += `    <lastmod>${page.lastmod}</lastmod>\n`;
+        xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+        xml += `    <priority>${page.priority}</priority>\n`;
+        xml += '  </url>\n';
+      });
+      
+      xml += '</urlset>';
+      
+      // Display the output panel with the generated XML
+      outputTextarea.value = xml;
+      outputPanel.style.display = 'block';
+      
+      // Scroll to the output panel
+      outputPanel.scrollIntoView({ behavior: 'smooth' });
+    });
+    
+    // Copy the XML to the clipboard
+    copyBtn.addEventListener('click', () => {
+      outputTextarea.select();
+      document.execCommand('copy');
+      
+      // Show success message
+      successMessage.style.display = 'block';
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        successMessage.style.display = 'none';
+      }, 3000);
+    });
+    
+    // Download the XML file
+    downloadBtn.addEventListener('click', () => {
+      const xml = outputTextarea.value;
+      const blob = new Blob([xml], { type: 'application/xml' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sitemap.xml';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+    
+    // Go back to the editor
+    backBtn.addEventListener('click', () => {
+      outputPanel.style.display = 'none';
+    });
+    
+    // Initialize the table visibility when the page loads
+    updateTableVisibility();
+    
+    // Add one empty row if the table is empty
+    if (tableBody.querySelectorAll('tr').length === 0) {
+      addRow();
+    }
+  </script>
+</body>
+</html>
