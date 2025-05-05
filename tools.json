@@ -60,7 +60,7 @@
         "name": "PDF Combiner",
         "url": "pdf-combiner.html",
         "description": "Upload multiple PDF documents, reorder them, and combine them into one. Download the result.",
-        "tier": "free",
+        "tier": "premium",
         "type": "",
         "icon": "/images/pdf-combine.png"
       },
