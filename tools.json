@@ -75,10 +75,18 @@
       {
         "name": "File Zipper",
         "url": "../tools/file-zipper.html",
-        "description": "Compress files into a zip file and test if it is small enough to send in Gmail, Yahoo, or Outlook.",
+        "description": "Compress multiple files into a single ZIP archive. Check compression rates and email compatibility before downloading.",
         "tier": "free",
         "type": "",
         "icon": "/images/zipper.png"
+      },
+      {
+        "name": "PDF Watermarker",
+        "url": "../tools/pdf-watermark.html",
+        "description": "Compress multiple files into a single ZIP archive. Check compression rates and email compatibility before downloading.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/watermark.png"
       }
     ]
   }
