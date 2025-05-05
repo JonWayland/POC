@@ -87,6 +87,14 @@
         "tier": "free",
         "type": "",
         "icon": "/images/watermark.png"
+      },
+      {
+        "name": "Image to SVG",
+        "url": "../tools/image-to-svg.html",
+        "description": "Transform raster images (PNG, JPG) into scalable vector graphics (SVG). Perfect for logos, icons, and illustrations that need to be resized without losing quality.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/image.png"
       }
     ]
   }
