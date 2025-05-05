@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
+  <title>Robots.txt Generator | The Dollar Web</title>
+  <style>
+    /* Inter and Montserrat Fonts */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/inter-semibold.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: italic;
+      src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+      --highlight: rgba(255, 241, 118, 0.4); /* Default highlight color */
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      padding-top: 70px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 40px 0 0px;
+    }
+    
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 3.2rem;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-top: 80px;
+    }
+    
+    p.tagline {
+      font-size: 1.3rem;
+      color: var(--dark);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Navigation Bar Styles */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer Styles */
+    .site-footer {
+      background: var(--dark);
+      padding: 40px 0 50px;
+      margin-top: 80px;
+      position: relative;
+      color: white;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      color: var(--secondary);
+    }
+
+    .footer-logo svg {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+
+    .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .footer-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin: 0 30px;
+      font-size: 1.8rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .footer-social a svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .footer-social a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .copyright-message {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .secondary-text {
+      color: var(--secondary);
+    }
+    
+    .tertiary-text {
+      color: var(--dark);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .nav-logo span {
+        font-size: 1.2rem;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .footer-links a {
+        margin: 10px 0;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) {
+        display: none;
+      }
+    }
+
+    /* Robots.txt Generator Specific Styles */
+    .tool-container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      margin: 20px auto;
+    }
+
+    .user-agent-block {
+      position: relative;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .user-agent-block:hover {
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      border-color: var(--primary);
+    }
+
+    .remove-block {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #999;
+      transition: all 0.2s;
+    }
+
+    .remove-block:hover {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .user-agent-block label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .user-agent-block input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .user-agent-block input[type="text"]:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+    }
+
+    .directives {
+      margin-bottom: 15px;
+    }
+
+    .directives .directive {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      background: rgba(0, 168, 150, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .directives .directive:hover {
+      background: rgba(0, 168, 150, 0.1);
+    }
+
+    .directive select,
+    .directive input[type="text"] {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .directive select {
+      min-width: 120px;
+      background-color: white;
+    }
+
+    .directive select:focus,
+    .directive input[type="text"]:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+    }
+
+    .directive input[type="text"] {
+      flex-grow: 1;
+    }
+
+    .remove-directive {
+      background: none;
+      border: none;
+      font-size: 1.2em;
+      cursor: pointer;
+      color: #999;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .remove-directive:hover {
+      color: var(--accent);
+      background: rgba(255, 107, 107, 0.1);
+      transform: scale(1.1);
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px 8px 10px 0;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .add-directive {
+      background: var(--secondary);
+      padding: 10px 15px;
+      font-size: 0.9rem;
+    }
+
+    .add-directive:hover {
+      background: #e9a800;
+    }
+
+    #preview {
+      background: #272822;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 15px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .preview-container {
+      margin-top: 30px;
+    }
+
+    .preview-container h2 {
+      color: var(--dark);
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    #generate-button {
+      background: var(--secondary);
+    }
+
+    #generate-button:hover {
+      background: #e9a800;
+    }
+
+    #download-button {
+      background: var(--dark);
+    }
+
+    .sitemap-field {
+      margin: 20px 0;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .sitemap-field label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .sitemap-field input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .sitemap-field input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+    }
+
+    .info-box {
+      background: rgba(0, 168, 150, 0.1);
+      border-left: 4px solid var(--primary);
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .info-box h3 {
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+
+    .info-box p {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Quick Templates */
+    .templates-container {
+      margin: 20px 0;
+    }
+
+    .template-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .template-button {
+      padding: 8px 15px;
+      background: rgba(0, 168, 150, 0.1);
+      color: var(--dark);
+      border: 1px solid rgba(0, 168, 150, 0.3);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .template-button:hover {
+      background: rgba(0, 168, 150, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .os-links a {
+      color: var(--primary); 
+      text-decoration: none; 
+      font-size: 0.9rem;
+    }
+    
+    .os-links a:hover { 
+      text-decoration: underline; 
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+
+    .ai-bots-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .ai-bots-container h3 {
+      color: var(--dark);
+      margin-bottom: 15px;
+    }
+
+    .ai-bots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    /* Button animation */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+
+    /* Loading indicator */
+    .loading {
+      display: inline-block;
+      position: relative;
+      width: 80px;
+      height: 20px;
+    }
+    .loading div {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: loading 1.2s linear infinite;
+    }
+    .loading div:nth-child(1) {
+      top: 0;
+      left: 0;
+      animation-delay: 0s;
+    }
+    .loading div:nth-child(2) {
+      top: 0;
+      left: 32px;
+      animation-delay: -0.4s;
+    }
+    .loading div:nth-child(3) {
+      top: 0;
+      left: 64px;
+      animation-delay: -0.8s;
+    }
+    @keyframes loading {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="main-nav">
+    <div class="container nav-container">
+      <a href="../index.html" class="nav-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 32px; height: 32px;">
+        <span class="tertiary-text">&nbsp;The&nbsp;</span>Dollar&nbsp;<span class="secondary-text">Web</span>
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../tools.html">Tools</a>
+        <a href="../about.html">About</a>
+        <a href="../login.html" class="login-btn">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>Robots.txt Generator</h1>
+      <p class="tagline">Create, customize, and manage robots.txt files for your website to control which web crawlers are allowed to access your content.</p>
+      <div class="os-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
+    </header>
+
+    <div class="tool-container">
+      <div class="info-box">
+        <h3>What is a robots.txt file?</h3>
+        <p>A robots.txt file tells search engines and other web crawlers which parts of your website they can access and index. It's an important file for managing your site's visibility and privacy online.</p>
+      </div>
+
+      <div class="templates-container">
+        <h3>Quick Templates:</h3>
+        <div class="template-buttons">
+          <button class="template-button" id="allow-all-template">Allow All Crawlers</button>
+          <button class="template-button" id="block-all-template">Block All Crawlers</button>
+          <button class="template-button" id="seo-friendly-template">SEO Friendly</button>
+          <button class="template-button" id="block-ai-template">Block AI Crawlers</button>
+          <button class="template-button" id="private-media-template">Protect Media Files</button>
+        </div>
+      </div>
+
+      <div class="ai-bots-container">
+        <h3>Common AI Web Crawlers</h3>
+        <p>Select the AI bots you want to include in your robots.txt file:</p>
+        <div class="ai-bots-grid">
+          <div class="checkbox-container">
+            <input type="checkbox" id="chatgpt" class="ai-bot-checkbox" data-bot="ChatGPT-User">
+            <label for="chatgpt">ChatGPT (OpenAI)</label>
+          </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="googlebot" class="ai-bot-checkbox" data-bot="Google-Extended">
+            <label for="googlebot">Google Bard/Gemini</label>
+          </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="bingbot" class="ai-bot-checkbox" data-bot="Bingbot">
+            <label for="bingbot">Bing (Microsoft)</label>
+          </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="anthropic" class="ai-bot-checkbox" data-bot="Claude-Web">
+            <label for="anthropic">Claude (Anthropic)</label>
+          </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="ccbot" class="ai-bot-checkbox" data-bot="CCBot">
+            <label for="ccbot">Common Crawl</label>
+          </div>
+          <div class="checkbox-container">
+            <input type="checkbox" id="perplexity" class="ai-bot-checkbox" data-bot="Perplexity">
+            <label for="perplexity">Perplexity</label>
+          </div>
+        </div>
+      </div>
+
+      <div id="directives-container"></div>
+      <button id="add-agent-button">+ Add User-agent Block</button>
+
+      <div class="sitemap-field">
+        <label for="sitemap">Sitemap URL (optional):</label>
+        <input type="url" id="sitemap" placeholder="https://example.com/sitemap.xml">
+      </div>
+
+      <button id="generate-button" class="pulse-animation">Generate Preview</button>
+
+      <div class="preview-container">
+        <h2>Preview</h2>
+        <pre id="preview">— Your robots.txt will appear here —</pre>
+        <button id="download-button">Download robots.txt</button>
+        <button id="copy-button">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 48px; height: 48px;">
+        <span>&nbsp;The Dollar Web</span>
+      </div>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../privacy.html">Privacy Policy</a>
+        <a href="../terms.html">Terms of Service</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://x.com/thedollarweb" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/thedollarwebpro/" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/the-dollar-web" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+            <rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 The DollarWeb</p>
+      <p class="copyright-message">Professional tools that won't break the bank</p>
+    </div>
+  </footer>
+
+  <script>
+    let blockCounter = 0;
+    const aiBotsData = {
+      'ChatGPT-User': { name: 'ChatGPT (OpenAI)', paths: ['/'] },
+      'Google-Extended': { name: 'Google Bard/Gemini', paths: ['/'] },
+      'Bingbot': { name: 'Bing (Microsoft)', paths: ['/'] },
+      'Claude-Web': { name: 'Claude (Anthropic)', paths: ['/'] },
+      'CCBot': { name: 'Common Crawl', paths: ['/'] },
+      'Perplexity': { name: 'Perplexity', paths: ['/'] }
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize with one block
+      addBlock();
+
+      // Add event listeners
+      document.getElementById('add-agent-button').addEventListener('click', addBlock);
+      document.getElementById('generate-button').addEventListener('click', generateRobots);
+      document.getElementById('download-button').addEventListener('click', downloadRobots);
+      document.getElementById('copy-button').addEventListener('click', copyToClipboard);
+
+      // Template listeners
+      document.getElementById('allow-all-template').addEventListener('click', loadAllowAllTemplate);
+      document.getElementById('block-all-template').addEventListener('click', loadBlockAllTemplate);
+      document.getElementById('seo-friendly-template').addEventListener('click', loadSeoFriendlyTemplate);
+      document.getElementById('block-ai-template').addEventListener('click', loadBlockAiTemplate);
+      document.getElementById('private-media-template').addEventListener('click', loadPrivateMediaTemplate);
+
+      // AI bot checkbox listeners
+      document.querySelectorAll('.ai-bot-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            addAiBot(this.dataset.bot);
+          } else {
+            removeAiBot(this.dataset.bot);
+          }
+        });
+      });
+    });
+
+    function addBlock() {
+      const container = document.getElementById('directives-container');
+      const block = document.createElement('div');
+      block.className = 'user-agent-block';
+      block.dataset.id = blockCounter++;
+
+      block.innerHTML = `
+        <button class="remove-block" title="Remove block">×</button>
+        <label>User-agent:</label>
+        <input type="text" list="agents" class="agent" placeholder="e.g., * or Googlebot">
+        <datalist id="agents">
+          <option value="*">
+          <option value="Googlebot">
+          <option value="Bingbot">
+          <option value="ChatGPT-User">
+          <option value="Claude-Web">
+          <option value="Google-Extended">
+          <option value="CCBot">
+          <option value="Perplexity">
+          <option value="GPTBot">
+          <option value="ClaudeBot">
+        </datalist>
+        <div class="directives"></div>
+        <button class="add-directive">+ Add Directive</button>
+      `;
+      container.appendChild(block);
+
+      block.querySelector('.remove-block').addEventListener('click', () => {
+        // Add a subtle fade-out animation before removal
+        block.style.opacity = '0';
+        block.style.transform = 'translateY(10px)';
+        setTimeout(() => block.remove(), 300);
+      });
+      
+      block.querySelector('.add-directive').addEventListener('click', () => addDirective(block));
+
+      // Start with one directive
+      addDirective(block);
+      
+      return block;
+    }
+
+    function addDirective(block) {
+      const div = document.createElement('div');
+      div.className = 'directive';
+      div.innerHTML = `
+        <select class="directive-type">
+          <option value="Disallow">Disallow</option>
+          <option value="Allow">Allow</option>
+        </select>
+        <input type="text" class="path" placeholder="/path/">
+        <button class="remove-directive" title="Remove">×</button>
+      `;
+      block.querySelector('.directives').appendChild(div);
+      
+      // Add animation
+      div.style.opacity = '0';
+      div.style.transform = 'translateY(10px)';
+      setTimeout(() => {
+        div.style.opacity = '1';
+        div.style.transform = 'translateY(0)';
+      }, 10);
+      
+      div.querySelector('.remove-directive').addEventListener('click', () => {
+        div.style.opacity = '0';
+        div.style.transform = 'translateY(10px)';
+        setTimeout(() => div.remove(), 300);
+      });
+    }
+
+    function generateRobots() {
+      // Show a subtle loading effect
+      const preview = document.getElementById('preview');
+      preview.innerHTML = '<div class="loading"><div></div><div></div><div></div></div> Generating...';
+      
+      // Remove the pulse animation from the generate button
+      document.getElementById('generate-button').classList.remove('pulse-animation');
+      
+      // Short delay for visual feedback
+      setTimeout(() => {
+        let text = '';
+        document.querySelectorAll('.user-agent-block').forEach(block => {
+          const agent = block.querySelector('.agent').value.trim();
+          if (!agent) return;
+          text += `User-agent: ${agent}\n`;
+          block.querySelectorAll('.directive').forEach(dir => {
+            const type = dir.querySelector('.directive-type').value;
+            const path = dir.querySelector('.path').value.trim() || '/';
+            text += `${type}: ${path}\n`;
+          });
+          text += '\n';
+        });
+        
+        const sitemap = document.getElementById('sitemap').value.trim();
+        if (sitemap) text += `Sitemap: ${sitemap}\n`;
+        
+        // Add a comment with generator information
+        text = `# robots.txt generated by The Dollar Web\n# ${new Date().toISOString().split('T')[0]}\n\n${text}`;
+        
+        preview.textContent = text || '# No directives added yet. Add a User-agent block to get started.';
+      }, 500);
+    }
+
+    function downloadRobots() {
+      const text = document.getElementById('preview').textContent;
+      if (text.includes('No directives added yet')) {
+        alert('Please generate some content first before downloading.');
+        return;
+      }
+      
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'robots.txt';
+      
+      // Animate the download button
+      const downloadBtn = document.getElementById('download-button');
+      downloadBtn.classList.add('pulse-animation');
+      
+      setTimeout(() => {
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        // Remove animation after download
+        setTimeout(() => {
+          downloadBtn.classList.remove('pulse-animation');
+        }, 1000);
+      }, 300);
+    }
+
+    function copyToClipboard() {
+      const text = document.getElementById('preview').textContent;
+      if (text.includes('No directives added yet')) {
+        alert('Please generate some content first before copying.');
+        return;
+      }
+      
+      navigator.clipboard.writeText(text).then(() => {
+        // Show copy success feedback
+        const copyBtn = document.getElementById('copy-button');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        copyBtn.style.background = '#4CAF50';
+        
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.style.background = '';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy text to clipboard.');
+      });
+    }
+
+    // Function to add an AI bot block
+    function addAiBot(botId) {
+      if (!aiBotsData[botId]) return;
+      
+      // Check if this bot already has a block
+      const existingBlock = findAiBotBlock(botId);
+      if (existingBlock) return; // Bot already added
+      
+      // Create a new block for this AI bot
+      const block = addBlock();
+      const agentInput = block.querySelector('.agent');
+      agentInput.value = botId;
+      
+      // Add default Disallow directive
+      const directiveInput = block.querySelector('.path');
+      directiveInput.value = '/';
+    }
+
+    // Function to remove an AI bot block
+    function removeAiBot(botId) {
+      const block = findAiBotBlock(botId);
+      if (block) {
+        block.style.opacity = '0';
+        block.style.transform = 'translateY(10px)';
+        setTimeout(() => block.remove(), 300);
+      }
+    }
+
+    // Helper function to find a block by bot ID
+    function findAiBotBlock(botId) {
+      const blocks = document.querySelectorAll('.user-agent-block');
+      for (const block of blocks) {
+        const agentInput = block.querySelector('.agent');
+        if (agentInput && agentInput.value === botId) {
+          return block;
+        }
+      }
+      return null;
+    }
+
+    // Template: Allow All Crawlers
+    function loadAllowAllTemplate() {
+      clearAllBlocks();
+      
+      const block = addBlock();
+      block.querySelector('.agent').value = '*';
+      block.querySelector('.directive-type').value = 'Allow';
+      block.querySelector('.path').value = '/';
+      
+      // Add sitemap
+      document.getElementById('sitemap').value = 'https://example.com/sitemap.xml';
+      
+      generateRobots();
+    }
+
+    // Template: Block All Crawlers
+    function loadBlockAllTemplate() {
+      clearAllBlocks();
+      
+      const block = addBlock();
+      block.querySelector('.agent').value = '*';
+      block.querySelector('.directive-type').value = 'Disallow';
+      block.querySelector('.path').value = '/';
+      
+      generateRobots();
+    }
+
+    // Template: SEO Friendly
+    function loadSeoFriendlyTemplate() {
+      clearAllBlocks();
+      
+      // Add general block
+      const generalBlock = addBlock();
+      generalBlock.querySelector('.agent').value = '*';
+      generalBlock.querySelector('.directive-type').value = 'Allow';
+      generalBlock.querySelector('.path').value = '/';
+      
+      // Add disallow directive for admin area
+      addDirective(generalBlock);
+      const directives = generalBlock.querySelectorAll('.directive');
+      directives[1].querySelector('.directive-type').value = 'Disallow';
+      directives[1].querySelector('.path').value = '/admin/';
+      
+      // Add disallow directive for private content
+      addDirective(generalBlock);
+      const privateDirective = generalBlock.querySelectorAll('.directive')[2];
+      privateDirective.querySelector('.directive-type').value = 'Disallow';
+      privateDirective.querySelector('.path').value = '/private/';
+      
+      // Add Googlebot specific block
+      const googleBlock = addBlock();
+      googleBlock.querySelector('.agent').value = 'Googlebot';
+      googleBlock.querySelector('.directive-type').value = 'Allow';
+      googleBlock.querySelector('.path').value = '/';
+      
+      // Add sitemap
+      document.getElementById('sitemap').value = 'https://example.com/sitemap.xml';
+      
+      generateRobots();
+    }
+
+    // Template: Block AI Crawlers
+    function loadBlockAiTemplate() {
+      clearAllBlocks();
+      
+      // Check all AI bot checkboxes
+      document.querySelectorAll('.ai-bot-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+        addAiBot(checkbox.dataset.bot);
+      });
+      
+      // Add general block allowing regular search engines
+      const generalBlock = addBlock();
+      generalBlock.querySelector('.agent').value = '*';
+      generalBlock.querySelector('.directive-type').value = 'Allow';
+      generalBlock.querySelector('.path').value = '/';
+      
+      generateRobots();
+    }
+
+    // Template: Private Media Template
+    function loadPrivateMediaTemplate() {
+      clearAllBlocks();
+      
+      // Add general block
+      const generalBlock = addBlock();
+      generalBlock.querySelector('.agent').value = '*';
+      generalBlock.querySelector('.directive-type').value = 'Allow';
+      generalBlock.querySelector('.path').value = '/';
+      
+      // Add disallow directives for media
+      addDirective(generalBlock);
+      const mediaDirective1 = generalBlock.querySelectorAll('.directive')[1];
+      mediaDirective1.querySelector('.directive-type').value = 'Disallow';
+      mediaDirective1.querySelector('.path').value = '/images/private/';
+      
+      addDirective(generalBlock);
+      const mediaDirective2 = generalBlock.querySelectorAll('.directive')[2];
+      mediaDirective2.querySelector('.directive-type').value = 'Disallow';
+      mediaDirective2.querySelector('.path').value = '/downloads/';
+      
+      addDirective(generalBlock);
+      const mediaDirective3 = generalBlock.querySelectorAll('.directive')[3];
+      mediaDirective3.querySelector('.directive-type').value = 'Disallow';
+      mediaDirective3.querySelector('.path').value = '/*.pdf';
+      
+      // Add sitemap
+      document.getElementById('sitemap').value = 'https://example.com/sitemap.xml';
+      
+      generateRobots();
+    }
+
+    // Helper function to clear all blocks
+    function clearAllBlocks() {
+      document.querySelectorAll('.user-agent-block').forEach(block => {
+        block.remove();
+      });
+      
+      // Also clear AI bot checkboxes
+      document.querySelectorAll('.ai-bot-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Robots.txt Generator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5; color: #333;
+    }
+    .container {
+      max-width: 800px; margin: auto;
+      background: #fff; padding: 20px;
+      border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; margin-top: 0; }
+    .user-agent-block {
+      position: relative;
+      background: #fafafa; border: 1px solid #ddd;
+      padding: 15px; margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    .remove-block {
+      position: absolute; top: 10px; right: 10px;
+      background: none; border: none; font-size: 1.2em;
+      cursor: pointer; color: #999;
+    }
+    .user-agent-block label {
+      display: block; margin-bottom: 5px; font-weight: bold;
+    }
+    .user-agent-block input[type="text"] {
+      width: 100%; padding: 8px; margin-bottom: 10px;
+      border: 1px solid #ccc; border-radius: 4px;
+    }
+    .directives .directive {
+      display: flex; gap: 8px; align-items: center;
+      margin-bottom: 8px;
+    }
+    .directive select,
+    .directive input[type="text"] {
+      padding: 6px; border: 1px solid #ccc; border-radius: 4px;
+    }
+    .remove-directive {
+      background: none; border: none; font-size: 1.2em;
+      cursor: pointer; color: #c00;
+    }
+    button {
+      padding: 8px 12px; margin: 8px 4px 0 0;
+      border: none; border-radius: 4px;
+      background: #4CAF50; color: #fff;
+      cursor: pointer;
+    }
+    button:hover { background: #45a049; }
+    #preview {
+      background: #272822; color: #f8f8f2;
+      padding: 15px; border-radius: 4px;
+      font-family: monospace; white-space: pre-wrap;
+      max-height: 300px; overflow-y: auto;
+    }
+    .sitemap-field {
+      margin: 15px 0;
+    }
+    .sitemap-field input {
+      width: 100%; padding: 8px; border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Robots.txt Generator</h1>
+    <div id="directives-container"></div>
+    <button id="add-agent-button">+ Add User‑agent Block</button>
+
+    <div class="sitemap-field">
+      <label for="sitemap"><strong>Sitemap URL (optional):</strong></label>
+      <input type="url" id="sitemap" placeholder="https://example.com/sitemap.xml">
+    </div>
+
+    <button id="generate-button">Generate Preview</button>
+    <h2>Preview</h2>
+    <pre id="preview">— your robots.txt will appear here —</pre>
+    <button id="download-button">Download robots.txt</button>
+  </div>
+
+  <script>
+    let blockCounter = 0;
+
+    function addBlock() {
+      const container = document.getElementById('directives-container');
+      const block = document.createElement('div');
+      block.className = 'user-agent-block';
+      block.dataset.id = blockCounter++;
+
+      block.innerHTML = `
+        <button class="remove-block" title="Remove block">×</button>
+        <label>User‑agent:</label>
+        <input type="text" list="agents" class="agent" placeholder="e.g., * or Googlebot">
+        <datalist id="agents">
+          <option value="*">
+          <option value="Googlebot">
+          <option value="Bingbot">
+          <option value="ChatGPT">
+          <option value="OpenAI">
+          <option value="DuckDuckBot">
+          <option value="Slurp">
+        </datalist>
+        <div class="directives"></div>
+        <button class="add-directive">+ Add Directive</button>
+      `;
+      container.appendChild(block);
+
+      block.querySelector('.remove-block')
+           .addEventListener('click', () => block.remove());
+      block.querySelector('.add-directive')
+           .addEventListener('click', () => addDirective(block));
+
+      // start with one directive
+      addDirective(block);
+    }
+
+    function addDirective(block) {
+      const div = document.createElement('div');
+      div.className = 'directive';
+      div.innerHTML = `
+        <select class="directive-type">
+          <option value="Disallow">Disallow</option>
+          <option value="Allow">Allow</option>
+        </select>
+        <input type="text" class="path" placeholder="/path/">
+        <button class="remove-directive" title="Remove">×</button>
+      `;
+      block.querySelector('.directives').appendChild(div);
+      div.querySelector('.remove-directive')
+         .addEventListener('click', () => div.remove());
+    }
+
+    function generateRobots() {
+      let text = '';
+      document.querySelectorAll('.user-agent-block').forEach(block => {
+        const agent = block.querySelector('.agent').value.trim();
+        if (!agent) return;
+        text += `User-agent: ${agent}\n`;
+        block.querySelectorAll('.directive').forEach(dir => {
+          const type = dir.querySelector('.directive-type').value;
+          const path = dir.querySelector('.path').value.trim() || '/';
+          text += `${type}: ${path}\n`;
+        });
+        text += '\n';
+      });
+      const sitemap = document.getElementById('sitemap').value.trim();
+      if (sitemap) text += `Sitemap: ${sitemap}\n`;
+      document.getElementById('preview').textContent = text;
+    }
+
+    function downloadRobots() {
+      const text = document.getElementById('preview').textContent;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'robots.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('add-agent-button')
+            .addEventListener('click', addBlock);
+    document.getElementById('generate-button')
+            .addEventListener('click', generateRobots);
+    document.getElementById('download-button')
+            .addEventListener('click', downloadRobots);
+
+    // initialize with one block
+    addBlock();
+  </script>
+</body>
+</html>

@@ -103,6 +103,14 @@
         "tier": "free",
         "type": "",
         "icon": "/images/sitemap.png"
+      },
+      {
+        "name": "Robots.txt Generator",
+        "url": "../tools/robots-generator.html",
+        "description": "Create, customize, and manage robots.txt files for your website to control which web crawlers are allowed to access your content.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/robots.png"
       }
     ]
   }
