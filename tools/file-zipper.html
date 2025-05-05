@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
+  <title>File Zipper | The Dollar Web</title>
+  <style>
+    /* Inter and Montserrat Fonts */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/inter-semibold.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: italic;
+      src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+      --highlight: rgba(255, 241, 118, 0.4); /* Default highlight color */
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      padding-top: 70px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 40px 0 0px;
+    }
+    
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 3.2rem;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-top: 80px;
+    }
+    
+    p.tagline {
+      font-size: 1.3rem;
+      color: var(--dark);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Navigation Bar Styles */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer Styles */
+    .site-footer {
+      background: var(--dark);
+      padding: 40px 0 50px;
+      margin-top: 80px;
+      position: relative;
+      color: white;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      color: var(--secondary);
+    }
+
+    .footer-logo svg {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+
+    .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .footer-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin: 0 30px;
+      font-size: 1.8rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .footer-social a svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .footer-social a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .copyright-message {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .secondary-text {
+      color: var(--secondary);
+    }
+    
+    .tertiary-text {
+      color: var(--dark);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .nav-logo span {
+        font-size: 1.2rem;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .footer-links a {
+        margin: 10px 0;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) {
+        display: none;
+      }
+    }
+
+    /* File Zipper Specific Styles */
+    .tool-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      padding: 30px;
+      margin-top: 30px;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--primary);
+      padding: 60px 20px;
+      text-align: center;
+      border-radius: 12px;
+      transition: all 0.3s;
+      cursor: pointer;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .drop-zone:hover {
+      background: rgba(0, 168, 150, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .drop-zone.dragover {
+      background: rgba(0, 168, 150, 0.1);
+      border-color: var(--dark);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .drop-zone p {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .drop-zone .icon {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .drop-zone .file-label {
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .file-list {
+      margin-top: 30px;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background: var(--bg);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .file-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border-color: var(--primary);
+    }
+
+    .file-item-left {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .file-icon {
+      margin-right: 12px;
+      color: var(--dark);
+      font-size: 1.2rem;
+    }
+
+    .file-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 300px;
+    }
+
+    .file-size {
+      font-weight: 500;
+      color: var(--dark);
+      margin-left: 10px;
+      white-space: nowrap;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .remove-btn:hover {
+      background: var(--accent);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .stats-container {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .stats-row:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .stats-label {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .stats-value {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 1.1rem;
+    }
+
+    .email-limits {
+      margin-top: 20px;
+    }
+
+    .limit-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .limit-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .limit-indicator.ok {
+      background-color: #4CAF50;
+    }
+
+    .limit-indicator.warning {
+      background-color: #FF9800;
+    }
+
+    .limit-indicator.exceeded {
+      background-color: #F44336;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      margin-top: 30px;
+      width: 100%;
+    }
+
+    .btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Custom scrollbar */
+    .file-list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .file-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    .file-list::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+
+    .file-list::-webkit-scrollbar-thumb:hover {
+      background: var(--dark);
+    }
+
+    /* Loading animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0, 168, 150, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    .os-links a {
+      color: var(--primary); 
+      text-decoration: none; 
+      font-size: 0.9rem;
+    }
+    
+    .os-links a:hover { 
+      text-decoration: underline; 
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="main-nav">
+    <div class="container nav-container">
+      <a href="../index.html" class="nav-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 32px; height: 32px;">
+        <span class="tertiary-text">&nbsp;The&nbsp;</span>Dollar&nbsp;<span class="secondary-text">Web</span>
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../tools.html">Tools</a>
+        <a href="../about.html">About</a>
+        <a href="../login.html" class="login-btn">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>File Zipper</h1>
+      <p class="tagline">Compress multiple files into a single ZIP archive. Check compression rates and email compatibility before downloading. Files don't leave your browser.</p>
+      <div class="os-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
+    </header>
+
+    <div class="tool-container">
+      <div id="drop-zone" class="drop-zone">
+        <span class="icon">📁</span>
+        <p>Drag & drop files here or <label for="file-input" class="file-label">browse your device</label></p>
+        <p style="font-size: 0.9rem; color: #666;">Select multiple files to compress them into a single ZIP file</p>
+        <input type="file" id="file-input" multiple hidden>
+      </div>
+
+      <div id="file-list" class="file-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">📂</div>
+          <p>No files added yet</p>
+        </div>
+      </div>
+
+      <div class="stats-container">
+        <div class="stats-row">
+          <span class="stats-label">Total Files:</span>
+          <span class="stats-value" id="total-files">0</span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-label">Original Size:</span>
+          <span class="stats-value" id="total-size">0 B</span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-label">Compressed Size:</span>
+          <span class="stats-value" id="zip-size">0 B</span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-label">Compression Ratio:</span>
+          <span class="stats-value" id="compression-ratio">-</span>
+        </div>
+        
+        <div class="email-limits">
+          <h3 style="margin-bottom: 15px; color: var(--dark);">Email Service Compatibility</h3>
+          <div class="limit-item">
+            <div class="limit-indicator ok" id="gmail-indicator"></div>
+            <div>Gmail (25MB): <span id="gmail-status">Compatible</span></div>
+          </div>
+          <div class="limit-item">
+            <div class="limit-indicator ok" id="outlook-indicator"></div>
+            <div>Outlook (20MB): <span id="outlook-status">Compatible</span></div>
+          </div>
+          <div class="limit-item">
+            <div class="limit-indicator ok" id="yahoo-indicator"></div>
+            <div>Yahoo Mail (25MB): <span id="yahoo-status">Compatible</span></div>
+          </div>
+        </div>
+      </div>
+
+      <button id="download-btn" class="btn" disabled>Download ZIP File</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 48px; height: 48px;">
+        <span>&nbsp;The Dollar Web</span>
+      </div>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../privacy.html">Privacy Policy</a>
+        <a href="../terms.html">Terms of Service</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://x.com/thedollarweb" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/thedollarwebpro/" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/the-dollar-web" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+            <rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 The DollarWeb</p>
+      <p class="copyright-message">Professional tools that won't break the bank</p>
+    </div>
+  </footer>
+
+  <!-- JSZip library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM Elements
+      const fileInput = document.getElementById('file-input');
+      const dropZone = document.getElementById('drop-zone');
+      const fileListEl = document.getElementById('file-list');
+      const totalFilesEl = document.getElementById('total-files');
+      const totalSizeEl = document.getElementById('total-size');
+      const zipSizeEl = document.getElementById('zip-size');
+      const downloadBtn = document.getElementById('download-btn');
+      const compressionRatioEl = document.getElementById('compression-ratio');
+      
+      // Email service limits in bytes
+      const EMAIL_LIMITS = {
+        gmail: 25 * 1024 * 1024,    // 25MB
+        outlook: 20 * 1024 * 1024,  // 20MB
+        yahoo: 25 * 1024 * 1024     // 25MB
+      };
+      
+      // State
+      let files = [];
+      let zipBlob = null;
+      let zipUrl = null;
+
+      // Open file picker when drop zone is clicked
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      // Handle file selection through file input
+      fileInput.addEventListener('change', e => {
+        addFiles(e.target.files);
+        fileInput.value = ''; // Reset file input to allow selecting the same file again
+      });
+
+      // Drag & drop events
+      ['dragenter', 'dragover'].forEach(evt => {
+        dropZone.addEventListener(evt, e => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+      });
+      
+      ['dragleave', 'drop'].forEach(evt => {
+        dropZone.addEventListener(evt, e => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+      });
+      
+      dropZone.addEventListener('drop', e => {
+        addFiles(e.dataTransfer.files);
+      });
+
+      // Add files to the list
+      function addFiles(selected) {
+        // Add new files to the existing list
+        for (let file of selected) {
+          // Check if the file already exists in the list
+          const exists = files.some(f => f.name === file.name && f.size === file.size);
+          if (!exists) {
+            files.push(file);
+          }
+        }
+        
+        refreshUI();
+      }
+
+      // Refresh the UI with the current list of files
+      function refreshUI() {
+        fileListEl.innerHTML = '';
+        
+        if (files.length === 0) {
+          fileListEl.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📂</div>
+              <p>No files added yet</p>
+            </div>`;
+          
+          totalFilesEl.textContent = '0';
+          totalSizeEl.textContent = '0 B';
+          zipSizeEl.textContent = '0 B';
+          compressionRatioEl.textContent = '-';
+          downloadBtn.disabled = true;
+          
+          // Reset email compatibility indicators
+          updateEmailCompatibility(0);
+          
+          return;
+        }
+        
+        // Calculate total size
+        let totalSize = 0;
+        files.forEach(file => {
+          totalSize += file.size;
+          
+          // Create file item element
+          const item = document.createElement('div');
+          item.className = 'file-item';
+          
+          // Determine file icon based on file type
+          let fileIcon = '📄'; // Default document icon
+          const extension = file.name.split('.').pop().toLowerCase();
+          
+          if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension)) {
+            fileIcon = '🖼️'; // Image icon
+          } else if (['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(extension)) {
+            fileIcon = '🎬'; // Video icon
+          } else if (['mp3', 'wav', 'ogg', 'flac', 'm4a'].includes(extension)) {
+            fileIcon = '🎵'; // Audio icon
+          } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
+            fileIcon = '🗜️'; // Archive icon
+          } else if (['pdf'].includes(extension)) {
+            fileIcon = '📑'; // PDF icon
+          } else if (['doc', 'docx', 'txt', 'rtf'].includes(extension)) {
+            fileIcon = '📝'; // Text document icon
+          } else if (['xls', 'xlsx', 'csv'].includes(extension)) {
+            fileIcon = '📊'; // Spreadsheet icon
+          } else if (['ppt', 'pptx'].includes(extension)) {
+            fileIcon = '📢'; // Presentation icon
+          }
+          
+          // Create content for the file item
+          item.innerHTML = `
+            <div class="file-item-left">
+              <span class="file-icon">${fileIcon}</span>
+              <span class="file-name">${file.name}</span>
+            </div>
+            <div class="file-item-right">
+              <span class="file-size">${formatBytes(file.size)}</span>
+              <button class="remove-btn" data-index="${files.indexOf(file)}">×</button>
+            </div>
+          `;
+          
+          // Add click event listener to remove button
+          item.querySelector('.remove-btn').addEventListener('click', e => {
+            const index = parseInt(e.target.dataset.index);
+            files.splice(index, 1);
+            refreshUI();
+          });
+          
+          fileListEl.appendChild(item);
+        });
+        
+        // Update file statistics
+        totalFilesEl.textContent = files.length.toString();
+        totalSizeEl.textContent = formatBytes(totalSize);
+        
+        // Generate zip file for preview
+        if (files.length > 0) {
+          // Show loading state
+          zipSizeEl.innerHTML = '<span class="loading-spinner"></span> Calculating...';
+          compressionRatioEl.innerHTML = '<span class="loading-spinner"></span> Calculating...';
+          downloadBtn.disabled = true;
+          
+          // Calculate zip size asynchronously
+          makeZip(files).then(({ blob, url }) => {
+            // Store zip blob and URL for download
+            zipBlob = blob;
+            zipUrl = url;
+            
+            // Update UI with zip size
+            zipSizeEl.textContent = formatBytes(blob.size);
+            
+            // Calculate and display compression ratio
+            const ratio = (totalSize > 0) ? ((totalSize - blob.size) / totalSize * 100).toFixed(1) : 0;
+            if (ratio == 0) {
+            compressionRatioEl.textContent = `No compression`;
+            } else {
+            compressionRatioEl.textContent = ratio > 0 ? `${ratio}% saved` : `${Math.abs(ratio)}% larger`;
+            }
+            
+            // Enable download button
+            downloadBtn.disabled = false;
+            
+            // Update email service compatibility
+            updateEmailCompatibility(blob.size);
+          });
+        }
+      }
+      
+      // Create ZIP file from the list of files
+      function makeZip(files) {
+        const zip = new JSZip();
+        
+        // Handle duplicate file names by adding a counter
+        const fileNames = {};
+        
+        files.forEach(file => {
+          let filename = file.name;
+          
+          // Check if the filename already exists in the zip
+          if (fileNames[filename]) {
+            // Extract file extension
+            const lastDotIndex = filename.lastIndexOf('.');
+            const name = lastDotIndex !== -1 ? filename.substring(0, lastDotIndex) : filename;
+            const ext = lastDotIndex !== -1 ? filename.substring(lastDotIndex) : '';
+            
+            // Increment counter
+            fileNames[filename]++;
+            
+            // Create new filename with counter
+            filename = `${name} (${fileNames[filename]})${ext}`;
+          } else {
+            fileNames[filename] = 1;
+          }
+          
+          // Add file to zip
+          zip.file(filename, file);
+        });
+        
+        // Generate the zip file
+        return zip.generateAsync({ type: 'blob' }).then(blob => {
+          const url = URL.createObjectURL(blob);
+          return { blob, url };
+        });
+      }
+      
+      // Format bytes to human-readable format
+      function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 B';
+        
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
+      }
+      
+      // Update email service compatibility indicators
+      function updateEmailCompatibility(zipSize) {
+        // Gmail (25MB)
+        const gmailIndicator = document.getElementById('gmail-indicator');
+        const gmailStatus = document.getElementById('gmail-status');
+        
+        if (zipSize === 0) {
+          gmailIndicator.className = 'limit-indicator ok';
+          gmailStatus.textContent = 'Compatible';
+        } else if (zipSize <= EMAIL_LIMITS.gmail * 0.8) {
+          // Under 80% of limit - good
+          gmailIndicator.className = 'limit-indicator ok';
+          gmailStatus.textContent = 'Compatible';
+        } else if (zipSize <= EMAIL_LIMITS.gmail) {
+          // Between 80% and 100% of limit - warning
+          gmailIndicator.className = 'limit-indicator warning';
+          gmailStatus.textContent = 'Close to limit';
+        } else {
+          // Over limit
+          gmailIndicator.className = 'limit-indicator exceeded';
+          gmailStatus.textContent = 'Too large';
+        }
+        
+        // Outlook (20MB)
+        const outlookIndicator = document.getElementById('outlook-indicator');
+        const outlookStatus = document.getElementById('outlook-status');
+        
+        if (zipSize === 0) {
+          outlookIndicator.className = 'limit-indicator ok';
+          outlookStatus.textContent = 'Compatible';
+        } else if (zipSize <= EMAIL_LIMITS.outlook * 0.8) {
+          outlookIndicator.className = 'limit-indicator ok';
+          outlookStatus.textContent = 'Compatible';
+        } else if (zipSize <= EMAIL_LIMITS.outlook) {
+          outlookIndicator.className = 'limit-indicator warning';
+          outlookStatus.textContent = 'Close to limit';
+        } else {
+          outlookIndicator.className = 'limit-indicator exceeded';
+          outlookStatus.textContent = 'Too large';
+        }
+        
+        // Yahoo Mail (25MB)
+        const yahooIndicator = document.getElementById('yahoo-indicator');
+        const yahooStatus = document.getElementById('yahoo-status');
+        
+        if (zipSize === 0) {
+          yahooIndicator.className = 'limit-indicator ok';
+          yahooStatus.textContent = 'Compatible';
+        } else if (zipSize <= EMAIL_LIMITS.yahoo * 0.8) {
+          yahooIndicator.className = 'limit-indicator ok';
+          yahooStatus.textContent = 'Compatible';
+        } else if (zipSize <= EMAIL_LIMITS.yahoo) {
+          yahooIndicator.className = 'limit-indicator warning';
+          yahooStatus.textContent = 'Close to limit';
+        } else {
+          yahooIndicator.className = 'limit-indicator exceeded';
+          yahooStatus.textContent = 'Too large';
+        }
+      }
+      
+      // Set up download button
+      downloadBtn.addEventListener('click', () => {
+        if (zipUrl) {
+          // Create a download link and trigger click
+          const downloadLink = document.createElement('a');
+          downloadLink.href = zipUrl;
+          
+          // Create a filename for the zip
+          let zipFileName = 'files.zip';
+          
+          // If there's only one file, use its name as the zip name
+          if (files.length === 1) {
+            const fileName = files[0].name;
+            const lastDotIndex = fileName.lastIndexOf('.');
+            const baseName = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
+            zipFileName = `${baseName}.zip`;
+          } else if (files.length > 1) {
+            // Use the current date in the filename
+            const date = new Date();
+            const formattedDate = date.toISOString().slice(0, 10).replace(/-/g, '');
+            zipFileName = `files_${formattedDate}.zip`;
+          }
+          
+          downloadLink.download = zipFileName;
+          downloadLink.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

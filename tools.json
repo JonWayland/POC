@@ -71,6 +71,14 @@
         "tier": "free",
         "type": "",
         "icon": "/images/table-markdown.png"
+      },
+      {
+        "name": "File Zipper",
+        "url": "../tools/file-zipper.html",
+        "description": "Compress files into a zip file and test if it is small enough to send in Gmail, Yahoo, or Outlook.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/zipper.png"
       }
     ]
   }
