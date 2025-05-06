@@ -115,8 +115,8 @@
       {
         "name": "Image Watermarker",
         "url": "../tools/image-watermark.html",
-        "description": "Protect your photography with professional watermarks. Add text, images, or website URLs to your photos.",
-        "tier": "free",
+        "description": "Protect your photography with professional watermarks. Add text, images, website URLs, or QR codes to your photos. QR Code is a registered trademark of DENSO WAVE Incorporated.",
+        "tier": "premium",
         "type": "",
         "icon": "/images/image-watermark.png"
       }

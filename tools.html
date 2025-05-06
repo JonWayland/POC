@@ -889,7 +889,8 @@
       const description = document.createElement('p');
       
       // Check if the description includes a footnote (for QR Customizer)
-      if (tool.name === "QR Customizer" && tool.description.includes("registered trademark")) {
+      const qrRegTools = ["QR Customizer", "Image Watermarker"];
+      if (qrRegTools.includes(tool.name) && tool.description.includes("registered trademark")) {
         // Split the description to separate the main text from the footnote
         const parts = tool.description.split("QR Code is");
         description.textContent = parts[0].trim();
@@ -897,7 +898,7 @@
         // Create footnote element for the trademark notice
         const footnote = document.createElement('div');
         footnote.className = 'tool-footnote';
-        footnote.textContent = "QR Code is" + parts[1].trim();
+        footnote.textContent = "QR Code is " + parts[1].trim();
         content.appendChild(title);
         content.appendChild(description);
         content.appendChild(footnote);

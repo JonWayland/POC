@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="../images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
-  <title>Image Watermark Tool | The Dollar Web</title>
+  <title>Image Watermarker | The Dollar Web</title>
   <style>
     /* Inter and Montserrat Fonts */
     @font-face {
@@ -670,6 +670,87 @@
       max-height: 200px;
       overflow-y: auto;
     }
+
+    /* Confirmation Dialog */
+    .confirm-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+    }
+
+    .confirm-dialog.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .confirm-dialog-content {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 400px;
+        transform: translateY(20px);
+        transition: transform 0.3s;
+    }
+
+    .confirm-dialog.active .confirm-dialog-content {
+        transform: translateY(0);
+    }
+
+    .confirm-dialog h3 {
+        color: var(--dark);
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+    .confirm-dialog p {
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .confirm-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .confirm-buttons button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    #cancelClearBtn {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    #cancelClearBtn:hover {
+        background: #e0e0e0;
+    }
+
+    #confirmClearBtn {
+        background: #f44336;
+        color: white;
+    }
+
+    #confirmClearBtn:hover {
+        background: #d32f2f;
+    }
   </style>
 </head>
 <body>
@@ -691,21 +772,27 @@
 
   <div class="container">
     <header>
-      <h1>Image Watermark Tool</h1>
-      <p class="tagline">Protect your photography with professional watermarks. Add text, images, or website URLs to your photos.</p>
+      <h1>Image Watermarker</h1>
+      <p class="tagline">Protect your photography with professional watermarks. Add text, images, website URLs, or QR codes to your photos.</p>
       <div class="os-links">
         <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
+      <div>
+        <p><i><br>QR Code is a registered trademark of DENSO WAVE Incorporated.</i></p>
       </div>
     </header>
     
     <div id="toolbar">
-      <div class="file-input-container">
-        <label class="file-input-label">Choose Image</label>
-        <input type="file" id="imageLoader" class="file-input" accept="image/*">
-      </div>
-      <button id="clearImageBtn" disabled>Clear Image</button>
-      <button id="undoBtn" disabled>Undo Last</button>
-      <button id="downloadBtn" disabled>Download</button>
+        <div class="file-input-container">
+          <label class="file-input-label" style="background-color: #ccc; color: #333;">Choose Image</label>
+          <input type="file" id="imageLoader" class="file-input" accept="image/*">
+        </div>
+        <button id="clearImageBtn" style="background-color: #f8b500;" disabled>Clear Image</button>
+        <button id="zoomInBtn" style="background-color: #05668d;"><span style="font-weight: bold; font-size: 16px;">+</span></button>
+        <button id="zoomOutBtn" style="background-color: #05668d;"><span style="font-weight: bold; font-size: 16px;">-</span></button>
+        <button id="resetZoomBtn" style="background-color: #ff6b6b;">Reset Zoom</button>
+        <button id="undoBtn" disabled>Undo Last</button>
+        <button id="downloadBtn" disabled>Download</button>
     </div>
     
     <div id="image-container">
@@ -892,7 +979,7 @@
   </footer>
 
   <!-- QR Code Library -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+  <script src="/libs/qrcode.js"></script>
 
   <script>
     // DOM Elements
@@ -959,6 +1046,58 @@
     let hasActiveWatermarkImage = false;
     let undoStack = [];
     let watermarkId = 0;
+    // Zoom state variables
+    let currentZoom = 1;
+    const minZoom = 0.1;
+    const maxZoom = 3;
+    const zoomStep = 0.1;
+
+    // Set up initial event listeners when the page loads
+    function setupInitialEventListeners() {
+        // Initial imageLoader listener
+        imageLoader.addEventListener('change', handleImageUpload);
+        
+        // Initial drag and drop listeners
+        imageContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        
+        imageContainer.addEventListener('dragleave', function() {
+            this.classList.remove('dragover');
+        });
+        
+        imageContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Please drop an image file.');
+                return;
+            }
+            
+            // Create a data transfer object
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            
+            // Set the files property of the file input
+            imageLoader.files = dataTransfer.files;
+            
+            // Trigger the change event
+            const event = new Event('change', { bubbles: true });
+            imageLoader.dispatchEvent(event);
+        });
+    }
+
+    // Call the setup function when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        setupInitialEventListeners();
+        
+        // Other initialization code if needed
+        updateWatermarksList();
+        updateUndoButton();
+    });
     
     // Update UI based on slider changes
     watermarkSize.addEventListener('input', () => {
@@ -1001,6 +1140,37 @@
     urlWatermarkBtn.addEventListener('click', () => {
       setActiveWatermarkType('url');
     });
+
+    // Apply zoom to the canvas
+    function applyZoom() {
+        // First save current dimensions
+        const originalWidth = imageCanvas.width;
+        const originalHeight = imageCanvas.height;
+        
+        // Apply zoom styling
+        imageCanvas.style.width = (originalWidth * currentZoom) + 'px';
+        imageCanvas.style.height = (originalHeight * currentZoom) + 'px';
+        
+        // Update the container to accommodate zoomed image if needed
+        if (currentZoom < 1) {
+            // Add some padding when zoomed out
+            imageContainer.style.padding = (40 / currentZoom) + 'px';
+        } else {
+            imageContainer.style.padding = '40px 20px';
+        }
+        
+        // Show zoom level somewhere (optional)
+        const zoomDisplay = document.getElementById('zoomDisplay') || 
+            (function() {
+            const span = document.createElement('span');
+            span.id = 'zoomDisplay';
+            span.style.marginLeft = '10px';
+            document.getElementById('toolbar').appendChild(span);
+            return span;
+            })();
+        
+        zoomDisplay.textContent = `Zoom: ${Math.round(currentZoom * 100)}%`;
+    }
     
     function setActiveWatermarkType(type) {
       // Reset all buttons and sections
@@ -1045,55 +1215,99 @@
     imageLoader.addEventListener('change', handleImageUpload);
     
     function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      // Show loading UI
-      progressOverlay.classList.add('active');
-      progressBar.style.width = '30%';
-      progressText.textContent = 'Loading image...';
-      
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        mainImage = new Image();
-        mainImage.onload = function() {
-          progressBar.style.width = '60%';
-          
-          // Set canvas size to match the image
-          imageCanvas.width = mainImage.width;
-          imageCanvas.height = mainImage.height;
-          
-          // Clear previous watermarks
-          watermarks = [];
-          undoStack = [];
-          updateWatermarksList();
-          
-          // Draw the image
-          drawImage();
-          
-          // Show the canvas and watermark controls
-          imageCanvas.style.display = 'block';
-          watermarkControls.style.display = 'block';
-          
-          // Enable buttons
-          downloadBtn.disabled = false;
-          clearImageBtn.disabled = false;
-          
-          progressBar.style.width = '100%';
-          progressText.textContent = 'Image loaded successfully!';
-          
-          // Hide loading UI after a short delay
-          setTimeout(() => {
-            progressOverlay.classList.remove('active');
-            progressBar.style.width = '0%';
-          }, 500);
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Show loading UI
+        progressOverlay.classList.add('active');
+        progressBar.style.width = '30%';
+        progressText.textContent = 'Loading image...';
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            mainImage = new Image();
+            mainImage.onload = function() {
+                progressBar.style.width = '60%';
+                
+                // Set canvas size to match the image
+                imageCanvas.width = mainImage.width;
+                imageCanvas.height = mainImage.height;
+                
+                // Clear previous watermarks
+                watermarks = [];
+                undoStack = [];
+                updateWatermarksList();
+                
+                // Remove the upload prompt if it exists
+                const uploadPrompt = document.getElementById('upload-prompt');
+                if (uploadPrompt) {
+                    uploadPrompt.remove();
+                }
+                
+                // Draw the image
+                drawImage();
+                
+                // Show the canvas and watermark controls
+                imageCanvas.style.display = 'block';
+                watermarkControls.style.display = 'block';
+                
+                // Enable buttons
+                downloadBtn.disabled = false;
+                clearImageBtn.disabled = false;
+                
+                progressBar.style.width = '100%';
+                progressText.textContent = 'Image loaded successfully!';
+                
+                // Hide loading UI after a short delay
+                setTimeout(() => {
+                    progressOverlay.classList.remove('active');
+                    progressBar.style.width = '0%';
+                }, 500);
+            };
+            
+            mainImage.src = event.target.result;
         };
         
-        mainImage.src = event.target.result;
-      };
-      
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
     }
+
+    // Zoom controls
+    document.getElementById('zoomInBtn').addEventListener('click', function() {
+    if (currentZoom < maxZoom) {
+        currentZoom += zoomStep;
+        applyZoom();
+    }
+    });
+
+    document.getElementById('zoomOutBtn').addEventListener('click', function() {
+    if (currentZoom > minZoom) {
+        currentZoom -= zoomStep;
+        applyZoom();
+    }
+    });
+
+    document.getElementById('resetZoomBtn').addEventListener('click', function() {
+    currentZoom = 1;
+    applyZoom();
+    });
+
+    // zooming with mouse wheel
+    imageCanvas.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+            // Scroll up - zoom in
+            if (currentZoom < maxZoom) {
+            currentZoom += zoomStep;
+            applyZoom();
+            }
+        } else {
+            // Scroll down - zoom out
+            if (currentZoom > minZoom) {
+            currentZoom -= zoomStep;
+            applyZoom();
+            }
+        }
+    });
     
     // Handle image watermark upload
     imageWatermarkInput.addEventListener('change', function(e) {
@@ -1251,25 +1465,31 @@
     
     // Generate QR code
     async function generateQRCode(url) {
-      return new Promise((resolve, reject) => {
-        try {
-          const tempCanvas = document.createElement('canvas');
-          QRCode.toCanvas(tempCanvas, url, {
-            width: parseInt(qrCodeSize.value),
-            margin: 1,
-            color: {
-              dark: '#000000',
-              light: '#ffffff'
-            }
-          }, function(error) {
-            if (error) reject(error);
+        return new Promise((resolve, reject) => {
+            try {
+            const tempCanvas = document.createElement('canvas');
+            const ctx = tempCanvas.getContext('2d');
+            const size = parseInt(qrCodeSize.value);
+            
+            // Set canvas size
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            
+            // Create QR code instance
+            const qr = qrcode(0, 'L'); // Auto-detect version, Low error correction
+            qr.addData(url);
+            qr.make();
+            
+            // Render to the canvas
+            const cellSize = size / qr.getModuleCount();
+            qr.renderTo2dContext(ctx, cellSize);
+            
             resolve(tempCanvas.toDataURL('image/png'));
-          });
-        } catch (error) {
-          reject(error);
+            } catch (error) {
+            reject(error);
+            }
+        });
         }
-      });
-    }
     
     // Clear all watermarks
     clearBtn.addEventListener('click', function() {
@@ -1285,51 +1505,156 @@
       updateUndoButton();
     });
     
-    // Clear the image
+    // Clear the image with confirmation
     clearImageBtn.addEventListener('click', function() {
-      mainImage = new Image();
-      watermarks = [];
-      undoStack = [];
-      
-      imageCanvas.style.display = 'none';
-      watermarkControls.style.display = 'none';
-      
-      downloadBtn.disabled = true;
-      clearImageBtn.disabled = true;
-      undoBtn.disabled = true;
-      
-      // Reset file input
-      imageLoader.value = '';
-      
-      // Reset container to show upload prompt
-      imageContainer.innerHTML = `
-        <p style="color:#666; margin-top:100px; text-align:center; font-size:1.2rem;">
-          Drag & drop images here, or use the file input above.<br>
-          <br>
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <polyline points="21 15 16 10 5 21"></polyline>
-          </svg>
-        </p>
-        <canvas id="imageCanvas"></canvas>
-      `;
-      
-      // Get the new canvas element
-      const newCanvas = document.getElementById('imageCanvas');
-        if (newCanvas) {
-            imageCanvas = newCanvas;
-            const newCtx = imageCanvas.getContext('2d');
-            ctx = newCtx;
+        // Only show confirmation if there's an image loaded
+        if (mainImage.src) {
+            // Create and show the confirmation dialog
+            const confirmDialog = document.createElement('div');
+            confirmDialog.className = 'confirm-dialog';
+            confirmDialog.innerHTML = `
+                <div class="confirm-dialog-content">
+                    <h3>Clear Image?</h3>
+                    <p>Are you sure you want to clear this image? This cannot be undone and any progress will be lost.</p>
+                    <div class="confirm-buttons">
+                        <button id="cancelClearBtn">Cancel</button>
+                        <button id="confirmClearBtn">Yes, Clear Image</button>
+                    </div>
+                </div>
+            `;
             
-            // Reattach drag and drop events to the container
-            imageContainer.addEventListener('dragover', handleDragOver);
-            imageContainer.addEventListener('dragleave', handleDragLeave);
-            imageContainer.addEventListener('drop', handleDrop);
+            // Add to body
+            document.body.appendChild(confirmDialog);
+            
+            // Show the dialog with animation
+            setTimeout(() => {
+                confirmDialog.classList.add('active');
+            }, 10);
+            
+            // Set up event listeners for the buttons
+            document.getElementById('cancelClearBtn').addEventListener('click', function() {
+                confirmDialog.classList.remove('active');
+                setTimeout(() => {
+                    document.body.removeChild(confirmDialog);
+                }, 300);
+            });
+            
+            document.getElementById('confirmClearBtn').addEventListener('click', function() {
+                // Close the dialog
+                confirmDialog.classList.remove('active');
+                setTimeout(() => {
+                    document.body.removeChild(confirmDialog);
+                    
+                    // Proceed with clearing the image
+                    clearImage();
+                }, 300);
+            });
         }
-      
-      updateWatermarksList();
     });
+
+    // Create a separate function for clearing the image
+    function clearImage() {
+        // Save reference to original elements before clearing
+        const originalCanvas = imageCanvas;
+        
+        // Reset state
+        mainImage = new Image();
+        watermarks = [];
+        undoStack = [];
+        
+        // Clear the canvas instead of replacing it
+        ctx.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+        
+        // Reset visibility
+        imageCanvas.style.display = 'none';
+        watermarkControls.style.display = 'none';
+        
+        // Reset buttons
+        downloadBtn.disabled = true;
+        clearImageBtn.disabled = true;
+        undoBtn.disabled = true;
+        
+        // Reset file input
+        imageLoader.value = '';
+        
+        // Show upload prompt in container, but keep the original canvas
+        const promptElement = document.createElement('div');
+        promptElement.id = 'upload-prompt';
+        promptElement.innerHTML = `
+            <p style="color:#666; margin-top:100px; text-align:center; font-size:1.2rem;">
+                Drag & drop images here, or use the file input above.<br>
+                <br>
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+            </p>
+        `;
+        
+        // Clear the container but keep the canvas
+        while (imageContainer.firstChild) {
+            imageContainer.removeChild(imageContainer.firstChild);
+        }
+        
+        // Add the prompt and the original canvas back
+        imageContainer.appendChild(promptElement);
+        imageContainer.appendChild(originalCanvas);
+        
+        updateWatermarksList();
+        
+        // Reset zoom if implemented
+        if (typeof currentZoom !== 'undefined') {
+            currentZoom = 1;
+        }
+    }
+
+    // Function to reattach all necessary event listeners after clearing
+    function reattachEventListeners() {
+        // Reattach drag and drop events to the container
+        imageContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        
+        imageContainer.addEventListener('dragleave', function() {
+            this.classList.remove('dragover');
+        });
+        
+        imageContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Please drop an image file.');
+                return;
+            }
+            
+            // Create a data transfer object
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            
+            // Set the files property of the file input
+            imageLoader.files = dataTransfer.files;
+            
+            // Trigger the change event
+            const event = new Event('change', { bubbles: true });
+            imageLoader.dispatchEvent(event);
+        });
+        
+        // IMPORTANT: We need to remove the existing event listener first to prevent duplicates
+        // First, create a clone of the imageLoader element to remove all event listeners
+        const oldImageLoader = imageLoader;
+        const newImageLoader = oldImageLoader.cloneNode(true);
+        oldImageLoader.parentNode.replaceChild(newImageLoader, oldImageLoader);
+        
+        // Update the reference to the new element
+        imageLoader = newImageLoader;
+        
+        // Add the event listener to the new element
+        imageLoader.addEventListener('change', handleImageUpload);
+    }
     
     // Undo last action
     undoBtn.addEventListener('click', function() {
@@ -1404,24 +1729,27 @@
     
     // Draw the image with all watermarks
     function drawImage() {
-      if (!mainImage.src) return;
-      
-      // Clear canvas
-      ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-      
-      // Draw the main image
-      ctx.drawImage(mainImage, 0, 0, imageCanvas.width, imageCanvas.height);
-      
-      // Draw each watermark
-      watermarks.forEach(async (wm) => {
-        if (wm.type === 'text') {
-          drawTextWatermark(wm);
-        } else if (wm.type === 'image') {
-          drawImageWatermark(wm);
-        } else if (wm.type === 'qr') {
-          drawQRCodeWatermark(wm);
-        }
-      });
+        if (!mainImage.src) return;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+        
+        // Draw the main image
+        ctx.drawImage(mainImage, 0, 0, imageCanvas.width, imageCanvas.height);
+        
+        // Draw each watermark
+        watermarks.forEach(async (wm) => {
+            if (wm.type === 'text') {
+            drawTextWatermark(wm);
+            } else if (wm.type === 'image') {
+            drawImageWatermark(wm);
+            } else if (wm.type === 'qr') {
+            drawQRCodeWatermark(wm);
+            }
+        });
+        
+        // Re-apply zoom after redrawing
+        applyZoom();
     }
     
     // Draw text watermark
@@ -1561,20 +1889,20 @@
     
     // Draw QR code watermark
     function drawQRCodeWatermark(wm) {
-    // Use a preloaded image if available
-    if (wm.loadedImage && wm.loadedImage.complete) {
-        drawQRCodeToCanvas(wm.loadedImage, wm);
-        return;
-    }
-    
-    // Create and load the QR code image if not already loaded
-    const img = new Image();
-    img.onload = function() {
-        // Store the loaded image for future use
-        wm.loadedImage = img;
-        drawQRCodeToCanvas(img, wm);
-    };
-    img.src = wm.qrCode;
+        // Use a preloaded image if available
+        if (wm.loadedImage && wm.loadedImage.complete) {
+            drawQRCodeToCanvas(wm.loadedImage, wm);
+            return;
+        }
+        
+        // Create and load the QR code image if not already loaded
+        const img = new Image();
+        img.onload = function() {
+            // Store the loaded image for future use
+            wm.loadedImage = img;
+            drawQRCodeToCanvas(img, wm);
+        };
+        img.src = wm.qrCode;
     }
 
     // Helper function to draw QR code to canvas
@@ -1663,41 +1991,6 @@
       updateWatermarksList();
     }
     
-    // Drag and drop functionality
-    imageContainer.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      this.classList.add('dragover');
-    });
-    
-    imageContainer.addEventListener('dragleave', function() {
-      this.classList.remove('dragover');
-    });
-    
-    imageContainer.addEventListener('drop', function(e) {
-      e.preventDefault();
-      this.classList.remove('dragover');
-      
-      const file = e.dataTransfer.files[0];
-      if (!file || !file.type.startsWith('image/')) {
-        alert('Please drop an image file.');
-        return;
-      }
-      
-      // Create a data transfer object
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      
-      // Set the files property of the file input
-      imageLoader.files = dataTransfer.files;
-      
-      // Trigger the change event
-      const event = new Event('change', { bubbles: true });
-      imageLoader.dispatchEvent(event);
-    });
-    
-    // Initialize UI
-    updateWatermarksList();
-    updateUndoButton();
   </script>
 </body>
 </html>
