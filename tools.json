@@ -33,6 +33,14 @@
         "icon": "/images/icon.png"
       },
       {
+        "name": "Image Watermarker",
+        "url": "../tools/image-watermark.html",
+        "description": "Protect your photography with professional watermarks. Add text, images, website URLs, or QR codes to your photos. QR Code is a registered trademark of DENSO WAVE Incorporated.",
+        "tier": "premium",
+        "type": "",
+        "icon": "/images/image-watermark.png"
+      },
+      {
         "name": "Color Palette Generator",
         "url": "../tools/color-palette.html",
         "description": "Design harmonious color palettes with accessibility checking for websites, presentations, and branding projects.",
@@ -111,14 +119,6 @@
         "tier": "free",
         "type": "",
         "icon": "/images/robots.png"
-      },
-      {
-        "name": "Image Watermarker",
-        "url": "../tools/image-watermark.html",
-        "description": "Protect your photography with professional watermarks. Add text, images, website URLs, or QR codes to your photos. QR Code is a registered trademark of DENSO WAVE Incorporated.",
-        "tier": "premium",
-        "type": "",
-        "icon": "/images/image-watermark.png"
       }
     ]
   }

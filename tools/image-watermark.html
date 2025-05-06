@@ -831,7 +831,7 @@
         <div class="control-group">
           <div class="control-item">
             <label for="watermarkText">Watermark Text</label>
-            <input type="text" id="watermarkText" placeholder="Enter your text here" value="© Your Name">
+            <input type="text" id="watermarkText" placeholder="Enter your text here" value="© The Dollar Web">
           </div>
           <div class="control-item">
             <label for="fontSelect">Font Style</label>
@@ -1682,7 +1682,7 @@
       updateUndoButton();
     });
     
-    // Download the watermarked image
+    // Download the watermarked image with custom filename
     downloadBtn.addEventListener('click', function() {
         if (!mainImage.src) return;
         
@@ -1704,12 +1704,79 @@
             return;
         }
         
-        // All watermarks are loaded, proceed with download
-        const link = document.createElement('a');
-        link.download = 'watermarked_image.png';
-        link.href = imageCanvas.toDataURL('image/png');
-        link.click();
+        // Create and show the filename dialog
+        const filenameDialog = document.createElement('div');
+        filenameDialog.className = 'confirm-dialog';
+        filenameDialog.innerHTML = `
+            <div class="confirm-dialog-content">
+                <h3>Save Image</h3>
+                <p>Enter a name for your watermarked image:</p>
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="filenameInput" value="watermarked_image" style="width: 70%; padding: 8px; margin-right: 5px;">
+                    <span style="display: inline-block;">.png</span>
+                </div>
+                <div class="confirm-buttons">
+                    <button id="cancelDownloadBtn">Cancel</button>
+                    <button id="confirmDownloadBtn">Download</button>
+                </div>
+            </div>
+        `;
+        
+        // Add to body
+        document.body.appendChild(filenameDialog);
+        
+        // Focus on the input
+        setTimeout(() => {
+            const filenameInput = document.getElementById('filenameInput');
+            filenameInput.focus();
+            filenameInput.select();
+        }, 100);
+        
+        // Show the dialog with animation
+        setTimeout(() => {
+            filenameDialog.classList.add('active');
+        }, 10);
+        
+        // Handle enter key in the input
+        document.getElementById('filenameInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('confirmDownloadBtn').click();
+            }
         });
+        
+        // Set up event listeners for the buttons
+        document.getElementById('cancelDownloadBtn').addEventListener('click', function() {
+            filenameDialog.classList.remove('active');
+            setTimeout(() => {
+                document.body.removeChild(filenameDialog);
+            }, 300);
+        });
+        
+        document.getElementById('confirmDownloadBtn').addEventListener('click', function() {
+            // Get the filename
+            let filename = document.getElementById('filenameInput').value.trim();
+            
+            // Default filename if empty
+            if (!filename) {
+                filename = 'watermarked_image';
+            }
+            
+            // Sanitize filename (remove invalid characters)
+            filename = filename.replace(/[\\/:*?"<>|]/g, '_');
+            
+            // Close the dialog
+            filenameDialog.classList.remove('active');
+            setTimeout(() => {
+                document.body.removeChild(filenameDialog);
+                
+                // Download the image with the custom filename
+                const link = document.createElement('a');
+                link.download = filename + '.png';
+                link.href = imageCanvas.toDataURL('image/png');
+                link.click();
+            }, 300);
+        });
+    });
     
     // Add after other event listeners
     imageCanvas.addEventListener('click', function(e) {
