@@ -3,7 +3,7 @@
       {
         "name": "PDF Toolbox",
         "url": "../tools/pdf.html",
-        "description": "Combine, split, rearrange, and edit PDF files with ease. Highlight text, add annotations, and make changes before downloading.",
+        "description": "Combine, split, rearrange, select pages, and edit PDF files with ease. Add text, draw, highlight, blackout, or make any other changes before downloading.",
         "tier": "premium",
         "type": "Popular",
         "icon": "/images/pdf.png"
@@ -91,8 +91,8 @@
       {
         "name": "PDF Watermarker",
         "url": "../tools/pdf-watermark.html",
-        "description": "Compress multiple files into a single ZIP archive. Check compression rates and email compatibility before downloading.",
-        "tier": "free",
+        "description": "Add customizable text watermarks to your PDF documents. Adjust text, color, opacity, and position to create professional watermarks that protect your content.",
+        "tier": "premium",
         "type": "",
         "icon": "/images/watermark.png"
       },
