@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Watermark Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .controls > * {
+      flex: 1 1 120px;
+    }
+    canvas {
+      max-width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: crosshair;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    label {
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Upload Image</h2>
+      <input type="file" id="imageLoader" accept="image/*">
+    </div>
+    <div class="card">
+      <canvas id="imageCanvas"></canvas>
+    </div>
+    <div class="card">
+      <h2>Watermark Controls</h2>
+      <div class="controls">
+        <input type="text" id="watermarkText" placeholder="Enter watermark text (or URL)">
+        <label>Color: <input type="color" id="watermarkColor" value="#ffffff"></label>
+        <label>Size: <input type="range" id="watermarkSize" min="10" max="100" value="36"></label>
+        <label>Opacity: <input type="range" id="watermarkOpacity" min="0" max="1" step="0.1" value="0.5"></label>
+        <button id="addWatermarkBtn" disabled>Add Watermark</button>
+        <button id="downloadBtn" disabled>Download Image</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const imageLoader = document.getElementById('imageLoader');
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const watermarkTextInput = document.getElementById('watermarkText');
+    const watermarkColorInput = document.getElementById('watermarkColor');
+    const watermarkSizeInput = document.getElementById('watermarkSize');
+    const watermarkOpacityInput = document.getElementById('watermarkOpacity');
+    const addWatermarkBtn = document.getElementById('addWatermarkBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let img = new Image();
+    let watermarks = [];
+    let placing = false;
+
+    imageLoader.addEventListener('change', handleImage, false);
+    watermarkTextInput.addEventListener('input', updateControls);
+    addWatermarkBtn.addEventListener('click', () => {
+      placing = true;
+      addWatermarkBtn.textContent = 'Click on Image...';
+    });
+    canvas.addEventListener('click', (e) => {
+      if (!placing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      watermarks.push({
+        text: watermarkTextInput.value.trim(),
+        x, y,
+        color: watermarkColorInput.value,
+        size: parseInt(watermarkSizeInput.value),
+        opacity: parseFloat(watermarkOpacityInput.value)
+      });
+      placing = false;
+      addWatermarkBtn.textContent = 'Add Watermark';
+      drawImage();
+    });
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'watermarked_image.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    function updateControls() {
+      const hasText = watermarkTextInput.value.trim().length > 0;
+      const hasImage = !!img.src;
+      addWatermarkBtn.disabled = !(hasText && hasImage);
+    }
+
+    function handleImage(e) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          watermarks = [];
+          drawImage();
+          downloadBtn.disabled = false;
+          updateControls();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function drawImage() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      watermarks.forEach(wm => {
+        ctx.font = wm.size + 'px Arial';
+        ctx.fillStyle = wm.color;
+        ctx.globalAlpha = wm.opacity;
+        ctx.textBaseline = 'top';
+        ctx.fillText(wm.text, wm.x, wm.y);
+      });
+      ctx.globalAlpha = 1.0;
+    }
+  </script>
+</body>
+</html>
