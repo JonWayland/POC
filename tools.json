@@ -111,6 +111,14 @@
         "tier": "free",
         "type": "",
         "icon": "/images/robots.png"
+      },
+      {
+        "name": "Image Watermarker",
+        "url": "../tools/image-watermark.html",
+        "description": "Protect your photography with professional watermarks. Add text, images, or website URLs to your photos.",
+        "tier": "free",
+        "type": "",
+        "icon": "/images/image-watermark.png"
       }
     ]
   }
