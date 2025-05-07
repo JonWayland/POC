@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>File → PDF Converter</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    #drop-zone {
+      border: 2px dashed #bbb;
+      border-radius: 6px;
+      padding: 40px;
+      text-align: center;
+      color: #777;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      margin-bottom: 20px;
+    }
+    #drop-zone.hover {
+      border-color: #333;
+      color: #333;
+    }
+    #file-input {
+      display: none;
+    }
+    #preview {
+      min-height: 200px;
+      border: 1px solid #e1e1e1;
+      border-radius: 4px;
+      overflow: auto;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    #convert-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    #convert-btn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Convert Files to PDF</h1>
+    <div id="drop-zone">
+      📂 Click or drag &amp; drop a file here<br>
+      <small>(.png .jpg .jpeg .txt .docx)</small>
+    </div>
+    <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.txt,.docx">
+    <div id="preview"></div>
+    <button id="convert-btn" disabled>Convert to PDF</button>
+  </div>
+
+  <!-- Library for .docx → HTML -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.18/mammoth.browser.min.js"></script>
+  <!-- Library for HTML/image → PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    const dropZone   = document.getElementById('drop-zone');
+    const fileInput  = document.getElementById('file-input');
+    const preview    = document.getElementById('preview');
+    const convertBtn = document.getElementById('convert-btn');
+    let currentFile, docxHtml = '';
+
+    // Drag & drop styling
+    ['dragenter','dragover'].forEach(ev => {
+      dropZone.addEventListener(ev, e => {
+        e.preventDefault(); e.stopPropagation();
+        dropZone.classList.add('hover');
+      });
+    });
+    ['dragleave','drop'].forEach(ev => {
+      dropZone.addEventListener(ev, e => {
+        e.preventDefault(); e.stopPropagation();
+        dropZone.classList.remove('hover');
+      });
+    });
+
+    // Click to open file dialog
+    dropZone.addEventListener('click', () => fileInput.click());
+    // Handle dropped files
+    dropZone.addEventListener('drop', e => {
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFile();
+      }
+    });
+    fileInput.addEventListener('change', handleFile);
+
+    function handleFile() {
+      if (!fileInput.files.length) return;
+      currentFile = fileInput.files[0];
+      const ext = currentFile.name.split('.').pop().toLowerCase();
+      preview.innerHTML = '';
+      convertBtn.disabled = true;
+
+      if (['png','jpg','jpeg'].includes(ext))      previewImage(currentFile);
+      else if (ext === 'txt')                      previewText(currentFile);
+      else if (ext === 'docx')                     previewDocx(currentFile);
+      else {
+        preview.innerHTML = '<p style="color:red;">Unsupported file type.</p>';
+        currentFile = null;
+      }
+    }
+
+    function previewImage(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '100%';
+        preview.appendChild(img);
+        convertBtn.disabled = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewText(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const pre = document.createElement('pre');
+        pre.textContent = e.target.result;
+        preview.appendChild(pre);
+        convertBtn.disabled = false;
+      };
+      reader.readAsText(file);
+    }
+
+    async function previewDocx(file) {
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const result = await mammoth.convertToHtml({ arrayBuffer: e.target.result });
+          docxHtml = result.value;
+          const div = document.createElement('div');
+          div.innerHTML = docxHtml;
+          preview.appendChild(div);
+          convertBtn.disabled = false;
+        } catch {
+          preview.innerHTML = '<p style="color:red;">Error parsing .docx file.</p>';
+          currentFile = null;
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    convertBtn.addEventListener('click', () => {
+      if (!currentFile) return;
+      const ext = currentFile.name.split('.').pop().toLowerCase();
+      const base = currentFile.name.replace(/\.[^/.]+$/, '');
+
+      if (['png','jpg','jpeg'].includes(ext)) {
+        // Wrap image in a div so html2pdf can size it to page
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(img);
+            html2pdf()
+              .from(wrapper)
+              .set({
+                margin:       0,
+                filename:     base + '.pdf',
+                image:        { type: ext==='png'?'PNG':'JPEG', quality: 1 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'pt', format: [img.width, img.height] }
+              })
+              .save();
+          };
+        };
+        reader.readAsDataURL(currentFile);
+      }
+      else if (ext === 'txt') {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const wrapper = document.createElement('div');
+          wrapper.style.padding = '20px';
+          wrapper.innerHTML = '<pre>' + escapeHtml(e.target.result) + '</pre>';
+          html2pdf().from(wrapper).set({filename: base + '.pdf'}).save();
+        };
+        reader.readAsText(currentFile);
+      }
+      else if (ext === 'docx') {
+        const wrapper = document.createElement('div');
+        wrapper.style.padding = '20px';
+        wrapper.innerHTML = docxHtml;
+        html2pdf().from(wrapper).set({filename: base + '.pdf'}).save();
+      }
+    });
+
+    function escapeHtml(txt) {
+      const d = document.createElement('div');
+      d.textContent = txt;
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>

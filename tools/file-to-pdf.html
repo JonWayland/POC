@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
+  <title>File to PDF Converter | The Dollar Web</title>
+  <style>
+    /* Inter and Montserrat Fonts */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/inter-semibold.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: italic;
+      src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      padding-top: 70px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 40px 0 0px;
+    }
+    
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 3.2rem;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-top: 80px;
+    }
+    
+    p.tagline {
+      font-size: 1.3rem;
+      color: var(--dark);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Navigation Bar Styles */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer Styles */
+    .site-footer {
+      background: var(--dark);
+      padding: 40px 0 50px;
+      margin-top: 80px;
+      position: relative;
+      color: white;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      color: var(--secondary);
+    }
+
+    .footer-logo svg {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+
+    .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .footer-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin: 0 30px;
+      font-size: 1.8rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .footer-social a svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .footer-social a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      font-size: 1.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .copyright-message {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .secondary-text {
+      color: var(--secondary);
+    }
+    
+    .tertiary-text {
+      color: var(--dark);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .nav-logo span {
+        font-size: 1.2rem;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .footer-links a {
+        margin: 10px 0;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) {
+        display: none;
+      }
+    }
+
+    /* File to PDF Conversion Tool Styles */
+    .tool-panel {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      margin-bottom: 20px;
+      padding: 30px;
+    }
+
+    #drop-zone {
+      border: 2px dashed #bbb;
+      border-radius: 12px;
+      padding: 60px 40px;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 20px;
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    #drop-zone svg {
+      width: 64px;
+      height: 64px;
+      stroke: #888;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    #drop-zone:hover {
+      border-color: var(--primary);
+      background: rgba(0, 168, 150, 0.03);
+    }
+
+    #drop-zone:hover svg {
+      stroke: var(--primary);
+      transform: translateY(-5px);
+    }
+
+    #drop-zone.dragover {
+      background: rgba(0, 168, 150, 0.05);
+      border-color: var(--primary);
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    .file-info {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .file-info h3 {
+      margin-top: 0;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    #preview {
+      min-height: 200px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: auto;
+      padding: 20px;
+      margin-bottom: 20px;
+      background: white;
+      display: none;
+    }
+
+    #preview img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .control-group {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .control-group h3 {
+      margin-top: 0;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    input[type="text"], 
+    input[type="color"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+    }
+
+    #custom-text {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .text-position {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .text-position button {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .text-position button.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    button:disabled {
+      background: #aaa;
+      transform: none;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    #convert-btn {
+      background: var(--secondary);
+      padding: 15px 30px;
+      font-size: 1.1rem;
+    }
+
+    #convert-btn:hover {
+      background: #e9a800;
+    }
+
+    .os-links a {
+      color: var(--primary); 
+      text-decoration: none; 
+      font-size: 0.9rem;
+    }
+    
+    .os-links a:hover { 
+      text-decoration: underline; 
+    }
+
+    /* Hide elements initially */
+    #file-info,
+    #preview,
+    #options-panel {
+      display: none;
+    }
+
+    /* Loading indicator */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      display: none;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="main-nav">
+    <div class="container nav-container">
+      <a href="../index.html" class="nav-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 32px; height: 32px;">
+        <span class="tertiary-text">&nbsp;The&nbsp;</span>Dollar&nbsp;<span class="secondary-text">Web</span>
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../tools.html">Tools</a>
+        <a href="../about.html">About</a>
+        <a href="../login.html" class="login-btn">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>File to PDF Converter</h1>
+      <p class="tagline">Convert various file formats to PDF. Add custom text, watermarks, and notes to your documents before conversion.</p>
+      <div class="os-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
+    </header>
+    
+    <div class="tool-panel">
+      <div id="drop-zone">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="12" y1="18" x2="12" y2="12"></line>
+          <line x1="9" y1="15" x2="15" y2="15"></line>
+        </svg>
+        <p>Click or drag & drop a file here</p>
+        <p style="font-size: 0.9rem; margin-top: 10px; color: #999;">Supported formats: PNG, JPG, JPEG, TXT, DOCX</p>
+      </div>
+      <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.txt,.docx">
+      
+      <div id="file-info" class="file-info">
+        <h3>File Information</h3>
+        <p id="file-name"></p>
+        <p id="file-type"></p>
+        <p id="file-size"></p>
+      </div>
+      
+      <div id="preview"></div>
+      
+      <div id="options-panel" class="control-group">
+        <h3>PDF Options</h3>
+        <div class="form-group">
+          <label for="pdf-name">PDF Filename:</label>
+          <input type="text" id="pdf-name" placeholder="Enter filename (without .pdf)">
+        </div>
+        
+        <div class="form-group">
+          <label for="custom-text">Add Text or Notes:</label>
+          <textarea id="custom-text" placeholder="Enter text to add to the PDF (e.g., copyright notice, URL, notes)"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="text-color">Text Color:</label>
+          <input type="color" id="text-color" value="#333333">
+        </div>
+        
+        <div class="form-group">
+          <label>Text Position:</label>
+          <div class="text-position">
+            <button class="position-btn active" data-position="top">Top</button>
+            <button class="position-btn" data-position="bottom">Bottom</button>
+            <button class="position-btn" data-position="watermark">Watermark</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button id="reset-btn">Reset</button>
+        <button id="convert-btn" disabled>Convert to PDF</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>Converting your file to PDF...</p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 48px; height: 48px;">
+        <span>&nbsp;The Dollar Web</span>
+      </div>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../privacy.html">Privacy Policy</a>
+        <a href="../terms.html">Terms of Service</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://x.com/thedollarweb" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/thedollarwebpro/" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/the-dollar-web" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+            <rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 The DollarWeb</p>
+      <p class="copyright-message">Professional tools that won't break the bank</p>
+    </div>
+  </footer>
+
+  <!-- Library for .docx → HTML -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.18/mammoth.browser.min.js"></script>
+  <!-- Library for HTML/image → PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    // DOM references
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
+    const convertBtn = document.getElementById('convert-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const fileInfo = document.getElementById('file-info');
+    const fileName = document.getElementById('file-name');
+    const fileType = document.getElementById('file-type');
+    const fileSize = document.getElementById('file-size');
+    const optionsPanel = document.getElementById('options-panel');
+    const pdfName = document.getElementById('pdf-name');
+    const customText = document.getElementById('custom-text');
+    const textColor = document.getElementById('text-color');
+    const positionBtns = document.querySelectorAll('.position-btn');
+    const loading = document.getElementById('loading');
+
+    // Variables
+    let currentFile;
+    let docxHtml = '';
+    let textPosition = 'top'; // Default text position
+
+    // Drag & drop styling
+    ['dragenter', 'dragover'].forEach(ev => {
+    dropZone.addEventListener(ev, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('dragover');
+    });
+    });
+
+    ['dragleave', 'drop'].forEach(ev => {
+    dropZone.addEventListener(ev, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('dragover');
+    });
+    });
+
+    // Click to open file dialog
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', e => {
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFile();
+    }
+    });
+
+    fileInput.addEventListener('change', handleFile);
+
+    // Handle the text position buttons
+    positionBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        positionBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        textPosition = btn.dataset.position;
+    });
+    });
+
+    // Reset button
+    resetBtn.addEventListener('click', () => {
+    resetTool();
+    });
+
+    function resetTool() {
+    // Clear file input
+    fileInput.value = '';
+    currentFile = null;
+    docxHtml = '';
+    
+    // Reset UI
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+    fileInfo.style.display = 'none';
+    optionsPanel.style.display = 'none';
+    convertBtn.disabled = true;
+    
+    // Reset form values
+    pdfName.value = '';
+    customText.value = '';
+    textColor.value = '#333333';
+    
+    // Reset position
+    positionBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.position === 'top') {
+        btn.classList.add('active');
+        }
+    });
+    textPosition = 'top';
+    }
+
+    // File handling
+    function handleFile() {
+    if (!fileInput.files.length) return;
+    
+    currentFile = fileInput.files[0];
+    const ext = currentFile.name.split('.').pop().toLowerCase();
+    
+    // Clear previous preview
+    preview.innerHTML = '';
+    
+    // Set default filename (without extension)
+    const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
+    pdfName.value = baseName;
+    
+    // Update file info
+    fileName.textContent = `Name: ${currentFile.name}`;
+    fileType.textContent = `Type: ${currentFile.type || 'Unknown'}`;
+    fileSize.textContent = `Size: ${formatFileSize(currentFile.size)}`;
+    fileInfo.style.display = 'block';
+    
+    // Handle different file types
+    if (['png', 'jpg', 'jpeg'].includes(ext)) {
+        previewImage(currentFile);
+    } else if (ext === 'txt') {
+        previewText(currentFile);
+    } else if (ext === 'docx') {
+        previewDocx(currentFile);
+    } else {
+        preview.innerHTML = '<p style="color:red; text-align:center; padding: 20px;">Unsupported file type. Please use PNG, JPG, JPEG, TXT, or DOCX files.</p>';
+        preview.style.display = 'block';
+        convertBtn.disabled = true;
+        currentFile = null;
+        return;
+    }
+    
+    // Show options
+    optionsPanel.style.display = 'block';
+    convertBtn.disabled = false;
+    }
+
+    function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function previewImage(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        preview.style.display = 'block';
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '100%';
+        preview.appendChild(img);
+        
+        // Preview custom text if provided
+        updateTextPreview();
+    };
+    reader.readAsDataURL(file);
+    }
+
+    function previewText(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        preview.style.display = 'block';
+        const pre = document.createElement('pre');
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.style.fontFamily = 'monospace';
+        pre.style.width = '100%';
+        pre.textContent = e.target.result;
+        preview.appendChild(pre);
+        
+        // Preview custom text if provided
+        updateTextPreview();
+    };
+    reader.readAsText(file);
+    }
+
+    function previewDocx(file) {
+    const reader = new FileReader();
+    reader.onload = async e => {
+        try {
+        const result = await mammoth.convertToHtml({ arrayBuffer: e.target.result });
+        docxHtml = result.value;
+        preview.style.display = 'block';
+        const div = document.createElement('div');
+        div.innerHTML = docxHtml;
+        preview.appendChild(div);
+        
+        // Preview custom text if provided
+        updateTextPreview();
+        } catch (error) {
+        preview.style.display = 'block';
+        preview.innerHTML = '<p style="color:red; text-align:center; padding: 20px;">Error parsing .docx file. Please try another file.</p>';
+        convertBtn.disabled = true;
+        currentFile = null;
+        }
+    };
+    reader.readAsArrayBuffer(file);
+    }
+
+    // Update the text preview when custom text changes
+    customText.addEventListener('input', updateTextPreview);
+    textColor.addEventListener('input', updateTextPreview);
+
+    function updateTextPreview() {
+    // Remove any existing text previews
+    const existingPreviews = document.querySelectorAll('.custom-text-preview');
+    existingPreviews.forEach(el => el.remove());
+    
+    const text = customText.value.trim();
+    if (!text) return;
+    
+    const color = textColor.value;
+    
+    // Create the text preview element
+    const textPreview = document.createElement('div');
+    textPreview.className = 'custom-text-preview';
+    textPreview.textContent = text;
+    textPreview.style.color = color;
+    textPreview.style.padding = '10px';
+    textPreview.style.borderRadius = '5px';
+    textPreview.style.backgroundColor = 'rgba(0,0,0,0.03)';
+    textPreview.style.marginTop = '10px';
+    textPreview.style.marginBottom = '10px';
+    textPreview.style.width = '100%';
+    
+    // Position the text preview
+    if (textPosition === 'top') {
+        preview.insertBefore(textPreview, preview.firstChild);
+    } else if (textPosition === 'bottom') {
+        preview.appendChild(textPreview);
+    } else if (textPosition === 'watermark') {
+        textPreview.style.position = 'absolute';
+        textPreview.style.top = '50%';
+        textPreview.style.left = '50%';
+        textPreview.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+        textPreview.style.fontSize = '36px';
+        textPreview.style.opacity = '0.3';
+        textPreview.style.backgroundColor = 'transparent';
+        textPreview.style.padding = '0';
+        textPreview.style.pointerEvents = 'none';
+        textPreview.style.zIndex = '1000';
+        textPreview.style.whiteSpace = 'nowrap';
+        
+        // Make sure preview container is positioned for absolute positioning
+        preview.style.position = 'relative';
+        
+        preview.appendChild(textPreview);
+    }
+    }
+
+    // Update preview when position changes
+    positionBtns.forEach(btn => {
+    btn.addEventListener('click', updateTextPreview);
+    });
+
+    // PDF conversion
+    convertBtn.addEventListener('click', () => {
+    if (!currentFile) return;
+    
+    // Show loading indicator
+    loading.style.display = 'flex';
+    
+    // Get file extension
+    const ext = currentFile.name.split('.').pop().toLowerCase();
+    
+    // Get PDF filename
+    let outputFilename = pdfName.value.trim() || currentFile.name.replace(/\.[^/.]+$/, '');
+    
+    // Ensure it ends with .pdf
+    if (!outputFilename.toLowerCase().endsWith('.pdf')) {
+        outputFilename += '.pdf';
+    }
+    
+    // Get text options
+    const textContent = customText.value.trim();
+    const color = textColor.value;
+    
+    // Convert based on file type with a small delay to show loading
+    setTimeout(() => {
+        if (['png', 'jpg', 'jpeg'].includes(ext)) {
+        convertImageToPdf(outputFilename, textContent, color);
+        } else if (ext === 'txt') {
+        convertTextToPdf(outputFilename, textContent, color);
+        } else if (ext === 'docx') {
+        convertDocxToPdf(outputFilename, textContent, color);
+        }
+    }, 300);
+    });
+
+    function convertImageToPdf(filename, textContent, textColor) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.src = e.target.result;
+            
+            img.onload = () => {
+            // Create a container div for the content
+            const container = document.createElement('div');
+            container.style.position = 'relative';
+            container.style.width = img.width + 'px';
+            container.style.maxWidth = '100%';
+            container.style.margin = '0 auto';
+            
+            // Add the image
+            const imgEl = document.createElement('img');
+            imgEl.src = e.target.result;
+            imgEl.style.display = 'block';
+            imgEl.style.width = '100%';
+            imgEl.style.maxWidth = '100%';
+            container.appendChild(imgEl);
+            
+            // Add text content if provided
+            if (textContent) {
+                if (textPosition === 'top') {
+                const textEl = document.createElement('div');
+                textEl.textContent = textContent;
+                textEl.style.color = textColor;
+                textEl.style.padding = '10px';
+                textEl.style.width = '100%';
+                textEl.style.boxSizing = 'border-box';
+                textEl.style.textAlign = 'center';
+                textEl.style.fontSize = '14pt';
+                container.insertBefore(textEl, imgEl);
+                } else if (textPosition === 'bottom') {
+                const textEl = document.createElement('div');
+                textEl.textContent = textContent;
+                textEl.style.color = textColor;
+                textEl.style.padding = '10px';
+                textEl.style.width = '100%';
+                textEl.style.boxSizing = 'border-box';
+                textEl.style.textAlign = 'center';
+                textEl.style.fontSize = '14pt';
+                container.appendChild(textEl);
+                } else if (textPosition === 'watermark') {
+                const watermark = document.createElement('div');
+                watermark.textContent = textContent;
+                watermark.style.position = 'absolute';
+                watermark.style.top = '50%';
+                watermark.style.left = '50%';
+                watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+                watermark.style.fontSize = '48px';
+                watermark.style.fontWeight = 'bold';
+                watermark.style.color = textColor;
+                watermark.style.opacity = '0.3';
+                watermark.style.pointerEvents = 'none';
+                watermark.style.zIndex = '1000';
+                watermark.style.whiteSpace = 'nowrap';
+                container.appendChild(watermark);
+                }
+            }
+            
+            // Add the container to the document temporarily
+            document.body.appendChild(container);
+            
+            // Give the browser a moment to render the content before capturing
+            setTimeout(() => {
+                // Use html2pdf with improved configuration
+                const opt = {
+                margin: 10,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: true,
+                    windowWidth: container.scrollWidth
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: [img.width * 0.264583, (img.height + (textContent ? 50 : 0)) * 0.264583],
+                    orientation: img.width > img.height ? 'landscape' : 'portrait',
+                    compress: true
+                }
+                };
+
+                html2pdf().from(container).set(opt).save()
+                .then(() => {
+                    // Remove the temporary container
+                    document.body.removeChild(container);
+                    // Hide loading indicator
+                    loading.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error("PDF conversion error:", error);
+                    alert("An error occurred during conversion. Please try again.");
+                    loading.style.display = 'none';
+                    document.body.removeChild(container);
+                });
+            }, 100);
+            };
+            
+            // Handle image loading errors
+            img.onerror = () => {
+            alert("Error loading the image. The file may be corrupted.");
+            loading.style.display = 'none';
+            };
+        };
+        reader.readAsDataURL(currentFile);
+        }
+
+    function convertTextToPdf(filename, textContent, textColor) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            // Create container
+            const container = document.createElement('div');
+            container.style.padding = '40px';
+            container.style.position = 'relative';
+            container.style.fontFamily = 'Arial, sans-serif';
+            container.style.backgroundColor = '#ffffff';
+            
+            // Add text based on position
+            if (textContent && textPosition === 'top') {
+            const textEl = document.createElement('div');
+            textEl.textContent = textContent;
+            textEl.style.color = textColor;
+            textEl.style.marginBottom = '20px';
+            textEl.style.fontSize = '14pt';
+            container.appendChild(textEl);
+            }
+            
+            // Add the text content from the file
+            const pre = document.createElement('pre');
+            pre.style.whiteSpace = 'pre-wrap';
+            pre.style.fontFamily = 'monospace';
+            pre.style.margin = '0';
+            pre.style.padding = '10px';
+            pre.style.border = '1px solid #eee';
+            pre.style.borderRadius = '5px';
+            pre.style.backgroundColor = '#f9f9f9';
+            pre.textContent = e.target.result;
+            container.appendChild(pre);
+            
+            // Add bottom text if needed
+            if (textContent && textPosition === 'bottom') {
+            const textEl = document.createElement('div');
+            textEl.textContent = textContent;
+            textEl.style.color = textColor;
+            textEl.style.marginTop = '20px';
+            textEl.style.fontSize = '14pt';
+            container.appendChild(textEl);
+            }
+            
+            // Add watermark if needed
+            if (textContent && textPosition === 'watermark') {
+            const watermark = document.createElement('div');
+            watermark.textContent = textContent;
+            watermark.style.position = 'absolute';
+            watermark.style.top = '50%';
+            watermark.style.left = '50%';
+            watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+            watermark.style.fontSize = '48px';
+            watermark.style.fontWeight = 'bold';
+            watermark.style.color = textColor;
+            watermark.style.opacity = '0.3';
+            watermark.style.pointerEvents = 'none';
+            watermark.style.zIndex = '1000';
+            watermark.style.whiteSpace = 'nowrap';
+            container.appendChild(watermark);
+            }
+            
+            // Add to document temporarily
+            document.body.appendChild(container);
+            
+            // Allow DOM to render
+            setTimeout(() => {
+            // Convert to PDF with improved settings
+            const opt = {
+                margin: [15, 15, 15, 15],
+                filename: filename,
+                html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                logging: true,
+                backgroundColor: '#ffffff'
+                },
+                jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait',
+                compress: true
+                }
+            };
+
+            html2pdf().from(container).set(opt).save()
+                .then(() => {
+                // Remove temporary element
+                document.body.removeChild(container);
+                // Hide loading indicator
+                loading.style.display = 'none';
+                })
+                .catch(error => {
+                console.error("PDF conversion error:", error);
+                alert("An error occurred during conversion. Please try again.");
+                loading.style.display = 'none';
+                document.body.removeChild(container);
+                });
+            }, 100);
+        };
+        reader.readAsText(currentFile);
+    }
+
+    function convertDocxToPdf(filename, textContent, textColor) {
+        // Create container
+        const container = document.createElement('div');
+        container.style.padding = '40px';
+        container.style.position = 'relative';
+        container.style.fontFamily = 'Arial, sans-serif';
+        container.style.backgroundColor = '#ffffff';
+        
+        // Add text based on position
+        if (textContent && textPosition === 'top') {
+            const textEl = document.createElement('div');
+            textEl.textContent = textContent;
+            textEl.style.color = textColor;
+            textEl.style.marginBottom = '20px';
+            textEl.style.fontSize = '14pt';
+            container.appendChild(textEl);
+        }
+        
+        // Add the DOCX content
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = docxHtml;
+        contentDiv.style.minHeight = '100px';
+        container.appendChild(contentDiv);
+        
+        // Add bottom text if needed
+        if (textContent && textPosition === 'bottom') {
+            const textEl = document.createElement('div');
+            textEl.textContent = textContent;
+            textEl.style.color = textColor;
+            textEl.style.marginTop = '20px';
+            textEl.style.fontSize = '14pt';
+            container.appendChild(textEl);
+        }
+        
+        // Add watermark if needed
+        if (textContent && textPosition === 'watermark') {
+            const watermark = document.createElement('div');
+            watermark.textContent = textContent;
+            watermark.style.position = 'absolute';
+            watermark.style.top = '50%';
+            watermark.style.left = '50%';
+            watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+            watermark.style.fontSize = '48px';
+            watermark.style.fontWeight = 'bold';
+            watermark.style.color = textColor;
+            watermark.style.opacity = '0.3';
+            watermark.style.pointerEvents = 'none';
+            watermark.style.zIndex = '1000';
+            watermark.style.whiteSpace = 'nowrap';
+            container.appendChild(watermark);
+        }
+        
+        // Add to document temporarily
+        document.body.appendChild(container);
+        
+        // Allow DOM to render
+        setTimeout(() => {
+            // Convert to PDF with improved settings
+            const opt = {
+            margin: [15, 15, 15, 15],
+            filename: filename,
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                logging: true,
+                backgroundColor: '#ffffff'
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait',
+                compress: true
+            }
+            };
+
+            html2pdf().from(container).set(opt).save()
+            .then(() => {
+                // Remove temporary element
+                document.body.removeChild(container);
+                // Hide loading indicator
+                loading.style.display = 'none';
+            })
+            .catch(error => {
+                console.error("PDF conversion error:", error);
+                alert("An error occurred during conversion. Please try again.");
+                loading.style.display = 'none';
+                document.body.removeChild(container);
+            });
+        }, 100);
+        }
+
+    // Prevent default drag behaviors on document
+    document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    });
+
+    document.addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    });
+  </script>
+</body>
+</html>
