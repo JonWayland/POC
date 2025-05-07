@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="../images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
   <title>File to PDF Converter | The Dollar Web</title>
   <style>
     /* Inter and Montserrat Fonts */
@@ -397,6 +396,7 @@
       margin-top: 0;
       color: var(--dark);
       font-weight: 500;
+      margin-bottom: 20px;
     }
 
     .form-group {
@@ -426,33 +426,6 @@
       border-color: var(--primary);
       outline: none;
       box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
-    }
-
-    #custom-text {
-      height: 100px;
-      resize: vertical;
-    }
-
-    .text-position {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .text-position button {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .text-position button.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
     }
 
     button {
@@ -543,6 +516,72 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    .text-block {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .text-block-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      align-items: center;
+    }
+
+    .position-select {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .text-color-picker {
+      width: 40px;
+      height: 30px;
+      padding: 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .remove-block-btn {
+      background: #ff6b6b;
+      color: white;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+
+    #add-text-block-btn {
+      background: var(--primary);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    #add-text-block-btn:hover {
+      background: var(--dark);
+    }
+
+    .custom-text {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      resize: vertical;
+    }
   </style>
 </head>
 <body>
@@ -601,22 +640,31 @@
         </div>
         
         <div class="form-group">
-          <label for="custom-text">Add Text or Notes:</label>
-          <textarea id="custom-text" placeholder="Enter text to add to the PDF (e.g., copyright notice, URL, notes)"></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label for="text-color">Text Color:</label>
-          <input type="color" id="text-color" value="#333333">
-        </div>
-        
-        <div class="form-group">
-          <label>Text Position:</label>
-          <div class="text-position">
-            <button class="position-btn active" data-position="top">Top</button>
-            <button class="position-btn" data-position="bottom">Bottom</button>
-            <button class="position-btn" data-position="watermark">Watermark</button>
+          <label>Text Blocks:</label>
+          <div id="text-blocks-container">
+            <div class="text-block">
+              <textarea class="custom-text" placeholder="Enter text to add to the PDF (e.g., copyright notice, URL, notes)"></textarea>
+              <div class="text-block-controls">
+                <select class="position-select">
+                  <option value="top-left">Top Left</option>
+                  <option value="top-center" selected>Top Center</option>
+                  <option value="top-right">Top Right</option>
+                  <option value="middle-left">Middle Left</option>
+                  <option value="middle-center">Middle Center</option>
+                  <option value="middle-right">Middle Right</option>
+                  <option value="bottom-left">Bottom Left</option>
+                  <option value="bottom-center">Bottom Center</option>
+                  <option value="bottom-right">Bottom Right</option>
+                  <option value="watermark">Watermark</option>
+                  <option value="header">Full Width Header</option>
+                  <option value="footer">Full Width Footer</option>
+                </select>
+                <input type="color" class="text-color-picker" value="#333333">
+                <button class="remove-block-btn" title="Remove this text block">✕</button>
+              </div>
+            </div>
           </div>
+          <button id="add-text-block-btn">+ Add Another Text Block</button>
         </div>
       </div>
       
@@ -676,7 +724,7 @@
   <!-- Library for .docx → HTML -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.18/mammoth.browser.min.js"></script>
   <!-- Library for HTML/image → PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="../libs/html2pdf.bundle.min.js"></script>
   <script>
     // DOM references
     const dropZone = document.getElementById('drop-zone');
@@ -690,31 +738,30 @@
     const fileSize = document.getElementById('file-size');
     const optionsPanel = document.getElementById('options-panel');
     const pdfName = document.getElementById('pdf-name');
-    const customText = document.getElementById('custom-text');
-    const textColor = document.getElementById('text-color');
-    const positionBtns = document.querySelectorAll('.position-btn');
+    const textBlocksContainer = document.getElementById('text-blocks-container');
+    const addTextBlockBtn = document.getElementById('add-text-block-btn');
     const loading = document.getElementById('loading');
 
     // Variables
     let currentFile;
     let docxHtml = '';
-    let textPosition = 'top'; // Default text position
+    let textBlocks = []; // Will store all text block configurations
 
     // Drag & drop styling
     ['dragenter', 'dragover'].forEach(ev => {
-    dropZone.addEventListener(ev, e => {
+      dropZone.addEventListener(ev, e => {
         e.preventDefault();
         e.stopPropagation();
         dropZone.classList.add('dragover');
-    });
+      });
     });
 
     ['dragleave', 'drop'].forEach(ev => {
-    dropZone.addEventListener(ev, e => {
+      dropZone.addEventListener(ev, e => {
         e.preventDefault();
         e.stopPropagation();
         dropZone.classList.remove('dragover');
-    });
+      });
     });
 
     // Click to open file dialog
@@ -722,107 +769,91 @@
 
     // Handle dropped files
     dropZone.addEventListener('drop', e => {
-    if (e.dataTransfer.files.length) {
+      if (e.dataTransfer.files.length) {
         fileInput.files = e.dataTransfer.files;
         handleFile();
-    }
+      }
     });
 
     fileInput.addEventListener('change', handleFile);
 
-    // Handle the text position buttons
-    positionBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        positionBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        textPosition = btn.dataset.position;
-    });
-    });
-
     // Reset button
     resetBtn.addEventListener('click', () => {
-    resetTool();
+      resetTool();
     });
 
+    // Reset tool function
     function resetTool() {
-    // Clear file input
-    fileInput.value = '';
-    currentFile = null;
-    docxHtml = '';
-    
-    // Reset UI
-    preview.style.display = 'none';
-    preview.innerHTML = '';
-    fileInfo.style.display = 'none';
-    optionsPanel.style.display = 'none';
-    convertBtn.disabled = true;
-    
-    // Reset form values
-    pdfName.value = '';
-    customText.value = '';
-    textColor.value = '#333333';
-    
-    // Reset position
-    positionBtns.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.position === 'top') {
-        btn.classList.add('active');
-        }
-    });
-    textPosition = 'top';
+      // Clear file input
+      fileInput.value = '';
+      currentFile = null;
+      docxHtml = '';
+      
+      // Reset UI
+      preview.style.display = 'none';
+      preview.innerHTML = '';
+      fileInfo.style.display = 'none';
+      optionsPanel.style.display = 'none';
+      convertBtn.disabled = true;
+      
+      // Reset form values
+      pdfName.value = '';
+      
+      // Reset text blocks to default
+      initTextBlocks();
     }
 
     // File handling
     function handleFile() {
-    if (!fileInput.files.length) return;
-    
-    currentFile = fileInput.files[0];
-    const ext = currentFile.name.split('.').pop().toLowerCase();
-    
-    // Clear previous preview
-    preview.innerHTML = '';
-    
-    // Set default filename (without extension)
-    const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
-    pdfName.value = baseName;
-    
-    // Update file info
-    fileName.textContent = `Name: ${currentFile.name}`;
-    fileType.textContent = `Type: ${currentFile.type || 'Unknown'}`;
-    fileSize.textContent = `Size: ${formatFileSize(currentFile.size)}`;
-    fileInfo.style.display = 'block';
-    
-    // Handle different file types
-    if (['png', 'jpg', 'jpeg'].includes(ext)) {
+      if (!fileInput.files.length) return;
+      
+      currentFile = fileInput.files[0];
+      const ext = currentFile.name.split('.').pop().toLowerCase();
+      
+      // Clear previous preview
+      preview.innerHTML = '';
+      
+      // Set default filename (without extension)
+      const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
+      pdfName.value = baseName;
+      
+      // Update file info
+      fileName.textContent = `Name: ${currentFile.name}`;
+      fileType.textContent = `Type: ${currentFile.type || 'Unknown'}`;
+      fileSize.textContent = `Size: ${formatFileSize(currentFile.size)}`;
+      fileInfo.style.display = 'block';
+      
+      // Handle different file types
+      if (['png', 'jpg', 'jpeg'].includes(ext)) {
         previewImage(currentFile);
-    } else if (ext === 'txt') {
+      } else if (ext === 'txt') {
         previewText(currentFile);
-    } else if (ext === 'docx') {
+      } else if (ext === 'docx') {
         previewDocx(currentFile);
-    } else {
+      } else {
         preview.innerHTML = '<p style="color:red; text-align:center; padding: 20px;">Unsupported file type. Please use PNG, JPG, JPEG, TXT, or DOCX files.</p>';
         preview.style.display = 'block';
         convertBtn.disabled = true;
         currentFile = null;
         return;
-    }
-    
-    // Show options
-    optionsPanel.style.display = 'block';
-    convertBtn.disabled = false;
+      }
+      
+      // Show options
+      optionsPanel.style.display = 'block';
+      convertBtn.disabled = false;
     }
 
     function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
     function previewImage(file) {
-    const reader = new FileReader();
-    reader.onload = e => {
+      const reader = new FileReader();
+      reader.onload = e => {
         preview.style.display = 'block';
         const img = document.createElement('img');
         img.src = e.target.result;
@@ -831,13 +862,13 @@
         
         // Preview custom text if provided
         updateTextPreview();
-    };
-    reader.readAsDataURL(file);
+      };
+      reader.readAsDataURL(file);
     }
 
     function previewText(file) {
-    const reader = new FileReader();
-    reader.onload = e => {
+      const reader = new FileReader();
+      reader.onload = e => {
         preview.style.display = 'block';
         const pre = document.createElement('pre');
         pre.style.whiteSpace = 'pre-wrap';
@@ -848,436 +879,674 @@
         
         // Preview custom text if provided
         updateTextPreview();
-    };
-    reader.readAsText(file);
+      };
+      reader.readAsText(file);
     }
 
     function previewDocx(file) {
-    const reader = new FileReader();
-    reader.onload = async e => {
+      const reader = new FileReader();
+      reader.onload = async e => {
         try {
-        const result = await mammoth.convertToHtml({ arrayBuffer: e.target.result });
-        docxHtml = result.value;
-        preview.style.display = 'block';
-        const div = document.createElement('div');
-        div.innerHTML = docxHtml;
-        preview.appendChild(div);
-        
-        // Preview custom text if provided
-        updateTextPreview();
+          const result = await mammoth.convertToHtml({ arrayBuffer: e.target.result });
+          docxHtml = result.value;
+          preview.style.display = 'block';
+          const div = document.createElement('div');
+          div.innerHTML = docxHtml;
+          preview.appendChild(div);
+          
+          // Preview custom text if provided
+          updateTextPreview();
         } catch (error) {
-        preview.style.display = 'block';
-        preview.innerHTML = '<p style="color:red; text-align:center; padding: 20px;">Error parsing .docx file. Please try another file.</p>';
-        convertBtn.disabled = true;
-        currentFile = null;
+          preview.style.display = 'block';
+          preview.innerHTML = '<p style="color:red; text-align:center; padding: 20px;">Error parsing .docx file. Please try another file.</p>';
+          convertBtn.disabled = true;
+          currentFile = null;
         }
-    };
-    reader.readAsArrayBuffer(file);
+      };
+      reader.readAsArrayBuffer(file);
     }
 
-    // Update the text preview when custom text changes
-    customText.addEventListener('input', updateTextPreview);
-    textColor.addEventListener('input', updateTextPreview);
-
+    // Update the text preview function to handle multiple text blocks
     function updateTextPreview() {
-    // Remove any existing text previews
-    const existingPreviews = document.querySelectorAll('.custom-text-preview');
-    existingPreviews.forEach(el => el.remove());
-    
-    const text = customText.value.trim();
-    if (!text) return;
-    
-    const color = textColor.value;
-    
-    // Create the text preview element
-    const textPreview = document.createElement('div');
-    textPreview.className = 'custom-text-preview';
-    textPreview.textContent = text;
-    textPreview.style.color = color;
-    textPreview.style.padding = '10px';
-    textPreview.style.borderRadius = '5px';
-    textPreview.style.backgroundColor = 'rgba(0,0,0,0.03)';
-    textPreview.style.marginTop = '10px';
-    textPreview.style.marginBottom = '10px';
-    textPreview.style.width = '100%';
-    
-    // Position the text preview
-    if (textPosition === 'top') {
-        preview.insertBefore(textPreview, preview.firstChild);
-    } else if (textPosition === 'bottom') {
-        preview.appendChild(textPreview);
-    } else if (textPosition === 'watermark') {
-        textPreview.style.position = 'absolute';
-        textPreview.style.top = '50%';
-        textPreview.style.left = '50%';
-        textPreview.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
-        textPreview.style.fontSize = '36px';
-        textPreview.style.opacity = '0.3';
-        textPreview.style.backgroundColor = 'transparent';
-        textPreview.style.padding = '0';
-        textPreview.style.pointerEvents = 'none';
-        textPreview.style.zIndex = '1000';
-        textPreview.style.whiteSpace = 'nowrap';
+      // Remove any existing text previews
+      const existingPreviews = document.querySelectorAll('.custom-text-preview');
+      existingPreviews.forEach(el => el.remove());
+      
+      // Add new text previews for each text block
+      textBlocks.forEach(block => {
+        const text = block.text.trim();
+        if (!text) return;
         
-        // Make sure preview container is positioned for absolute positioning
-        preview.style.position = 'relative';
+        const color = block.color;
+        const position = block.position;
         
-        preview.appendChild(textPreview);
-    }
+        // Create the text preview element
+        const textPreview = document.createElement('div');
+        textPreview.className = 'custom-text-preview';
+        textPreview.textContent = text;
+        textPreview.style.color = color;
+        textPreview.style.padding = '10px';
+        textPreview.style.borderRadius = '5px';
+        textPreview.style.backgroundColor = 'rgba(0,0,0,0.03)';
+        textPreview.style.width = position.includes('full') ? '100%' : 'auto';
+        textPreview.dataset.blockId = block.id;
+        
+        // Position the text preview based on the selected position
+        if (position === 'watermark') {
+          textPreview.style.position = 'absolute';
+          textPreview.style.top = '50%';
+          textPreview.style.left = '50%';
+          textPreview.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+          textPreview.style.fontSize = '36px';
+          textPreview.style.opacity = '0.3';
+          textPreview.style.backgroundColor = 'transparent';
+          textPreview.style.padding = '0';
+          textPreview.style.pointerEvents = 'none';
+          textPreview.style.zIndex = '1000';
+          textPreview.style.whiteSpace = 'nowrap';
+          
+          // Make sure preview container is positioned for absolute positioning
+          preview.style.position = 'relative';
+          
+          preview.appendChild(textPreview);
+        } else if (position === 'header') {
+          textPreview.style.borderBottom = '1px solid #ddd';
+          textPreview.style.textAlign = 'center';
+          textPreview.style.marginBottom = '20px';
+          preview.insertBefore(textPreview, preview.firstChild);
+        } else if (position === 'footer') {
+          textPreview.style.borderTop = '1px solid #ddd';
+          textPreview.style.textAlign = 'center';
+          textPreview.style.marginTop = '20px';
+          preview.appendChild(textPreview);
+        } else {
+          // Handle the grid positions (top-left, middle-center, etc.)
+          textPreview.style.position = 'absolute';
+          
+          // Set horizontal position
+          if (position.includes('left')) {
+            textPreview.style.left = '10px';
+          } else if (position.includes('center')) {
+            textPreview.style.left = '50%';
+            textPreview.style.transform = 'translateX(-50%)';
+          } else if (position.includes('right')) {
+            textPreview.style.right = '10px';
+          }
+          
+          // Set vertical position
+          if (position.includes('top')) {
+            textPreview.style.top = '10px';
+          } else if (position.includes('middle')) {
+            textPreview.style.top = '50%';
+            textPreview.style.transform = position.includes('center') 
+              ? 'translate(-50%, -50%)' 
+              : 'translateY(-50%)';
+          } else if (position.includes('bottom')) {
+            textPreview.style.bottom = '10px';
+          }
+          
+          // Make sure the preview is relatively positioned
+          preview.style.position = 'relative';
+          preview.appendChild(textPreview);
+        }
+      });
     }
 
-    // Update preview when position changes
-    positionBtns.forEach(btn => {
-    btn.addEventListener('click', updateTextPreview);
-    });
+    // Initialize with first text block
+    function initTextBlocks() {
+      // Clear any existing text blocks in the DOM
+      textBlocksContainer.innerHTML = '';
+      textBlocks = [];
+      
+      // Add the first text block
+      addTextBlock();
+    }
 
-    // PDF conversion
+    // Function to add a new text block
+    function addTextBlock() {
+      const textBlock = document.createElement('div');
+      textBlock.className = 'text-block';
+      
+      // Create a unique ID for this text block
+      const blockId = 'text-block-' + Date.now();
+      textBlock.dataset.id = blockId;
+      
+      textBlock.innerHTML = `
+        <textarea class="custom-text" placeholder="Enter text to add to the PDF (e.g., copyright notice, URL, notes)"></textarea>
+        <div class="text-block-controls">
+          <select class="position-select">
+            <option value="top-left">Top Left</option>
+            <option value="top-center" selected>Top Center</option>
+            <option value="top-right">Top Right</option>
+            <option value="middle-left">Middle Left</option>
+            <option value="middle-center">Middle Center</option>
+            <option value="middle-right">Middle Right</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="bottom-center">Bottom Center</option>
+            <option value="bottom-right">Bottom Right</option>
+            <option value="watermark">Watermark</option>
+            <option value="header">Full Width Header</option>
+            <option value="footer">Full Width Footer</option>
+          </select>
+          <input type="color" class="text-color-picker" value="#333333">
+          <button class="remove-block-btn" title="Remove this text block">✕</button>
+        </div>
+      `;
+      
+      textBlocksContainer.appendChild(textBlock);
+      
+      // Add event listeners to the new elements
+      const textArea = textBlock.querySelector('.custom-text');
+      const positionSelect = textBlock.querySelector('.position-select');
+      const colorPicker = textBlock.querySelector('.text-color-picker');
+      const removeBtn = textBlock.querySelector('.remove-block-btn');
+      
+      // Store the text block configuration
+      const blockConfig = {
+        id: blockId,
+        text: '',
+        position: 'top-center',
+        color: '#333333'
+      };
+      textBlocks.push(blockConfig);
+      
+      // Event listeners
+      textArea.addEventListener('input', () => {
+        blockConfig.text = textArea.value;
+        updateTextPreview();
+      });
+      
+      positionSelect.addEventListener('change', () => {
+        blockConfig.position = positionSelect.value;
+        updateTextPreview();
+      });
+      
+      colorPicker.addEventListener('input', () => {
+        blockConfig.color = colorPicker.value;
+        updateTextPreview();
+      });
+      
+      removeBtn.addEventListener('click', () => {
+        // Only allow removal if there's more than one block
+        if (textBlocks.length > 1) {
+          textBlock.remove();
+          // Remove from the array
+          const index = textBlocks.findIndex(b => b.id === blockId);
+          if (index !== -1) {
+            textBlocks.splice(index, 1);
+          }
+          updateTextPreview();
+        } else {
+          alert('You must have at least one text block. Clear the text if you don\'t want to add any text.');
+        }
+      });
+    }
+
+    // Add event listener for the "Add Another Text Block" button
+    addTextBlockBtn.addEventListener('click', addTextBlock);
+    
+    // PDF conversion button
     convertBtn.addEventListener('click', () => {
-    if (!currentFile) return;
-    
-    // Show loading indicator
-    loading.style.display = 'flex';
-    
-    // Get file extension
-    const ext = currentFile.name.split('.').pop().toLowerCase();
-    
-    // Get PDF filename
-    let outputFilename = pdfName.value.trim() || currentFile.name.replace(/\.[^/.]+$/, '');
-    
-    // Ensure it ends with .pdf
-    if (!outputFilename.toLowerCase().endsWith('.pdf')) {
+      if (!currentFile) return;
+      
+      // Show loading indicator
+      loading.style.display = 'flex';
+      
+      // Get file extension
+      const ext = currentFile.name.split('.').pop().toLowerCase();
+      
+      // Get PDF filename
+      let outputFilename = pdfName.value.trim() || currentFile.name.replace(/\.[^/.]+$/, '');
+      
+      // Ensure it ends with .pdf
+      if (!outputFilename.toLowerCase().endsWith('.pdf')) {
         outputFilename += '.pdf';
-    }
-    
-    // Get text options
-    const textContent = customText.value.trim();
-    const color = textColor.value;
-    
-    // Convert based on file type with a small delay to show loading
-    setTimeout(() => {
+      }
+      
+      // Convert based on file type with a small delay to show loading
+      setTimeout(() => {
         if (['png', 'jpg', 'jpeg'].includes(ext)) {
-        convertImageToPdf(outputFilename, textContent, color);
+          convertImageToPdf(outputFilename);
         } else if (ext === 'txt') {
-        convertTextToPdf(outputFilename, textContent, color);
+          convertTextToPdf(outputFilename);
         } else if (ext === 'docx') {
-        convertDocxToPdf(outputFilename, textContent, color);
+          convertDocxToPdf(outputFilename);
         }
-    }, 300);
+      }, 300);
     });
-
-    function convertImageToPdf(filename, textContent, textColor) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const img = new Image();
-            img.src = e.target.result;
-            
-            img.onload = () => {
-            // Create a container div for the content
-            const container = document.createElement('div');
-            container.style.position = 'relative';
-            container.style.width = img.width + 'px';
-            container.style.maxWidth = '100%';
-            container.style.margin = '0 auto';
-            
-            // Add the image
-            const imgEl = document.createElement('img');
-            imgEl.src = e.target.result;
-            imgEl.style.display = 'block';
-            imgEl.style.width = '100%';
-            imgEl.style.maxWidth = '100%';
-            container.appendChild(imgEl);
-            
-            // Add text content if provided
-            if (textContent) {
-                if (textPosition === 'top') {
-                const textEl = document.createElement('div');
-                textEl.textContent = textContent;
-                textEl.style.color = textColor;
-                textEl.style.padding = '10px';
-                textEl.style.width = '100%';
-                textEl.style.boxSizing = 'border-box';
-                textEl.style.textAlign = 'center';
-                textEl.style.fontSize = '14pt';
-                container.insertBefore(textEl, imgEl);
-                } else if (textPosition === 'bottom') {
-                const textEl = document.createElement('div');
-                textEl.textContent = textContent;
-                textEl.style.color = textColor;
-                textEl.style.padding = '10px';
-                textEl.style.width = '100%';
-                textEl.style.boxSizing = 'border-box';
-                textEl.style.textAlign = 'center';
-                textEl.style.fontSize = '14pt';
-                container.appendChild(textEl);
-                } else if (textPosition === 'watermark') {
-                const watermark = document.createElement('div');
-                watermark.textContent = textContent;
-                watermark.style.position = 'absolute';
-                watermark.style.top = '50%';
-                watermark.style.left = '50%';
-                watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
-                watermark.style.fontSize = '48px';
-                watermark.style.fontWeight = 'bold';
-                watermark.style.color = textColor;
-                watermark.style.opacity = '0.3';
-                watermark.style.pointerEvents = 'none';
-                watermark.style.zIndex = '1000';
-                watermark.style.whiteSpace = 'nowrap';
-                container.appendChild(watermark);
-                }
-            }
-            
-            // Add the container to the document temporarily
-            document.body.appendChild(container);
-            
-            // Give the browser a moment to render the content before capturing
-            setTimeout(() => {
-                // Use html2pdf with improved configuration
-                const opt = {
-                margin: 10,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    logging: true,
-                    windowWidth: container.scrollWidth
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: [img.width * 0.264583, (img.height + (textContent ? 50 : 0)) * 0.264583],
-                    orientation: img.width > img.height ? 'landscape' : 'portrait',
-                    compress: true
-                }
-                };
-
-                html2pdf().from(container).set(opt).save()
-                .then(() => {
-                    // Remove the temporary container
-                    document.body.removeChild(container);
-                    // Hide loading indicator
-                    loading.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error("PDF conversion error:", error);
-                    alert("An error occurred during conversion. Please try again.");
-                    loading.style.display = 'none';
-                    document.body.removeChild(container);
-                });
-            }, 100);
-            };
-            
-            // Handle image loading errors
-            img.onerror = () => {
-            alert("Error loading the image. The file may be corrupted.");
-            loading.style.display = 'none';
-            };
-        };
-        reader.readAsDataURL(currentFile);
-        }
-
-    function convertTextToPdf(filename, textContent, textColor) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            // Create container
-            const container = document.createElement('div');
-            container.style.padding = '40px';
-            container.style.position = 'relative';
-            container.style.fontFamily = 'Arial, sans-serif';
-            container.style.backgroundColor = '#ffffff';
-            
-            // Add text based on position
-            if (textContent && textPosition === 'top') {
-            const textEl = document.createElement('div');
-            textEl.textContent = textContent;
-            textEl.style.color = textColor;
+    
+    // Image to PDF conversion
+    function convertImageToPdf(filename) {
+      const reader = new FileReader();
+      
+      reader.onload = e => {
+        // Create a container with explicitly set dimensions
+        const container = document.createElement('div');
+        container.style.padding = '20px';
+        container.style.backgroundColor = '#ffffff';
+        container.style.position = 'relative';
+        container.style.maxWidth = '750px'; // Ensure it's not too wide for PDF
+        container.style.margin = '0 auto';
+        
+        // Add the image with explicit dimensions
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.display = 'block';
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+        container.appendChild(img);
+        
+        // Add all text blocks
+        textBlocks.forEach(block => {
+          const text = block.text.trim();
+          if (!text) return;
+          
+          const position = block.position;
+          const color = block.color;
+          
+          const textEl = document.createElement('div');
+          textEl.textContent = text;
+          textEl.style.color = color;
+          textEl.style.fontSize = '14pt';
+          
+          if (position === 'watermark') {
+            textEl.style.position = 'absolute';
+            textEl.style.top = '50%';
+            textEl.style.left = '50%';
+            textEl.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+            textEl.style.fontSize = '48px';
+            textEl.style.fontWeight = 'bold';
+            textEl.style.opacity = '0.3';
+            textEl.style.pointerEvents = 'none';
+            textEl.style.zIndex = '1000';
+            textEl.style.whiteSpace = 'nowrap';
+          } else if (position === 'header') {
+            textEl.style.width = '100%';
+            textEl.style.textAlign = 'center';
+            textEl.style.borderBottom = '1px solid #ddd';
+            textEl.style.paddingBottom = '10px';
             textEl.style.marginBottom = '20px';
-            textEl.style.fontSize = '14pt';
-            container.appendChild(textEl);
-            }
-            
-            // Add the text content from the file
-            const pre = document.createElement('pre');
-            pre.style.whiteSpace = 'pre-wrap';
-            pre.style.fontFamily = 'monospace';
-            pre.style.margin = '0';
-            pre.style.padding = '10px';
-            pre.style.border = '1px solid #eee';
-            pre.style.borderRadius = '5px';
-            pre.style.backgroundColor = '#f9f9f9';
-            pre.textContent = e.target.result;
-            container.appendChild(pre);
-            
-            // Add bottom text if needed
-            if (textContent && textPosition === 'bottom') {
-            const textEl = document.createElement('div');
-            textEl.textContent = textContent;
-            textEl.style.color = textColor;
+            // Insert at the beginning
+            container.insertBefore(textEl, container.firstChild);
+            return; // Skip the rest of this iteration
+          } else if (position === 'footer') {
+            textEl.style.width = '100%';
+            textEl.style.textAlign = 'center';
+            textEl.style.borderTop = '1px solid #ddd';
+            textEl.style.paddingTop = '10px';
             textEl.style.marginTop = '20px';
-            textEl.style.fontSize = '14pt';
+            // Append at the end
             container.appendChild(textEl);
+            return; // Skip the rest of this iteration
+          } else {
+            textEl.style.position = 'absolute';
+            
+            // Set horizontal position
+            if (position.includes('left')) {
+              textEl.style.left = '20px';
+              textEl.style.textAlign = 'left';
+            } else if (position.includes('center')) {
+              textEl.style.left = '50%';
+              textEl.style.transform = 'translateX(-50%)';
+              textEl.style.textAlign = 'center';
+            } else if (position.includes('right')) {
+              textEl.style.right = '20px';
+              textEl.style.textAlign = 'right';
             }
             
-            // Add watermark if needed
-            if (textContent && textPosition === 'watermark') {
-            const watermark = document.createElement('div');
-            watermark.textContent = textContent;
-            watermark.style.position = 'absolute';
-            watermark.style.top = '50%';
-            watermark.style.left = '50%';
-            watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
-            watermark.style.fontSize = '48px';
-            watermark.style.fontWeight = 'bold';
-            watermark.style.color = textColor;
-            watermark.style.opacity = '0.3';
-            watermark.style.pointerEvents = 'none';
-            watermark.style.zIndex = '1000';
-            watermark.style.whiteSpace = 'nowrap';
-            container.appendChild(watermark);
+            // Set vertical position
+            if (position.includes('top')) {
+              textEl.style.top = '20px';
+            } else if (position.includes('middle')) {
+              textEl.style.top = '50%';
+              textEl.style.transform = position.includes('center') 
+                ? 'translate(-50%, -50%)' 
+                : 'translateY(-50%)';
+            } else if (position.includes('bottom')) {
+              textEl.style.bottom = '20px';
             }
-            
-            // Add to document temporarily
-            document.body.appendChild(container);
-            
-            // Allow DOM to render
-            setTimeout(() => {
-            // Convert to PDF with improved settings
-            const opt = {
-                margin: [15, 15, 15, 15],
-                filename: filename,
-                html2canvas: { 
-                scale: 2,
-                useCORS: true,
-                logging: true,
-                backgroundColor: '#ffffff'
-                },
-                jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait',
-                compress: true
-                }
-            };
-
-            html2pdf().from(container).set(opt).save()
-                .then(() => {
-                // Remove temporary element
-                document.body.removeChild(container);
-                // Hide loading indicator
-                loading.style.display = 'none';
-                })
-                .catch(error => {
-                console.error("PDF conversion error:", error);
-                alert("An error occurred during conversion. Please try again.");
-                loading.style.display = 'none';
-                document.body.removeChild(container);
-                });
-            }, 100);
+          }
+          
+          container.appendChild(textEl);
+        });
+        
+        // Add the container to the document temporarily
+        document.body.appendChild(container);
+        
+        // Define PDF options
+        const opt = {
+          margin: 10,
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            logging: true,
+            backgroundColor: '#ffffff'
+          },
+          jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait'
+          }
         };
-        reader.readAsText(currentFile);
+        
+        // Use the recommended Promise-based API approach
+        html2pdf()
+          .from(container)
+          .set(opt)
+          .save()
+          .then(() => {
+            // Remove the temporary container
+            document.body.removeChild(container);
+            // Hide loading indicator
+            loading.style.display = 'none';
+          })
+          .catch(error => {
+            console.error("PDF conversion error:", error);
+            alert("An error occurred during conversion. Please try again.");
+            loading.style.display = 'none';
+            document.body.removeChild(container);
+          });
+      };
+      
+      reader.onerror = () => {
+        alert("Error reading the file.");
+        loading.style.display = 'none';
+      };
+      
+      reader.readAsDataURL(currentFile);
     }
 
-    function convertDocxToPdf(filename, textContent, textColor) {
-        // Create container
+    // Text to PDF conversion
+    function convertTextToPdf(filename) {
+      const reader = new FileReader();
+      
+      reader.onload = e => {
+        // Create container with explicit dimensions
         const container = document.createElement('div');
         container.style.padding = '40px';
+        container.style.backgroundColor = '#ffffff';
         container.style.position = 'relative';
         container.style.fontFamily = 'Arial, sans-serif';
-        container.style.backgroundColor = '#ffffff';
+        container.style.maxWidth = '750px';
+        container.style.margin = '0 auto';
         
-        // Add text based on position
-        if (textContent && textPosition === 'top') {
-            const textEl = document.createElement('div');
-            textEl.textContent = textContent;
-            textEl.style.color = textColor;
+        // Add the text content from the file
+        const pre = document.createElement('pre');
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.style.fontFamily = 'monospace';
+        pre.style.margin = '0';
+        pre.style.padding = '10px';
+        pre.style.border = '1px solid #eee';
+        pre.style.borderRadius = '5px';
+        pre.style.backgroundColor = '#f9f9f9';
+        pre.style.color = '#333'; // Ensure text is visible
+        pre.textContent = e.target.result;
+        container.appendChild(pre);
+        
+        // Add text blocks
+        textBlocks.forEach(block => {
+          const text = block.text.trim();
+          if (!text) return;
+          
+          const position = block.position;
+          const color = block.color;
+          
+          const textEl = document.createElement('div');
+          textEl.textContent = text;
+          textEl.style.color = color;
+          textEl.style.fontSize = '14pt';
+          
+          if (position === 'watermark') {
+            textEl.style.position = 'absolute';
+            textEl.style.top = '50%';
+            textEl.style.left = '50%';
+            textEl.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+            textEl.style.fontSize = '48px';
+            textEl.style.fontWeight = 'bold';
+            textEl.style.opacity = '0.3';
+            textEl.style.pointerEvents = 'none';
+            textEl.style.zIndex = '1000';
+            textEl.style.whiteSpace = 'nowrap';
+            container.appendChild(textEl);
+          } else if (position === 'header') {
+            textEl.style.width = '100%';
+            textEl.style.textAlign = 'center';
+            textEl.style.borderBottom = '1px solid #ddd';
+            textEl.style.paddingBottom = '10px';
             textEl.style.marginBottom = '20px';
-            textEl.style.fontSize = '14pt';
-            container.appendChild(textEl);
-        }
-        
-        // Add the DOCX content
-        const contentDiv = document.createElement('div');
-        contentDiv.innerHTML = docxHtml;
-        contentDiv.style.minHeight = '100px';
-        container.appendChild(contentDiv);
-        
-        // Add bottom text if needed
-        if (textContent && textPosition === 'bottom') {
-            const textEl = document.createElement('div');
-            textEl.textContent = textContent;
-            textEl.style.color = textColor;
+            container.insertBefore(textEl, container.firstChild);
+          } else if (position === 'footer') {
+            textEl.style.width = '100%';
+            textEl.style.textAlign = 'center';
+            textEl.style.borderTop = '1px solid #ddd';
+            textEl.style.paddingTop = '10px';
             textEl.style.marginTop = '20px';
-            textEl.style.fontSize = '14pt';
             container.appendChild(textEl);
-        }
-        
-        // Add watermark if needed
-        if (textContent && textPosition === 'watermark') {
-            const watermark = document.createElement('div');
-            watermark.textContent = textContent;
-            watermark.style.position = 'absolute';
-            watermark.style.top = '50%';
-            watermark.style.left = '50%';
-            watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
-            watermark.style.fontSize = '48px';
-            watermark.style.fontWeight = 'bold';
-            watermark.style.color = textColor;
-            watermark.style.opacity = '0.3';
-            watermark.style.pointerEvents = 'none';
-            watermark.style.zIndex = '1000';
-            watermark.style.whiteSpace = 'nowrap';
-            container.appendChild(watermark);
-        }
+          } else {
+            textEl.style.position = 'absolute';
+            
+            // Set horizontal position
+            if (position.includes('left')) {
+              textEl.style.left = '20px';
+              textEl.style.textAlign = 'left';
+            } else if (position.includes('center')) {
+              textEl.style.left = '50%';
+              textEl.style.transform = 'translateX(-50%)';
+              textEl.style.textAlign = 'center';
+            } else if (position.includes('right')) {
+              textEl.style.right = '20px';
+              textEl.style.textAlign = 'right';
+            }
+            
+            // Set vertical position
+            if (position.includes('top')) {
+              textEl.style.top = '20px';
+            } else if (position.includes('middle')) {
+              textEl.style.top = '50%';
+              textEl.style.transform = position.includes('center') 
+                ? 'translate(-50%, -50%)' 
+                : 'translateY(-50%)';
+            } else if (position.includes('bottom')) {
+              textEl.style.bottom = '20px';
+            }
+            
+            container.appendChild(textEl);
+          }
+        });
         
         // Add to document temporarily
         document.body.appendChild(container);
         
-        // Allow DOM to render
-        setTimeout(() => {
-            // Convert to PDF with improved settings
-            const opt = {
-            margin: [15, 15, 15, 15],
-            filename: filename,
-            html2canvas: { 
-                scale: 2,
-                useCORS: true,
-                logging: true,
-                backgroundColor: '#ffffff'
-            },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait',
-                compress: true
-            }
-            };
+        // Define PDF options
+        const opt = {
+          margin: [15, 15, 15, 15],
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            logging: true,
+            backgroundColor: '#ffffff'
+          },
+          jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait'
+          }
+        };
+        
+        // Use the recommended Promise-based API approach
+        html2pdf()
+          .from(container)
+          .set(opt)
+          .save()
+          .then(() => {
+            // Remove temporary element
+            document.body.removeChild(container);
+            // Hide loading indicator
+            loading.style.display = 'none';
+          })
+          .catch(error => {
+            console.error("PDF conversion error:", error);
+            alert("An error occurred during conversion. Please try again.");
+            loading.style.display = 'none';
+            document.body.removeChild(container);
+          });
+      };
+      
+      reader.onerror = () => {
+        alert("Error reading the file.");
+        loading.style.display = 'none';
+      };
+      
+      reader.readAsText(currentFile);
+    }
 
-            html2pdf().from(container).set(opt).save()
-            .then(() => {
-                // Remove temporary element
-                document.body.removeChild(container);
-                // Hide loading indicator
-                loading.style.display = 'none';
-            })
-            .catch(error => {
-                console.error("PDF conversion error:", error);
-                alert("An error occurred during conversion. Please try again.");
-                loading.style.display = 'none';
-                document.body.removeChild(container);
-            });
-        }, 100);
+    // DOCX to PDF conversion
+    function convertDocxToPdf(filename) {
+      // Create container with explicit dimensions
+      const container = document.createElement('div');
+      container.style.padding = '40px';
+      container.style.backgroundColor = '#ffffff';
+      container.style.position = 'relative';
+      container.style.fontFamily = 'Arial, sans-serif';
+      container.style.maxWidth = '750px';
+      container.style.margin = '0 auto';
+      
+      // Add the DOCX content with explicit color
+      const contentDiv = document.createElement('div');
+      contentDiv.innerHTML = docxHtml;
+      contentDiv.style.minHeight = '100px';
+      contentDiv.style.color = '#333'; // Ensure text is visible
+      container.appendChild(contentDiv);
+      
+      // Add text blocks
+      textBlocks.forEach(block => {
+        const text = block.text.trim();
+        if (!text) return;
+        
+        const position = block.position;
+        const color = block.color;
+        
+        const textEl = document.createElement('div');
+        textEl.textContent = text;
+        textEl.style.color = color;
+        textEl.style.fontSize = '14pt';
+        
+        if (position === 'watermark') {
+          textEl.style.position = 'absolute';
+          textEl.style.top = '50%';
+          textEl.style.left = '50%';
+          textEl.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+          textEl.style.fontSize = '48px';
+          textEl.style.fontWeight = 'bold';
+          textEl.style.opacity = '0.3';
+          textEl.style.pointerEvents = 'none';
+          textEl.style.zIndex = '1000';
+          textEl.style.whiteSpace = 'nowrap';
+          container.appendChild(textEl);
+        } else if (position === 'header') {
+          textEl.style.width = '100%';
+          textEl.style.textAlign = 'center';
+          textEl.style.borderBottom = '1px solid #ddd';
+          textEl.style.paddingBottom = '10px';
+          textEl.style.marginBottom = '20px';
+          container.insertBefore(textEl, container.firstChild);
+        } else if (position === 'footer') {
+          textEl.style.width = '100%';
+          textEl.style.textAlign = 'center';
+          textEl.style.borderTop = '1px solid #ddd';
+          textEl.style.paddingTop = '10px';
+          textEl.style.marginTop = '20px';
+          container.appendChild(textEl);
+        } else {
+          textEl.style.position = 'absolute';
+          
+          // Set horizontal position
+          if (position.includes('left')) {
+            textEl.style.left = '20px';
+            textEl.style.textAlign = 'left';
+          } else if (position.includes('center')) {
+            textEl.style.left = '50%';
+            textEl.style.transform = 'translateX(-50%)';
+            textEl.style.textAlign = 'center';
+          } else if (position.includes('right')) {
+            textEl.style.right = '20px';
+            textEl.style.textAlign = 'right';
+          }
+          
+          // Set vertical position
+          if (position.includes('top')) {
+            textEl.style.top = '20px';
+          } else if (position.includes('middle')) {
+            textEl.style.top = '50%';
+            textEl.style.transform = position.includes('center') 
+              ? 'translate(-50%, -50%)' 
+              : 'translateY(-50%)';
+          } else if (position.includes('bottom')) {
+            textEl.style.bottom = '20px';
+          }
+          
+          container.appendChild(textEl);
         }
+      });
+      
+      // Add to document temporarily
+      document.body.appendChild(container);
+      
+      // Define PDF options
+      const opt = {
+        margin: [15, 15, 15, 15],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          logging: true,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait'
+        }
+      };
+      
+      // Use the recommended Promise-based API approach
+      html2pdf()
+        .from(container)
+        .set(opt)
+        .save()
+        .then(() => {
+          // Remove temporary element
+          document.body.removeChild(container);
+          // Hide loading indicator
+          loading.style.display = 'none';
+        })
+        .catch(error => {
+          console.error("PDF conversion error:", error);
+          alert("An error occurred during conversion. Please try again.");
+          loading.style.display = 'none';
+          document.body.removeChild(container);
+        });
+    }
 
     // Prevent default drag behaviors on document
     document.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
     });
 
     document.addEventListener('drop', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    // Initialize text blocks
+    document.addEventListener('DOMContentLoaded', function() {
+      initTextBlocks();
     });
   </script>
 </body>
