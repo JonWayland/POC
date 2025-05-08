@@ -531,6 +531,24 @@
       margin-top: 10px;
       align-items: center;
     }
+    
+    /* Make the select box smaller in width */
+    .position-select {
+      flex: 0.7;
+      max-width: 150px;
+    }
+    
+    /* Add styling for the color picker label */
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .color-label {
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
 
     .position-select {
       flex: 1;
@@ -545,6 +563,29 @@
       padding: 0;
       border: 1px solid #ddd;
       border-radius: 4px;
+      min-width: 40px;
+      max-width: 40px;
+      flex: 0 0 40px; /* Don't allow flex to grow or shrink */
+      cursor: pointer;
+      /* Remove default styling */
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    
+    /* Make the color swatch fill the entire control */
+    .text-color-picker::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    
+    .text-color-picker::-webkit-color-swatch {
+      border: none;
+      border-radius: 3px;
+    }
+    
+    .text-color-picker::-moz-color-swatch {
+      border: none;
+      border-radius: 3px;
     }
 
     .remove-block-btn {
@@ -581,6 +622,9 @@
       border: 1px solid #ddd;
       border-radius: 6px;
       resize: vertical;
+      white-space: pre-wrap; /* Preserve line breaks */
+      font-family: Arial, sans-serif; /* Use a standard font */
+      line-height: 1.4; /* Improve readability */
     }
   </style>
 </head>
@@ -659,7 +703,10 @@
                   <option value="header">Full Width Header</option>
                   <option value="footer">Full Width Footer</option>
                 </select>
-                <input type="color" class="text-color-picker" value="#333333">
+                <div class="color-picker-wrapper">
+                  <span class="color-label">Color:</span>
+                  <input type="color" class="text-color-picker" value="#333333">
+                </div>
                 <button class="remove-block-btn" title="Remove this text block">✕</button>
               </div>
             </div>
@@ -923,7 +970,8 @@
         // Create the text preview element
         const textPreview = document.createElement('div');
         textPreview.className = 'custom-text-preview';
-        textPreview.textContent = text;
+        // Use innerHTML with nl2br to preserve line breaks
+        textPreview.innerHTML = text.replace(/\n/g, '<br>');
         textPreview.style.color = color;
         textPreview.style.padding = '10px';
         textPreview.style.borderRadius = '5px';
@@ -1028,7 +1076,10 @@
             <option value="header">Full Width Header</option>
             <option value="footer">Full Width Footer</option>
           </select>
-          <input type="color" class="text-color-picker" value="#333333">
+          <div class="color-picker-wrapper">
+            <span class="color-label">Color:</span>
+            <input type="color" class="text-color-picker" value="#333333">
+          </div>
           <button class="remove-block-btn" title="Remove this text block">✕</button>
         </div>
       `;
@@ -1145,9 +1196,11 @@
           const color = block.color;
           
           const textEl = document.createElement('div');
-          textEl.textContent = text;
+          // Use innerHTML for line breaks
+          textEl.innerHTML = text.replace(/\n/g, '<br>');
           textEl.style.color = color;
           textEl.style.fontSize = '14pt';
+          textEl.style.lineHeight = '1.4'; // Add proper line height
           
           if (position === 'watermark') {
             textEl.style.position = 'absolute';
