@@ -1,0 +1,2834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../images/sand_dollar_favicon_64.png" sizes="64x64" type="image/png">
+  <title>Interactive Workflow Diagrammer | The Dollar Web</title>
+  <style>
+    /* Inter and Montserrat Fonts */
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/inter-semibold.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900; /* This tells the browser this file contains all weights */
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: italic;
+      src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    :root {
+      --primary: #00a896;
+      --secondary: #f8b500;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #05668d;
+      --text: #333;
+      --bg: #f5f9f8;
+      --highlight: rgba(255, 241, 118, 0.4);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' opacity='0.03' viewBox='0 0 120 120'%3E%3Cpath d='M20,60 C20,60 35,30 60,30 C85,30 100,60 100,60 C100,60 85,90 60,90 C35,90 20,60 20,60 Z' fill='%2300a896'/%3E%3C/svg%3E");
+      background-size: 120px;
+      padding-top: 70px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 40px 0 0px;
+    }
+    
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 3.2rem;
+      color: var(--primary);
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-top: 80px;
+    }
+    
+    p.tagline {
+      font-size: 1.3rem;
+      color: var(--dark);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Navigation Bar Styles */
+    .main-nav {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .nav-logo:hover {
+      transform: translateY(-2px);
+    }
+
+    .nav-logo svg {
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: all 0.2s !important;
+    }
+
+    .login-btn:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer Styles */
+    .site-footer {
+      background: var(--dark);
+      padding: 40px 0 50px;
+      margin-top: 80px;
+      position: relative;
+      color: white;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' width='1200' height='120' opacity='0.1'%3E%3Cpath d='M0,100 C200,20 400,60 600,80 C800,100 1000,40 1200,120 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      color: var(--secondary);
+    }
+
+    .footer-logo svg {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+    }
+
+    .footer-logo span {
+      font-weight: 600;
+      font-size: 2.4rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .footer-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin: 0 30px;
+      font-size: 1.2rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .footer-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .footer-social a svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .footer-social a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .copyright-message {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 10px;
+    }
+
+    .secondary-text {
+      color: var(--secondary);
+    }
+    
+    .tertiary-text {
+      color: var(--dark);
+    }
+
+    /* Flowchart Tool Specific Styles */
+    #toolbar {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #toolbar * { 
+      margin: 4px; 
+    }
+    
+    button {
+      padding: 8px 12px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: var(--dark);
+      transform: translateY(-2px);
+    }
+    
+    button.active {
+      background: var(--dark);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .dropdown-content a {
+      color: var(--text);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    label {
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    input[type="color"] {
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type="range"] {
+      width: 100px;
+    }
+
+    input[type="text"] {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      width: 200px;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.2);
+    }
+
+    #canvasContainer {
+      margin-top: 80px;
+      padding: 20px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+      height: calc(100vh - 300px);
+      min-height: 500px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      background: white;
+      user-select: none;
+    }
+
+    .node {
+      cursor: move;
+    }
+
+    .node rect, .node ellipse, .node polygon, .node path {
+      fill: #ffffff;
+      stroke: var(--dark);
+      stroke-width: 2;
+    }
+
+    .node text {
+      pointer-events: none;
+      font-size: 14px;
+      fill: var(--text);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .node.editing text {
+      pointer-events: auto;
+    }
+
+    .connector {
+      stroke: var(--dark);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .connector-handle {
+      fill: white;
+      stroke: var(--dark);
+      stroke-width: 2;
+      cursor: move;
+    }
+
+    .node.selected rect, .node.selected ellipse, .node.selected polygon, .node.selected path {
+      stroke: var(--primary);
+      stroke-width: 3;
+    }
+
+    .connector.selected {
+      stroke: var(--primary);
+      stroke-width: 3;
+    }
+
+    .node.connection-source rect, 
+    .node.connection-source ellipse, 
+    .node.connection-source polygon, 
+    .node.connection-source path {
+      stroke: var(--secondary);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 5px rgba(248, 181, 0, 0.5));
+    }
+    
+    .node.connection-target rect, 
+    .node.connection-target ellipse, 
+    .node.connection-target polygon, 
+    .node.connection-target path {
+      stroke: var(--accent);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 5px rgba(255, 107, 107, 0.5));
+    }
+    
+    .connection-preview {
+      stroke-dasharray: 5,5;
+      stroke-width: 2;
+      pointer-events: none;
+    }
+    
+    .connection-helper {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: 500;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .nav-logo span {
+        font-size: 1.2rem;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .footer-links a {
+        margin: 10px 0;
+      }
+
+      #toolbar {
+        overflow-x: auto;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .nav-links a:not(.login-btn) {
+        display: none;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+      }
+    }
+
+    /* Context menu */
+    .context-menu {
+      position: absolute;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 10px 0;
+      z-index: 1000;
+      display: none;
+    }
+
+    .context-menu-item {
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .context-menu-item:hover {
+      background: #f5f5f5;
+      color: var(--primary);
+    }
+
+    .context-menu hr {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 5px 0;
+    }
+
+    /* Properties panel */
+    #properties-panel {
+      position: fixed;
+      top: 130px; /* Position below the toolbar */
+      right: 0;
+      width: 250px;
+      background: white;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+      padding: 15px;
+      height: calc(100vh - 130px); /* Adjust height to account for toolbar */
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1500;
+      overflow-y: auto;
+    }
+
+    #properties-panel.open {
+      transform: translateX(0);
+    }
+
+    .properties-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .properties-header h3 {
+      margin: 0;
+      color: var(--dark);
+    }
+
+    .close-properties {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .properties-group {
+      margin-bottom: 15px;
+    }
+
+    .properties-group h4 {
+      margin: 0 0 10px;
+      color: var(--primary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+
+    .property-row {
+      display: flex;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .property-label {
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .property-value {
+      flex: 2;
+    }
+
+    /* Additional workspace controls */
+    .zoom-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .zoom-controls button {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      margin: 0 2px;
+      padding: 0;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .zoom-display {
+      margin: 0 8px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    /* Action buttons at the bottom */
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .action-buttons button {
+      min-width: 120px;
+    }
+
+    #toggle-properties-btn {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      z-index: 900;
+      background: var(--dark);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Mini map */
+    #mini-map {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 150px;
+      height: 100px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #mini-map svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .mini-viewport {
+      stroke: var(--primary);
+      stroke-width: 2;
+      fill: rgba(0, 168, 150, 0.1);
+      pointer-events: none;
+    }
+
+    .os-links a {
+      color: var(--primary); 
+      text-decoration: none; 
+      font-size: 0.9rem;
+    }
+    
+    .os-links a:hover { 
+      text-decoration: underline; 
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="main-nav">
+    <div class="container nav-container">
+      <a href="../index.html" class="nav-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 32px; height: 32px;">
+        <span class="tertiary-text">&nbsp;The&nbsp;</span>Dollar&nbsp;<span class="secondary-text">Web</span>
+      </a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../tools.html">Tools</a>
+        <a href="../about.html">About</a>
+        <a href="../login.html" class="login-btn">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>Interactive Workflow Diagrammer</h1>
+      <p class="tagline">Create professional flowcharts, diagrams, and process maps with our easy-to-use diagramming tool. Add shapes, connect elements, and export your work.</p>
+      <div class="os-links">
+        <a href="/licenses.html">Open-source acknowledgements</a>
+      </div>
+    </header>
+
+    <div id="toolbar">
+      <!-- Shapes dropdown -->
+      <div class="dropdown">
+        <button id="add-shape-btn">Add Shape</button>
+        <div class="dropdown-content">
+          <a href="#" data-shape="rectangle">Rectangle</a>
+          <a href="#" data-shape="ellipse">Ellipse</a>
+          <a href="#" data-shape="diamond">Diamond</a>
+          <a href="#" data-shape="hexagon">Hexagon</a>
+          <a href="#" data-shape="circle">Circle</a>
+          <a href="#" data-shape="parallelogram">Parallelogram</a>
+          <a href="#" data-shape="document">Document</a>
+          <a href="#" data-shape="cylinder">Cylinder</a>
+        </div>
+      </div>
+
+      <!-- Connector types -->
+      <div class="dropdown">
+        <button id="connector-type-btn">Connector: Straight</button>
+        <div class="dropdown-content">
+          <a href="#" data-connector="straight">Straight</a>
+          <a href="#" data-connector="curved">Curved</a>
+          <a href="#" data-connector="orthogonal">Orthogonal</a>
+        </div>
+      </div>
+
+      <button id="connect-btn">Connect Shapes</button>
+      
+      <!-- Text styling - keep only this from the original controls -->
+      <label>Text: <input type="text" id="text-input" placeholder="Enter text for shape"></label>
+      
+      <!-- Actions -->
+      <button id="delete-btn">Delete Selected</button>
+      <button id="clear-btn">Clear All</button>
+      <button id="undo-btn">Undo</button>
+      <button id="export-btn">Export</button>
+      <button id="toggle-properties-btn" style="margin-left: 10px; background-color: var(--dark);">Properties ⚙️</button>
+    </div>
+
+    <div class="connection-helper" id="connection-helper">Select a shape to connect from</div>
+
+    <div id="canvasContainer">
+      <svg id="svgCanvas">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#05668d" />
+          </marker>
+          <marker id="circle-marker" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+            <circle cx="4" cy="4" r="3" fill="#05668d" />
+          </marker>
+        </defs>
+        <g id="grid"></g>
+        <g id="connections"></g>
+        <g id="nodes"></g>
+      </svg>
+
+      <!-- Mini map -->
+      <div id="mini-map">
+        <svg></svg>
+      </div>
+
+      <!-- Zoom controls -->
+      <div class="zoom-controls">
+        <button id="zoom-out">-</button>
+        <span class="zoom-display">100%</span>
+        <button id="zoom-in">+</button>
+        <button id="zoom-reset">⟳</button>
+      </div>
+
+      <button id="toggle-properties-btn">⚙️</button>
+    </div>
+
+    <!-- Hidden controls that JavaScript still depends on -->
+    <div style="display: none;">
+      <input type="color" id="fill-color" value="#ffffff">
+      <input type="color" id="stroke-color" value="#05668d">
+      <input type="range" id="opacity-slider" min="0" max="100" value="100">
+    </div>
+
+    <!-- Properties panel -->
+    <div id="properties-panel">
+      <div class="properties-header">
+        <h3>Properties</h3>
+        <button class="close-properties">×</button>
+      </div>
+      <div id="properties-content">
+        <div class="properties-group">
+          <h4>Appearance</h4>
+          <div class="property-row">
+            <div class="property-label">Fill Color</div>
+            <div class="property-value">
+              <input type="color" id="prop-fill-color" value="#ffffff">
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">Border Color</div>
+            <div class="property-value">
+              <input type="color" id="prop-stroke-color" value="#05668d">
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">Border Width</div>
+            <div class="property-value">
+              <input type="range" id="prop-stroke-width" min="1" max="10" value="2">
+              <span id="stroke-width-value">2px</span>
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">Opacity</div>
+            <div class="property-value">
+              <input type="range" id="prop-opacity" min="0" max="100" value="100">
+              <span id="opacity-value">100%</span>
+            </div>
+          </div>
+        </div>
+        <div class="properties-group">
+          <h4>Text</h4>
+          <div class="property-row">
+            <div class="property-label">Content</div>
+            <div class="property-value">
+              <input type="text" id="prop-text-content" placeholder="Enter text">
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">Font Size</div>
+            <div class="property-value">
+              <input type="range" id="prop-font-size" min="8" max="36" value="14">
+              <span id="font-size-value">14px</span>
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">Text Color</div>
+            <div class="property-value">
+              <input type="color" id="prop-text-color" value="#333333">
+            </div>
+          </div>
+        </div>
+        <div class="properties-group">
+          <h4>Connector</h4>
+          <div class="property-row">
+            <div class="property-label">Style</div>
+            <div class="property-value">
+              <select id="prop-connector-style">
+                <option value="straight">Straight</option>
+                <option value="curved">Curved</option>
+                <option value="orthogonal">Orthogonal</option>
+              </select>
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">Line Color</div>
+            <div class="property-value">
+              <input type="color" id="prop-line-color" value="#05668d">
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">Start Marker</div>
+            <div class="property-value">
+              <select id="prop-start-marker">
+                <option value="none">None</option>
+                <option value="arrow">Arrow</option>
+                <option value="circle">Circle</option>
+              </select>
+            </div>
+          </div>
+          <div class="property-row">
+            <div class="property-label">End Marker</div>
+            <div class="property-value">
+              <select id="prop-end-marker">
+                <option value="arrow" selected>Arrow</option>
+                <option value="none">None</option>
+                <option value="circle">Circle</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context menu -->
+    <div id="context-menu" class="context-menu">
+      <div class="context-menu-item" id="ctx-edit-text">Edit Text</div>
+      <div class="context-menu-item" id="ctx-change-shape">Change Shape</div>
+      <div class="context-menu-item" id="ctx-bring-front">Bring to Front</div>
+      <div class="context-menu-item" id="ctx-send-back">Send to Back</div>
+      <hr>
+      <div class="context-menu-item" id="ctx-duplicate">Duplicate</div>
+      <div class="context-menu-item" id="ctx-delete">Delete</div>
+    </div>
+
+    <div class="action-buttons">
+      <button id="save-btn">Save Diagram</button>
+      <button id="export-png-btn">Export as PNG</button>
+      <button id="export-svg-btn">Export as SVG</button>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="../images/logo.svg" alt="The Dollar Web Logo" style="width: 48px; height: 48px;">
+        <span>&nbsp;The Dollar Web</span>
+      </div>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../privacy.html">Privacy Policy</a>
+        <a href="../terms.html">Terms of Service</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://x.com/thedollarweb" aria-label="Twitter">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Z"/>
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/thedollarwebpro/" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/the-dollar-web" aria-label="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+            <rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; 2025 The DollarWeb</p>
+      <p class="copyright-message">Professional tools that won't break the bank</p>
+    </div>
+  </footer>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirmation-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Clear All Elements?</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to clear all shapes and connections? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancel-clear">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="confirm-clear">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM References
+    const svg = document.getElementById('svgCanvas');
+    const nodesGroup = document.getElementById('nodes');
+    const connectionsGroup = document.getElementById('connections');
+    const addShapeBtn = document.getElementById('add-shape-btn');
+    const connectBtn = document.getElementById('connect-btn');
+    const deleteBtn = document.getElementById('delete-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const undoBtn = document.getElementById('undo-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const fillColorInput = document.getElementById('fill-color');
+    const strokeColorInput = document.getElementById('stroke-color');
+    const opacitySlider = document.getElementById('opacity-slider');
+    const textInput = document.getElementById('text-input');
+    const propertiesPanel = document.getElementById('properties-panel');
+    const togglePropertiesBtn = document.getElementById('toggle-properties-btn');
+    const closePropertiesBtn = document.querySelector('.close-properties');
+    const contextMenu = document.getElementById('context-menu');
+    const miniMap = document.getElementById('mini-map');
+    const saveBtn = document.getElementById('save-btn');
+    const exportPngBtn = document.getElementById('export-png-btn');
+    const exportSvgBtn = document.getElementById('export-svg-btn');
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const cancelClearBtn = document.getElementById('cancel-clear');
+    const confirmClearBtn = document.getElementById('confirm-clear');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomResetBtn = document.getElementById('zoom-reset');
+    const zoomDisplay = document.querySelector('.zoom-display');
+    const shapeLinks = document.querySelectorAll('.dropdown-content a[data-shape]');
+    const connectorTypeLinks = document.querySelectorAll('.dropdown-content a[data-connector]');
+    const connectorTypeBtn = document.getElementById('connector-type-btn');
+
+    // State variables
+    let nodeCount = 0;
+    let mode = 'select'; // 'select', 'connect', 'add'
+    let connectStep = 0;
+    let firstNode = null;
+    let currentShape = 'rectangle';
+    let currentConnectorType = 'straight';
+    let selectedElement = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let isDragging = false;
+    let zoomLevel = 1;
+    let viewBox = { x: 0, y: 0, width: 800, height: 600 };
+    let undoStack = [];
+    let lastCanvasState = null;
+    const connections = [];
+
+    // Initialize the grid
+    function initializeGrid() {
+      const gridGroup = document.getElementById('grid');
+      gridGroup.innerHTML = '';
+      
+      // Create horizontal lines
+      for (let y = 0; y <= 2000; y += 20) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', -1000);
+        line.setAttribute('y1', y - 1000);
+        line.setAttribute('x2', 1000);
+        line.setAttribute('y2', y - 1000);
+        line.setAttribute('stroke', '#e5e5e5');
+        line.setAttribute('stroke-width', '1');
+        gridGroup.appendChild(line);
+      }
+      
+      // Create vertical lines
+      for (let x = 0; x <= 2000; x += 20) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x - 1000);
+        line.setAttribute('y1', -1000);
+        line.setAttribute('x2', x - 1000);
+        line.setAttribute('y2', 1000);
+        line.setAttribute('stroke', '#e5e5e5');
+        line.setAttribute('stroke-width', '1');
+        gridGroup.appendChild(line);
+      }
+    }
+
+    // Function to save the current state for undo
+    function saveState() {
+      const state = svg.cloneNode(true);
+      undoStack.push(state);
+      
+      // Limit the stack size to prevent memory issues
+      if (undoStack.length > 20) {
+        undoStack.shift();
+      }
+    }
+
+    // Undo function
+    function undo() {
+      if (undoStack.length === 0) return;
+      
+      const previousState = undoStack.pop();
+      // Replace the current SVG with the previous state
+      svg.parentNode.replaceChild(previousState, svg);
+      
+      // Update references
+      updateDOMReferences();
+      
+      // Reattach event listeners
+      attachEventListeners();
+    }
+
+    // Update DOM references after state change
+    function updateDOMReferences() {
+      // Re-get main elements
+      svg = document.getElementById('svgCanvas');
+      nodesGroup = document.getElementById('nodes');
+      connectionsGroup = document.getElementById('connections');
+      
+      // Reattach event listeners to nodes
+      const nodes = svg.querySelectorAll('.node');
+      nodes.forEach(node => {
+        makeDraggable(node);
+        node.addEventListener('click', nodeClickHandler);
+        node.addEventListener('contextmenu', showContextMenu);
+      });
+      
+      // Reattach event listeners to connections
+      const connectors = svg.querySelectorAll('.connector');
+      connectors.forEach(connector => {
+        connector.addEventListener('click', () => {
+          selectElement(connector);
+        });
+        connector.addEventListener('contextmenu', showContextMenu);
+      });
+    }
+
+    // Create shape based on type
+    function createShape(type, x, y) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.classList.add('node');
+      g.setAttribute('data-id', ++nodeCount);
+      g.setAttribute('data-shape', type);
+      
+      let shapeElement;
+      const fillColor = fillColorInput.value;
+      const strokeColor = strokeColorInput.value;
+      const opacity = opacitySlider.value / 100;
+      
+      switch (type) {
+        case 'rectangle':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'rect');
+          shapeElement.setAttribute('width', 120);
+          shapeElement.setAttribute('height', 60);
+          shapeElement.setAttribute('x', -60);
+          shapeElement.setAttribute('y', -30);
+          shapeElement.setAttribute('rx', 4);
+          shapeElement.setAttribute('ry', 4);
+          break;
+          
+        case 'ellipse':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'ellipse');
+          shapeElement.setAttribute('rx', 60);
+          shapeElement.setAttribute('ry', 30);
+          shapeElement.setAttribute('cx', 0);
+          shapeElement.setAttribute('cy', 0);
+          break;
+          
+        case 'diamond':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'polygon');
+          shapeElement.setAttribute('points', '0,-40 60,0 0,40 -60,0');
+          break;
+          
+        case 'hexagon':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'polygon');
+          shapeElement.setAttribute('points', '50,-30 50,30 0,60 -50,30 -50,-30 0,-60');
+          break;
+          
+        case 'circle':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'ellipse');
+          shapeElement.setAttribute('rx', 40);
+          shapeElement.setAttribute('ry', 40);
+          shapeElement.setAttribute('cx', 0);
+          shapeElement.setAttribute('cy', 0);
+          break;
+          
+        case 'parallelogram':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'polygon');
+          shapeElement.setAttribute('points', '-70,-30 70,-30 50,30 -90,30');
+          break;
+          
+        case 'document':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'path');
+          shapeElement.setAttribute('d', 'M-60,-40 H60 V30 C40,50 20,30 0,40 C-20,50 -40,30 -60,40 V-40');
+          break;
+          
+        case 'cylinder':
+          shapeElement = document.createElementNS(svg.namespaceURI, 'path');
+          shapeElement.setAttribute('d', 'M-50,-30 H50 C70,-30 70,30 50,30 H-50 C-70,30 -70,-30 -50,-30 Z M-50,-30 C-30,-40 30,-40 50,-30 M-50,30 C-30,40 30,40 50,30');
+          break;
+          
+        default:
+          shapeElement = document.createElementNS(svg.namespaceURI, 'rect');
+          shapeElement.setAttribute('width', 120);
+          shapeElement.setAttribute('height', 60);
+          shapeElement.setAttribute('x', -60);
+          shapeElement.setAttribute('y', -30);
+          shapeElement.setAttribute('rx', 4);
+          shapeElement.setAttribute('ry', 4);
+      }
+      
+      shapeElement.setAttribute('fill', fillColor);
+      shapeElement.setAttribute('stroke', strokeColor);
+      shapeElement.setAttribute('stroke-width', 2);
+      shapeElement.setAttribute('fill-opacity', opacity);
+      g.appendChild(shapeElement);
+      
+      const text = document.createElementNS(svg.namespaceURI, 'text');
+      text.setAttribute('x', 0);
+      text.setAttribute('y', 5);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('font-family', 'Inter, sans-serif');
+      text.setAttribute('font-size', '14px');
+      text.setAttribute('fill', '#333333');
+      
+      // Use the text from the input field or default text
+      const textContent = textInput.value.trim() || `Node ${nodeCount}`;
+      text.textContent = textContent;
+      
+      g.appendChild(text);
+      g.setAttribute('transform', `translate(${x},${y})`);
+      nodesGroup.appendChild(g);
+      
+      makeDraggable(g);
+      g.addEventListener('click', nodeClickHandler);
+      g.addEventListener('contextmenu', showContextMenu);
+      
+      return g;
+    }
+
+    // Make elements draggable
+    function makeDraggable(el) {
+      el.addEventListener('mousedown', startDrag);
+      el.addEventListener('touchstart', startDrag, { passive: false });
+      
+      function startDrag(e) {
+        e.preventDefault();
+        if (mode === 'connect') return;
+        
+        // Select the node on drag start
+        selectElement(el);
+        
+        isDragging = true;
+        const svgPoint = getMousePosition(e);
+        const matrix = el.transform.baseVal.getItem(0).matrix;
+        
+        dragOffsetX = svgPoint.x - matrix.e;
+        dragOffsetY = svgPoint.y - matrix.f;
+        
+        window.addEventListener('mousemove', drag);
+        window.addEventListener('touchmove', drag, { passive: false });
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+      }
+
+      function drag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        
+        const svgPoint = getMousePosition(e);
+        const x = svgPoint.x - dragOffsetX;
+        const y = svgPoint.y - dragOffsetY;
+        
+        el.setAttribute('transform', `translate(${x},${y})`);
+        updateConnections(el.getAttribute('data-id'), x, y);
+        updateMiniMap();
+      }
+
+      function endDrag() {
+        if (isDragging) {
+          saveState();
+          isDragging = false;
+        }
+        
+        window.removeEventListener('mousemove', drag);
+        window.removeEventListener('touchmove', drag);
+        window.removeEventListener('mouseup', endDrag);
+        window.removeEventListener('touchend', endDrag);
+      }
+    }
+
+    // Handle node clicks
+    function nodeClickHandler(e) {
+      e.stopPropagation();
+      
+      const node = e.currentTarget;
+      
+      if (mode === 'connect') {
+        if (connectStep === 0) {
+          // First node selection
+          firstNode = node;
+          // Add a visual indication that this node is selected for connection
+          node.classList.add('active');
+          node.classList.add('connection-source');
+          connectStep = 1;
+          
+          // Display connection helper message
+          showConnectionHelper("Now select the destination shape");
+        } else {
+          // Second node selection
+          const secondNode = node;
+          // Add a visual indication that this is the target
+          secondNode.classList.add('connection-target');
+          
+          // Create the connection
+          drawConnector(firstNode, secondNode);
+          
+          // Remove visual indicators
+          firstNode.classList.remove('active');
+          firstNode.classList.remove('connection-source');
+          secondNode.classList.remove('connection-target');
+          firstNode = null;
+          connectStep = 0;
+          
+          // Hide the connection helper
+          hideConnectionHelper();
+          
+          // Automatically switch back to select mode after creating connection
+          mode = 'select';
+          connectBtn.classList.remove('active');
+          
+          // Select the newly created connector
+          const lastConnector = connections[connections.length - 1].element;
+          if (lastConnector) {
+            selectElement(lastConnector);
+          }
+        }
+      } else {
+        selectElement(node);
+        
+        // Get the text from the node and display it in the text input
+        const textElement = node.querySelector('text');
+        if (textElement) {
+          textInput.value = textElement.textContent;
+          
+          // If it's a double-click, initiate text editing
+          if (e.detail === 2 && mode === 'select') {
+            editNodeText();
+          }
+        }
+      }
+    }
+
+    // Get mouse position in SVG coordinates
+    function getMousePosition(event) {
+      const CTM = svg.getScreenCTM();
+      let x, y;
+      
+      if (event.touches) {
+        // Touch event
+        x = event.touches[0].clientX;
+        y = event.touches[0].clientY;
+      } else {
+        // Mouse event
+        x = event.clientX;
+        y = event.clientY;
+      }
+      
+      return {
+        x: (x - CTM.e) / CTM.a,
+        y: (y - CTM.f) / CTM.d
+      };
+    }
+
+    // Draw connectors between nodes
+    function drawConnector(n1, n2) {
+      const id1 = n1.getAttribute('data-id');
+      const id2 = n2.getAttribute('data-id');
+      
+      // Get center points of both nodes
+      const [x1, y1] = getNodeCenter(n1);
+      const [x2, y2] = getNodeCenter(n2);
+      
+      // Create the appropriate type of connector
+      let connector;
+      
+      switch (currentConnectorType) {
+        case 'straight':
+          connector = document.createElementNS(svg.namespaceURI, 'line');
+          connector.setAttribute('x1', x1);
+          connector.setAttribute('y1', y1);
+          connector.setAttribute('x2', x2);
+          connector.setAttribute('y2', y2);
+          break;
+          
+        case 'curved':
+          connector = document.createElementNS(svg.namespaceURI, 'path');
+          // Calculate control points for curve
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          const midX = (x1 + x2) / 2;
+          const midY = (y1 + y2) / 2;
+          const offset = Math.min(100, Math.sqrt(dx * dx + dy * dy) / 2);
+          const cx1 = midX - offset;
+          const cy1 = midY - offset;
+          const cx2 = midX + offset;
+          const cy2 = midY + offset;
+          connector.setAttribute('d', `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`);
+          break;
+          
+        case 'orthogonal':
+          connector = document.createElementNS(svg.namespaceURI, 'path');
+          // Calculate midpoint for orthogonal line
+          const midX2 = (x1 + x2) / 2;
+          connector.setAttribute('d', `M${x1},${y1} L${midX2},${y1} L${midX2},${y2} L${x2},${y2}`);
+          break;
+          
+        default:
+          connector = document.createElementNS(svg.namespaceURI, 'line');
+          connector.setAttribute('x1', x1);
+          connector.setAttribute('y1', y1);
+          connector.setAttribute('x2', x2);
+          connector.setAttribute('y2', y2);
+      }
+      
+      connector.classList.add('connector');
+      connector.setAttribute('data-from', id1);
+      connector.setAttribute('data-to', id2);
+      connector.setAttribute('data-type', currentConnectorType);
+      connector.setAttribute('marker-end', 'url(#arrow)');
+      connector.setAttribute('stroke', strokeColorInput.value);
+      
+      // Add event listeners
+      connector.addEventListener('click', () => {
+        selectElement(connector);
+      });
+      connector.addEventListener('contextmenu', showContextMenu);
+      
+      connectionsGroup.appendChild(connector);
+      connections.push({ from: id1, to: id2, element: connector });
+      
+      saveState();
+      updateMiniMap();
+      
+      return connector;
+    }
+
+    // Get the center of a node
+    function getNodeCenter(node) {
+      const transform = node.transform.baseVal.getItem(0).matrix;
+      return [transform.e, transform.f];
+    }
+
+    // Update connections when nodes move
+    function updateConnections(movedId, x, y) {
+      connections.forEach(c => {
+        if (c.from === movedId || c.to === movedId) {
+          const fromNode = svg.querySelector(`.node[data-id="${c.from}"]`);
+          const toNode = svg.querySelector(`.node[data-id="${c.to}"]`);
+          
+          if (!fromNode || !toNode) return;
+          
+          const [x1, y1] = getNodeCenter(fromNode);
+          const [x2, y2] = getNodeCenter(toNode);
+          
+          const connector = c.element;
+          const type = connector.getAttribute('data-type');
+          
+          switch (type) {
+            case 'straight':
+              connector.setAttribute('x1', x1);
+              connector.setAttribute('y1', y1);
+              connector.setAttribute('x2', x2);
+              connector.setAttribute('y2', y2);
+              break;
+              
+            case 'curved':
+              // Update curved path
+              const dx = x2 - x1;
+              const dy = y2 - y1;
+              const midX = (x1 + x2) / 2;
+              const midY = (y1 + y2) / 2;
+              const offset = Math.min(100, Math.sqrt(dx * dx + dy * dy) / 2);
+              const cx1 = midX - offset;
+              const cy1 = midY - offset;
+              const cx2 = midX + offset;
+              const cy2 = midY + offset;
+              connector.setAttribute('d', `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`);
+              break;
+              
+            case 'orthogonal':
+              // Update orthogonal path
+              const midX2 = (x1 + x2) / 2;
+              connector.setAttribute('d', `M${x1},${y1} L${midX2},${y1} L${midX2},${y2} L${x2},${y2}`);
+              break;
+          }
+        }
+      });
+    }
+
+    // Select an element
+    function selectElement(element) {
+      // Deselect previous element
+      if (selectedElement) {
+        selectedElement.classList.remove('selected');
+      }
+      
+      // Select new element
+      selectedElement = element;
+      element.classList.add('selected');
+      
+      // Update toolbar text input if this is a node
+      if (element.classList.contains('node')) {
+        const textElement = element.querySelector('text');
+        if (textElement) {
+          textInput.value = textElement.textContent;
+        }
+      }
+      
+      // Update properties panel
+      updatePropertiesPanel();
+    }
+
+    // Deselect all elements
+    function deselectAll() {
+      if (selectedElement) {
+        selectedElement.classList.remove('selected');
+        selectedElement = null;
+      }
+    }
+
+    // Update properties panel based on selected element
+    function updatePropertiesPanel() {
+      if (!selectedElement) return;
+      
+      const isNode = selectedElement.classList.contains('node');
+      const isConnector = selectedElement.classList.contains('connector');
+      
+      // Show appropriate sections in properties panel
+      document.querySelectorAll('.properties-group').forEach(group => {
+        if (group.querySelector('h4').textContent === 'Appearance' && isNode) {
+          group.style.display = 'block';
+        } else if (group.querySelector('h4').textContent === 'Text' && isNode) {
+          group.style.display = 'block';
+        } else if (group.querySelector('h4').textContent === 'Connector' && isConnector) {
+          group.style.display = 'block';
+        } else {
+          group.style.display = 'none';
+        }
+      });
+      
+      if (isNode) {
+        // Update node properties
+        const shape = selectedElement.querySelector('rect, ellipse, polygon, path');
+        const text = selectedElement.querySelector('text');
+        
+        document.getElementById('prop-fill-color').value = shape.getAttribute('fill');
+        document.getElementById('prop-stroke-color').value = shape.getAttribute('stroke');
+        document.getElementById('prop-stroke-width').value = shape.getAttribute('stroke-width');
+        document.getElementById('stroke-width-value').textContent = `${shape.getAttribute('stroke-width')}px`;
+        
+        const opacity = parseFloat(shape.getAttribute('fill-opacity') || 1) * 100;
+        document.getElementById('prop-opacity').value = opacity;
+        document.getElementById('opacity-value').textContent = `${Math.round(opacity)}%`;
+        
+        document.getElementById('prop-text-content').value = text.textContent;
+        document.getElementById('prop-font-size').value = parseInt(text.getAttribute('font-size')) || 14;
+        document.getElementById('font-size-value').textContent = `${document.getElementById('prop-font-size').value}px`;
+        document.getElementById('prop-text-color').value = text.getAttribute('fill');
+        
+        // Update the hidden form elements to keep them in sync
+        document.getElementById('fill-color').value = shape.getAttribute('fill');
+        document.getElementById('stroke-color').value = shape.getAttribute('stroke');
+        document.getElementById('opacity-slider').value = opacity;
+      }
+      
+      if (isConnector) {
+        // Update connector properties
+        document.getElementById('prop-connector-style').value = selectedElement.getAttribute('data-type') || 'straight';
+        document.getElementById('prop-line-color').value = selectedElement.getAttribute('stroke');
+        
+        // Determine start marker
+        const startMarker = selectedElement.getAttribute('marker-start');
+        document.getElementById('prop-start-marker').value = startMarker ? startMarker.replace('url(#', '').replace(')', '') : 'none';
+        
+        // Determine end marker
+        const endMarker = selectedElement.getAttribute('marker-end');
+        document.getElementById('prop-end-marker').value = endMarker ? endMarker.replace('url(#', '').replace(')', '') : 'none';
+      }
+      
+      // Open properties panel if not already open
+      propertiesPanel.classList.add('open');
+    }
+
+    // Show context menu for right-click
+    function showContextMenu(e) {
+      e.preventDefault();
+      
+      selectElement(e.currentTarget);
+      
+      const isNode = selectedElement.classList.contains('node');
+      const isConnector = selectedElement.classList.contains('connector');
+      
+      // Show/hide appropriate menu items
+      document.getElementById('ctx-edit-text').style.display = isNode ? 'block' : 'none';
+      document.getElementById('ctx-change-shape').style.display = isNode ? 'block' : 'none';
+      
+      // Position and show the menu
+      contextMenu.style.left = `${e.clientX}px`;
+      contextMenu.style.top = `${e.clientY}px`;
+      contextMenu.style.display = 'block';
+      
+      // Add event listener to hide menu when clicking elsewhere
+      setTimeout(() => {
+        window.addEventListener('click', hideContextMenu);
+      }, 0);
+    }
+
+    // Hide context menu
+    function hideContextMenu() {
+      contextMenu.style.display = 'none';
+      window.removeEventListener('click', hideContextMenu);
+    }
+
+    // Delete selected element
+    function deleteSelected() {
+      if (!selectedElement) return;
+      
+      saveState();
+      
+      if (selectedElement.classList.contains('node')) {
+        // Delete node and all its connections
+        const nodeId = selectedElement.getAttribute('data-id');
+        
+        // Find and remove all connections involving this node
+        connections.forEach(c => {
+          if (c.from === nodeId || c.to === nodeId) {
+            c.element.remove();
+          }
+        });
+        
+        // Filter connections array
+        connections = connections.filter(c => c.from !== nodeId && c.to !== nodeId);
+        
+        // Remove the node
+        selectedElement.remove();
+      } else if (selectedElement.classList.contains('connector')) {
+        // Remove the connection from the array
+        const from = selectedElement.getAttribute('data-from');
+        const to = selectedElement.getAttribute('data-to');
+        connections = connections.filter(c => !(c.from === from && c.to === to));
+        
+        // Remove the connector element
+        selectedElement.remove();
+      }
+      
+      selectedElement = null;
+      updateMiniMap();
+    }
+
+    // Edit text of selected node
+    function editNodeText() {
+      if (!selectedElement || !selectedElement.classList.contains('node')) return;
+      
+      const textElement = selectedElement.querySelector('text');
+      const currentText = textElement.textContent;
+      
+      // Create an input field
+      const svgRect = svg.getBoundingClientRect();
+      const nodeMatrix = selectedElement.transform.baseVal.getItem(0).matrix;
+      
+      const inputField = document.createElement('input');
+      inputField.type = 'text';
+      inputField.value = currentText;
+      inputField.style.position = 'absolute';
+      inputField.style.left = `${svgRect.left + nodeMatrix.e}px`;
+      inputField.style.top = `${svgRect.top + nodeMatrix.f}px`;
+      inputField.style.transform = 'translate(-50%, -50%)';
+      inputField.style.width = '200px';
+      inputField.style.zIndex = '1000';
+      inputField.style.textAlign = 'center';
+      
+      document.body.appendChild(inputField);
+      inputField.focus();
+      inputField.select();
+      
+      inputField.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          textElement.textContent = inputField.value;
+          inputField.remove();
+          saveState();
+        } else if (e.key === 'Escape') {
+          inputField.remove();
+        }
+      });
+      
+      inputField.addEventListener('blur', () => {
+        textElement.textContent = inputField.value;
+        inputField.remove();
+        saveState();
+      });
+    }
+
+    // Change the shape of selected node
+    function changeShape(newShape) {
+      if (!selectedElement || !selectedElement.classList.contains('node')) return;
+      
+      saveState();
+      
+      const nodeId = selectedElement.getAttribute('data-id');
+      const nodeMatrix = selectedElement.transform.baseVal.getItem(0).matrix;
+      const x = nodeMatrix.e;
+      const y = nodeMatrix.f;
+      const textContent = selectedElement.querySelector('text').textContent;
+      
+      // Remove the old node
+      selectedElement.remove();
+      
+      // Create a new node with the same properties but different shape
+      textInput.value = textContent;
+      currentShape = newShape;
+      const newNode = createShape(newShape, x, y);
+      newNode.setAttribute('data-id', nodeId);
+      
+      // Update connections to the new node
+      connections.forEach(c => {
+        if (c.from === nodeId || c.to === nodeId) {
+          updateConnections(nodeId, x, y);
+        }
+      });
+      
+      selectElement(newNode);
+      updateMiniMap();
+    }
+
+    // Update mini map
+    function updateMiniMap() {
+      const miniMapSvg = miniMap.querySelector('svg');
+      miniMapSvg.innerHTML = '';
+      
+      // Calculate the bounds of all elements
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      
+      // Check all nodes
+      const nodes = svg.querySelectorAll('.node');
+      nodes.forEach(node => {
+        const matrix = node.transform.baseVal.getItem(0).matrix;
+        const x = matrix.e;
+        const y = matrix.f;
+        
+        // Approximate boundaries based on node type
+        const width = 120;
+        const height = 60;
+        
+        minX = Math.min(minX, x - width/2);
+        minY = Math.min(minY, y - height/2);
+        maxX = Math.max(maxX, x + width/2);
+        maxY = Math.max(maxY, y + height/2);
+      });
+      
+      // If no nodes, use default viewbox
+      if (nodes.length === 0) {
+        minX = -200;
+        minY = -150;
+        maxX = 200;
+        maxY = 150;
+      }
+      
+      // Add padding
+      minX -= 50;
+      minY -= 50;
+      maxX += 50;
+      maxY += 50;
+      
+      const diagramWidth = maxX - minX;
+      const diagramHeight = maxY - minY;
+      
+      // Calculate scale for mini map
+      const mapWidth = miniMap.clientWidth;
+      const mapHeight = miniMap.clientHeight;
+      const scaleX = mapWidth / diagramWidth;
+      const scaleY = mapHeight / diagramHeight;
+      const scale = Math.min(scaleX, scaleY);
+      
+      // Draw all nodes
+      nodes.forEach(node => {
+        const matrix = node.transform.baseVal.getItem(0).matrix;
+        const x = (matrix.e - minX) * scale;
+        const y = (matrix.f - minY) * scale;
+        
+        const miniNode = document.createElementNS(svg.namespaceURI, 'rect');
+        miniNode.setAttribute('x', x - 5);
+        miniNode.setAttribute('y', y - 3);
+        miniNode.setAttribute('width', 10);
+        miniNode.setAttribute('height', 6);
+        miniNode.setAttribute('fill', node.querySelector('rect, ellipse, polygon, path').getAttribute('fill'));
+        miniNode.setAttribute('stroke', node.querySelector('rect, ellipse, polygon, path').getAttribute('stroke'));
+        
+        miniMapSvg.appendChild(miniNode);
+      });
+      
+      // Draw all connections
+      connections.forEach(conn => {
+        const connector = conn.element;
+        
+        let line;
+        const type = connector.getAttribute('data-type');
+        
+        if (type === 'straight' || !type) {
+          const x1 = (parseFloat(connector.getAttribute('x1')) - minX) * scale;
+          const y1 = (parseFloat(connector.getAttribute('y1')) - minY) * scale;
+          const x2 = (parseFloat(connector.getAttribute('x2')) - minX) * scale;
+          const y2 = (parseFloat(connector.getAttribute('y2')) - minY) * scale;
+          
+          line = document.createElementNS(svg.namespaceURI, 'line');
+          line.setAttribute('x1', x1);
+          line.setAttribute('y1', y1);
+          line.setAttribute('x2', x2);
+          line.setAttribute('y2', y2);
+        } else {
+          // For curved and orthogonal connections, just create a simpler representation
+          const fromNode = svg.querySelector(`.node[data-id="${conn.from}"]`);
+          const toNode = svg.querySelector(`.node[data-id="${conn.to}"]`);
+          
+          if (fromNode && toNode) {
+            const [x1, y1] = getNodeCenter(fromNode);
+            const [x2, y2] = getNodeCenter(toNode);
+            
+            const mx1 = (x1 - minX) * scale;
+            const my1 = (y1 - minY) * scale;
+            const mx2 = (x2 - minX) * scale;
+            const my2 = (y2 - minY) * scale;
+            
+            line = document.createElementNS(svg.namespaceURI, 'line');
+            line.setAttribute('x1', mx1);
+            line.setAttribute('y1', my1);
+            line.setAttribute('x2', mx2);
+            line.setAttribute('y2', my2);
+          }
+        }
+        
+        if (line) {
+          line.setAttribute('stroke', connector.getAttribute('stroke') || '#05668d');
+          line.setAttribute('stroke-width', 1);
+          miniMapSvg.appendChild(line);
+        }
+      });
+      
+      // Draw viewport rectangle
+      const viewportRect = document.createElementNS(svg.namespaceURI, 'rect');
+      const vpX = (viewBox.x - minX) * scale;
+      const vpY = (viewBox.y - minY) * scale;
+      const vpWidth = viewBox.width * scale;
+      const vpHeight = viewBox.height * scale;
+      
+      viewportRect.setAttribute('x', vpX);
+      viewportRect.setAttribute('y', vpY);
+      viewportRect.setAttribute('width', vpWidth);
+      viewportRect.setAttribute('height', vpHeight);
+      viewportRect.setAttribute('class', 'mini-viewport');
+      
+      miniMapSvg.appendChild(viewportRect);
+    }
+
+    // Initialize zoom controls
+    function initializeZoom() {
+      // Update SVG viewBox
+      updateViewBox();
+      
+      // Zoom in
+      zoomInBtn.addEventListener('click', () => {
+        zoomLevel *= 1.2;
+        updateZoom();
+      });
+      
+      // Zoom out
+      zoomOutBtn.addEventListener('click', () => {
+        zoomLevel /= 1.2;
+        if (zoomLevel < 0.1) zoomLevel = 0.1;
+        updateZoom();
+      });
+      
+      // Reset zoom
+      zoomResetBtn.addEventListener('click', () => {
+        zoomLevel = 1;
+        viewBox = { x: 0, y: 0, width: 800, height: 600 };
+        updateZoom();
+      });
+      
+      // Zoom with mouse wheel
+      svg.addEventListener('wheel', (e) => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          
+          // Determine zoom direction
+          const delta = e.deltaY > 0 ? 0.9 : 1.1;
+          
+          // Get mouse position in SVG coordinates before zoom
+          const mousePos = getMousePosition(e);
+          
+          // Apply zoom
+          zoomLevel *= delta;
+          if (zoomLevel < 0.1) zoomLevel = 0.1;
+          
+          // Update viewBox while keeping mouse position fixed
+          const newWidth = 800 / zoomLevel;
+          const newHeight = 600 / zoomLevel;
+          
+          viewBox.x = mousePos.x - (mousePos.x - viewBox.x) * (newWidth / viewBox.width);
+          viewBox.y = mousePos.y - (mousePos.y - viewBox.y) * (newHeight / viewBox.height);
+          viewBox.width = newWidth;
+          viewBox.height = newHeight;
+          
+          updateViewBox();
+          updateMiniMap();
+          
+          // Update zoom display
+          zoomDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+      }, { passive: false });
+      
+      // Pan by dragging the canvas
+      let isPanning = false;
+      let startPanX, startPanY;
+      
+      svg.addEventListener('mousedown', (e) => {
+        // Only start panning if not on a node and space key is pressed or middle mouse button
+        if (e.target === svg || e.target.id === 'grid' || e.target.parentNode.id === 'grid') {
+          if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
+            isPanning = true;
+            startPanX = e.clientX;
+            startPanY = e.clientY;
+            svg.style.cursor = 'grabbing';
+            e.preventDefault();
+          }
+        }
+      });
+      
+      window.addEventListener('mousemove', (e) => {
+        if (isPanning) {
+          const dx = (e.clientX - startPanX) / zoomLevel;
+          const dy = (e.clientY - startPanY) / zoomLevel;
+          
+          viewBox.x -= dx;
+          viewBox.y -= dy;
+          
+          updateViewBox();
+          updateMiniMap();
+          
+          startPanX = e.clientX;
+          startPanY = e.clientY;
+        }
+      });
+      
+      window.addEventListener('mouseup', () => {
+        if (isPanning) {
+          isPanning = false;
+          svg.style.cursor = 'default';
+        }
+      });
+    }
+
+    // Update zoom level
+    function updateZoom() {
+      viewBox.width = 800 / zoomLevel;
+      viewBox.height = 600 / zoomLevel;
+      
+      updateViewBox();
+      updateMiniMap();
+      
+      // Update zoom display
+      zoomDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
+    }
+
+    // Update SVG viewBox
+    function updateViewBox() {
+      svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+    }
+
+    // Export to PNG
+    function exportToPNG() {
+      // Save current state
+      const currentViewBox = svg.getAttribute('viewBox');
+      
+      // Temporarily modify SVG to get all content
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      
+      const nodes = svg.querySelectorAll('.node');
+      nodes.forEach(node => {
+        const matrix = node.transform.baseVal.getItem(0).matrix;
+        const x = matrix.e;
+        const y = matrix.f;
+        
+        // Approximate boundaries
+        const width = 120;
+        const height = 60;
+        
+        minX = Math.min(minX, x - width/2);
+        minY = Math.min(minY, y - height/2);
+        maxX = Math.max(maxX, x + width/2);
+        maxY = Math.max(maxY, y + height/2);
+      });
+      
+      // Add padding
+      minX -= 50;
+      minY -= 50;
+      maxX += 50;
+      maxY += 50;
+      
+      const width = maxX - minX;
+      const height = maxY - minY;
+      
+      // Set viewBox to include all content
+      svg.setAttribute('viewBox', `${minX} ${minY} ${width} ${height}`);
+      
+      // Serialize SVG
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      
+      // Create an Image element to load the SVG
+      const img = new Image();
+      
+      img.onload = () => {
+        // Create a canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = width * 2; // 2x for better resolution
+        canvas.height = height * 2;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Convert to PNG and download
+        const pngData = canvas.toDataURL('image/png');
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = pngData;
+        downloadLink.download = 'flowchart.png';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        // Clean up
+        URL.revokeObjectURL(url);
+        
+        // Restore original viewBox
+        svg.setAttribute('viewBox', currentViewBox);
+      };
+      
+      img.src = url;
+    }
+
+    // Export to SVG
+    function exportToSVG() {
+      // Save current state
+      const currentViewBox = svg.getAttribute('viewBox');
+      
+      // Temporarily modify SVG to get all content
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      
+      const nodes = svg.querySelectorAll('.node');
+      nodes.forEach(node => {
+        const matrix = node.transform.baseVal.getItem(0).matrix;
+        const x = matrix.e;
+        const y = matrix.f;
+        
+        // Approximate boundaries
+        const width = 120;
+        const height = 60;
+        
+        minX = Math.min(minX, x - width/2);
+        minY = Math.min(minY, y - height/2);
+        maxX = Math.max(maxX, x + width/2);
+        maxY = Math.max(maxY, y + height/2);
+      });
+      
+      // Add padding
+      minX -= 50;
+      minY -= 50;
+      maxX += 50;
+      maxY += 50;
+      
+      const width = maxX - minX;
+      const height = maxY - minY;
+      
+      // Set viewBox to include all content
+      svg.setAttribute('viewBox', `${minX} ${minY} ${width} ${height}`);
+      
+      // Create a new SVG for export without the UI elements
+      const exportSvg = svg.cloneNode(true);
+      
+      // Remove UI-related elements
+      const miniViewport = exportSvg.querySelector('.mini-viewport');
+      if (miniViewport) miniViewport.remove();
+      
+      // Add a white background
+      const background = document.createElementNS(svg.namespaceURI, 'rect');
+      background.setAttribute('x', minX);
+      background.setAttribute('y', minY);
+      background.setAttribute('width', width);
+      background.setAttribute('height', height);
+      background.setAttribute('fill', 'white');
+      exportSvg.insertBefore(background, exportSvg.firstChild);
+      
+      // Serialize SVG
+      const svgData = new XMLSerializer().serializeToString(exportSvg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      
+      // Download SVG
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = 'flowchart.svg';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      
+      // Restore original viewBox
+      svg.setAttribute('viewBox', currentViewBox);
+    }
+
+    // Save diagram state
+    function saveDiagram() {
+      // Get current diagram state
+      const nodes = [];
+      const connections = [];
+      
+      // Collect node data
+      document.querySelectorAll('.node').forEach(node => {
+        const id = node.getAttribute('data-id');
+        const matrix = node.transform.baseVal.getItem(0).matrix;
+        const shape = node.getAttribute('data-shape') || 'rectangle';
+        const shapeElement = node.querySelector('rect, ellipse, polygon, path');
+        
+        const nodeData = {
+          id,
+          x: matrix.e,
+          y: matrix.f,
+          shape,
+          text: node.querySelector('text').textContent,
+          fill: shapeElement.getAttribute('fill'),
+          stroke: shapeElement.getAttribute('stroke'),
+          strokeWidth: shapeElement.getAttribute('stroke-width'),
+          opacity: shapeElement.getAttribute('fill-opacity') || 1
+        };
+        
+        nodes.push(nodeData);
+      });
+      
+      // Collect connection data
+      document.querySelectorAll('.connector').forEach(connector => {
+        const from = connector.getAttribute('data-from');
+        const to = connector.getAttribute('data-to');
+        const type = connector.getAttribute('data-type') || 'straight';
+        
+        const connData = {
+          from,
+          to,
+          type,
+          stroke: connector.getAttribute('stroke'),
+          markerStart: connector.getAttribute('marker-start'),
+          markerEnd: connector.getAttribute('marker-end')
+        };
+        
+        connections.push(connData);
+      });
+      
+      // Create a JSON representation
+      const diagramData = {
+        nodes,
+        connections,
+        version: '1.0'
+      };
+      
+      // Convert to JSON string
+      const jsonData = JSON.stringify(diagramData, null, 2);
+      
+      // Download JSON file
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = 'flowchart.json';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      URL.revokeObjectURL(url);
+    }
+
+    // Initialize event listeners
+    function attachEventListeners() {
+      // Add shape
+      addShapeBtn.addEventListener('click', () => {
+        hideContextMenu();
+        mode = 'add';
+      });
+      
+      // Shape selection dropdown items
+      shapeLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          currentShape = e.target.getAttribute('data-shape');
+          
+          // Get center of visible area
+          const viewBoxValues = svg.getAttribute('viewBox').split(' ').map(parseFloat);
+          const centerX = viewBoxValues[0] + viewBoxValues[2] / 2;
+          const centerY = viewBoxValues[1] + viewBoxValues[3] / 2;
+          
+          saveState();
+          
+          // Create the shape at the center
+          const newNode = createShape(currentShape, centerX, centerY);
+          selectElement(newNode);
+          
+          updateMiniMap();
+        });
+      });
+      
+      // Connect mode
+      connectBtn.addEventListener('click', () => {
+        hideContextMenu();
+        
+        if (mode === 'connect') {
+          // Exit connect mode
+          mode = 'select';
+          connectBtn.classList.remove('active');
+          
+          if (firstNode) {
+            firstNode.classList.remove('active');
+            firstNode.classList.remove('connection-source');
+            firstNode = null;
+          }
+          
+          connectStep = 0;
+          
+          // Hide connection preview line and helper
+          removeConnectionPreview();
+          hideConnectionHelper();
+        } else {
+          // Enter connect mode
+          mode = 'connect';
+          connectBtn.classList.add('active');
+          
+          // Show helper message
+          showConnectionHelper("Select a shape to connect from");
+        }
+      });
+      
+      // Connector type dropdown items
+      connectorTypeLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          currentConnectorType = e.target.getAttribute('data-connector');
+          connectorTypeBtn.textContent = `Connector: ${currentConnectorType.charAt(0).toUpperCase() + currentConnectorType.slice(1)}`;
+        });
+      });
+      
+      // Delete selected element
+      deleteBtn.addEventListener('click', () => {
+        hideContextMenu();
+        deleteSelected();
+      });
+      
+      // Clear all elements
+      clearBtn.addEventListener('click', () => {
+        hideContextMenu();
+        confirmationModal.style.display = 'flex';
+      });
+      
+      // Cancel clear
+      cancelClearBtn.addEventListener('click', () => {
+        confirmationModal.style.display = 'none';
+      });
+      
+      // Confirm clear
+      confirmClearBtn.addEventListener('click', () => {
+        confirmationModal.style.display = 'none';
+        
+        saveState();
+        
+        // Clear all nodes and connections
+        nodesGroup.innerHTML = '';
+        connectionsGroup.innerHTML = '';
+        connections.length = 0;
+        selectedElement = null;
+        
+        updateMiniMap();
+      });
+      
+      // Undo button
+      undoBtn.addEventListener('click', () => {
+        hideContextMenu();
+        undo();
+      });
+      
+      // Export button
+      exportBtn.addEventListener('click', () => {
+        hideContextMenu();
+        exportToPNG();
+      });
+      
+      // Toggle properties panel
+      togglePropertiesBtn.addEventListener('click', () => {
+        propertiesPanel.classList.toggle('open');
+      });
+      
+      // Close properties panel
+      closePropertiesBtn.addEventListener('click', () => {
+        propertiesPanel.classList.remove('open');
+      });
+      
+      // Context menu items
+      document.getElementById('ctx-edit-text').addEventListener('click', () => {
+        hideContextMenu();
+        editNodeText();
+      });
+      
+      document.getElementById('ctx-change-shape').addEventListener('click', () => {
+        hideContextMenu();
+        
+        // Show a shape selection menu
+        const menu = document.createElement('div');
+        menu.className = 'context-menu';
+        menu.style.display = 'block';
+        menu.style.left = contextMenu.style.left;
+        menu.style.top = contextMenu.style.top;
+        
+        const shapes = ['rectangle', 'ellipse', 'diamond', 'hexagon', 'circle', 'parallelogram', 'document', 'cylinder'];
+        
+        shapes.forEach(shape => {
+          const item = document.createElement('div');
+          item.className = 'context-menu-item';
+          item.textContent = shape.charAt(0).toUpperCase() + shape.slice(1);
+          
+          item.addEventListener('click', () => {
+            changeShape(shape);
+            menu.remove();
+          });
+          
+          menu.appendChild(item);
+        });
+        
+        document.body.appendChild(menu);
+        
+        setTimeout(() => {
+          window.addEventListener('click', function hideShapeMenu() {
+            menu.remove();
+            window.removeEventListener('click', hideShapeMenu);
+          });
+        }, 0);
+      });
+      
+      document.getElementById('ctx-bring-front').addEventListener('click', () => {
+        hideContextMenu();
+        if (selectedElement) {
+          saveState();
+          
+          // Move the element to the end of its parent
+          selectedElement.parentNode.appendChild(selectedElement);
+        }
+      });
+      
+      document.getElementById('ctx-send-back').addEventListener('click', () => {
+        hideContextMenu();
+        if (selectedElement) {
+          saveState();
+          
+          // Move the element to the beginning of its parent
+          selectedElement.parentNode.insertBefore(selectedElement, selectedElement.parentNode.firstChild);
+        }
+      });
+      
+      document.getElementById('ctx-duplicate').addEventListener('click', () => {
+        hideContextMenu();
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          saveState();
+          
+          const nodeMatrix = selectedElement.transform.baseVal.getItem(0).matrix;
+          const x = nodeMatrix.e + 20;
+          const y = nodeMatrix.f + 20;
+          const shape = selectedElement.getAttribute('data-shape') || 'rectangle';
+          const text = selectedElement.querySelector('text').textContent;
+          
+          // Set properties for new node
+          textInput.value = text;
+          currentShape = shape;
+          
+          // Create new node
+          const newNode = createShape(shape, x, y);
+          
+          // Copy visual properties
+          const originalShape = selectedElement.querySelector('rect, ellipse, polygon, path');
+          const newShape = newNode.querySelector('rect, ellipse, polygon, path');
+          
+          newShape.setAttribute('fill', originalShape.getAttribute('fill'));
+          newShape.setAttribute('stroke', originalShape.getAttribute('stroke'));
+          newShape.setAttribute('stroke-width', originalShape.getAttribute('stroke-width'));
+          newShape.setAttribute('fill-opacity', originalShape.getAttribute('fill-opacity') || 1);
+          
+          selectElement(newNode);
+          updateMiniMap();
+        }
+      });
+      
+      document.getElementById('ctx-delete').addEventListener('click', () => {
+        hideContextMenu();
+        deleteSelected();
+      });
+      
+      // Export to PNG
+      exportPngBtn.addEventListener('click', () => {
+        exportToPNG();
+      });
+      
+      // Export to SVG
+      exportSvgBtn.addEventListener('click', () => {
+        exportToSVG();
+      });
+      
+      // Save diagram
+      saveBtn.addEventListener('click', () => {
+        saveDiagram();
+      });
+      
+      // Property change event handlers
+      document.getElementById('prop-fill-color').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          saveState();
+          
+          const shape = selectedElement.querySelector('rect, ellipse, polygon, path');
+          shape.setAttribute('fill', e.target.value);
+          
+          // Update the hidden element to keep them in sync
+          document.getElementById('fill-color').value = e.target.value;
+        }
+      });
+      
+      document.getElementById('prop-stroke-color').addEventListener('change', (e) => {
+        if (selectedElement) {
+          saveState();
+          
+          if (selectedElement.classList.contains('node')) {
+            const shape = selectedElement.querySelector('rect, ellipse, polygon, path');
+            shape.setAttribute('stroke', e.target.value);
+            
+            // Update the hidden element to keep them in sync
+            document.getElementById('stroke-color').value = e.target.value;
+          } else if (selectedElement.classList.contains('connector')) {
+            selectedElement.setAttribute('stroke', e.target.value);
+          }
+        }
+      });
+      
+      document.getElementById('prop-stroke-width').addEventListener('input', (e) => {
+        document.getElementById('stroke-width-value').textContent = `${e.target.value}px`;
+        
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          const shape = selectedElement.querySelector('rect, ellipse, polygon, path');
+          shape.setAttribute('stroke-width', e.target.value);
+        }
+      });
+      
+      document.getElementById('prop-stroke-width').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          saveState();
+          
+          const shape = selectedElement.querySelector('rect, ellipse, polygon, path');
+          shape.setAttribute('stroke-width', e.target.value);
+        }
+      });
+      
+      document.getElementById('prop-opacity').addEventListener('input', (e) => {
+        document.getElementById('opacity-value').textContent = `${e.target.value}%`;
+        
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          const shape = selectedElement.querySelector('rect, ellipse, polygon, path');
+          shape.setAttribute('fill-opacity', e.target.value / 100);
+        }
+      });
+      
+      document.getElementById('prop-opacity').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          saveState();
+          
+          const shape = selectedElement.querySelector('rect, ellipse, polygon, path');
+          shape.setAttribute('fill-opacity', e.target.value / 100);
+          
+          // Update the hidden element to keep them in sync
+          document.getElementById('opacity-slider').value = e.target.value;
+        }
+      });
+      
+      document.getElementById('prop-text-content').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          saveState();
+          
+          const text = selectedElement.querySelector('text');
+          text.textContent = e.target.value;
+        }
+      });
+      
+      document.getElementById('prop-font-size').addEventListener('input', (e) => {
+        document.getElementById('font-size-value').textContent = `${e.target.value}px`;
+        
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          const text = selectedElement.querySelector('text');
+          text.setAttribute('font-size', `${e.target.value}px`);
+        }
+      });
+      
+      document.getElementById('prop-font-size').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          saveState();
+          
+          const text = selectedElement.querySelector('text');
+          text.setAttribute('font-size', `${e.target.value}px`);
+        }
+      });
+      
+      document.getElementById('prop-text-color').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          saveState();
+          
+          const text = selectedElement.querySelector('text');
+          text.setAttribute('fill', e.target.value);
+        }
+      });
+      
+      document.getElementById('prop-connector-style').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('connector')) {
+          saveState();
+          
+          const oldType = selectedElement.getAttribute('data-type');
+          const newType = e.target.value;
+          
+          selectedElement.setAttribute('data-type', newType);
+          
+          // Get connected nodes
+          const fromId = selectedElement.getAttribute('data-from');
+          const toId = selectedElement.getAttribute('data-to');
+          
+          const fromNode = svg.querySelector(`.node[data-id="${fromId}"]`);
+          const toNode = svg.querySelector(`.node[data-id="${toId}"]`);
+          
+          if (fromNode && toNode) {
+            // Remove old connector
+            selectedElement.remove();
+            
+            // Create new connector with the new type
+            currentConnectorType = newType;
+            const newConnector = drawConnector(fromNode, toNode);
+            
+            // Update the connections array
+            const connIndex = connections.findIndex(c => c.from === fromId && c.to === toId);
+            if (connIndex >= 0) {
+              connections[connIndex].element = newConnector;
+            }
+            
+            selectElement(newConnector);
+          }
+        }
+      });
+      
+      document.getElementById('prop-line-color').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('connector')) {
+          saveState();
+          selectedElement.setAttribute('stroke', e.target.value);
+        }
+      });
+      
+      document.getElementById('prop-start-marker').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('connector')) {
+          saveState();
+          
+          const value = e.target.value;
+          if (value === 'none') {
+            selectedElement.removeAttribute('marker-start');
+          } else {
+            selectedElement.setAttribute('marker-start', `url(#${value})`);
+          }
+        }
+      });
+      
+      document.getElementById('prop-end-marker').addEventListener('change', (e) => {
+        if (selectedElement && selectedElement.classList.contains('connector')) {
+          saveState();
+          
+          const value = e.target.value;
+          if (value === 'none') {
+            selectedElement.removeAttribute('marker-end');
+          } else {
+            selectedElement.setAttribute('marker-end', `url(#${value})`);
+          }
+        }
+      });
+      
+      // Deselect on background click
+      svg.addEventListener('click', (e) => {
+        if (e.target === svg || e.target.id === 'grid' || e.target.parentNode.id === 'grid') {
+          deselectAll();
+        }
+      });
+      
+      // Add these functions for connection helper UI
+    function showConnectionHelper(message) {
+      const helper = document.getElementById('connection-helper');
+      helper.textContent = message;
+      helper.style.display = 'block';
+    }
+    
+    function hideConnectionHelper() {
+      const helper = document.getElementById('connection-helper');
+      helper.style.display = 'none';
+    }
+    
+    // Add dynamic connection preview
+    let connectionPreview = null;
+    
+    function createConnectionPreview() {
+      // Remove any existing preview
+      removeConnectionPreview();
+      
+      // Create a new preview based on connector type
+      if (currentConnectorType === 'straight') {
+        connectionPreview = document.createElementNS(svg.namespaceURI, 'line');
+      } else {
+        connectionPreview = document.createElementNS(svg.namespaceURI, 'path');
+      }
+      
+      connectionPreview.classList.add('connection-preview');
+      connectionPreview.setAttribute('stroke', strokeColorInput.value);
+      connectionPreview.setAttribute('marker-end', 'url(#arrow)');
+      
+      // Add to connections group
+      connectionsGroup.appendChild(connectionPreview);
+    }
+    
+    function updateConnectionPreview(event) {
+      if (!firstNode || !connectionPreview) return;
+      
+      // Get source node center
+      const [x1, y1] = getNodeCenter(firstNode);
+      
+      // Get current mouse position in SVG coordinates
+      const point = getMousePosition(event);
+      const x2 = point.x;
+      const y2 = point.y;
+      
+      // Update preview based on connector type
+      if (currentConnectorType === 'straight') {
+        connectionPreview.setAttribute('x1', x1);
+        connectionPreview.setAttribute('y1', y1);
+        connectionPreview.setAttribute('x2', x2);
+        connectionPreview.setAttribute('y2', y2);
+      } else if (currentConnectorType === 'curved') {
+        // Calculate control points for curve
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2;
+        const offset = Math.min(100, Math.sqrt(dx * dx + dy * dy) / 2);
+        const cx1 = midX - offset;
+        const cy1 = midY - offset;
+        const cx2 = midX + offset;
+        const cy2 = midY + offset;
+        
+        connectionPreview.setAttribute('d', `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`);
+      } else if (currentConnectorType === 'orthogonal') {
+        // Calculate midpoint for orthogonal line
+        const midX = (x1 + x2) / 2;
+        connectionPreview.setAttribute('d', `M${x1},${y1} L${midX},${y1} L${midX},${y2} L${x2},${y2}`);
+      }
+    }
+    
+    function removeConnectionPreview() {
+      if (connectionPreview) {
+        connectionPreview.remove();
+        connectionPreview = null;
+      }
+    }
+    
+    // Add event listeners for connection preview
+    svg.addEventListener('mousemove', (e) => {
+      if (mode === 'connect' && connectStep === 1) {
+        if (!connectionPreview) {
+          createConnectionPreview();
+        }
+        updateConnectionPreview(e);
+      }
+    });
+    
+    svg.addEventListener('mouseenter', () => {
+      if (mode === 'connect' && connectStep === 1) {
+        createConnectionPreview();
+      }
+    });
+    
+    svg.addEventListener('mouseleave', () => {
+      if (mode === 'connect' && connectStep === 1) {
+        removeConnectionPreview();
+      }
+    });
+    
+    // Update connection preview when connector type changes
+    connectorTypeLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (mode === 'connect' && connectStep === 1 && connectionPreview) {
+          removeConnectionPreview();
+          createConnectionPreview();
+        }
+      });
+    });
+
+    // Add text event listener to automatically update shape text
+      textInput.addEventListener('input', updateSelectedNodeText);
+      textInput.addEventListener('change', updateSelectedNodeText);
+      
+      function updateSelectedNodeText() {
+        if (selectedElement && selectedElement.classList.contains('node')) {
+          const textElement = selectedElement.querySelector('text');
+          if (textElement) {
+            textElement.textContent = textInput.value;
+            
+            // Also update the corresponding property panel field
+            const propTextContent = document.getElementById('prop-text-content');
+            if (propTextContent) {
+              propTextContent.value = textInput.value;
+            }
+          }
+        }
+      }
+      
+      // Key bindings
+      document.addEventListener('keydown', (e) => {
+        // Don't process if in a text field
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+          return;
+        }
+        
+        // Delete selected element
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          if (selectedElement) {
+            deleteSelected();
+            e.preventDefault();
+          }
+        }
+        
+        // Undo with Ctrl+Z
+        if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+          undo();
+          e.preventDefault();
+        }
+        
+        // Escape to exit connect mode
+        if (e.key === 'Escape') {
+          if (mode === 'connect') {
+            mode = 'select';
+            connectBtn.classList.remove('active');
+            
+            if (firstNode) {
+              firstNode.classList.remove('active');
+              firstNode = null;
+            }
+            
+            connectStep = 0;
+          } else if (contextMenu.style.display === 'block') {
+            hideContextMenu();
+          }
+        }
+        
+        // Arrow keys to move selected node
+        if (selectedElement && selectedElement.classList.contains('node') && 
+            (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+          
+          e.preventDefault();
+          
+          const matrix = selectedElement.transform.baseVal.getItem(0).matrix;
+          let x = matrix.e;
+          let y = matrix.f;
+          
+          const step = e.shiftKey ? 10 : 1;
+          
+          switch (e.key) {
+            case 'ArrowUp':
+              y -= step;
+              break;
+            case 'ArrowDown':
+              y += step;
+              break;
+            case 'ArrowLeft':
+              x -= step;
+              break;
+            case 'ArrowRight':
+              x += step;
+              break;
+          }
+          
+          selectedElement.setAttribute('transform', `translate(${x},${y})`);
+          updateConnections(selectedElement.getAttribute('data-id'), x, y);
+          updateMiniMap();
+        }
+      });
+    }
+    
+    // Initialize the application
+    function init() {
+      // Initialize grid
+      initializeGrid();
+      
+      // Setup zoom controls
+      initializeZoom();
+      
+      // Add event listeners
+      attachEventListeners();
+      
+      // Initialize mini map
+      updateMiniMap();
+      
+      // Create initial node
+      const rect = svg.getBoundingClientRect();
+      const centerX = viewBox.x + viewBox.width / 2;
+      const centerY = viewBox.y + viewBox.height / 2;
+      
+      const initialNode = createShape('rectangle', centerX, centerY);
+      selectElement(initialNode);
+      
+      // Save initial state
+      saveState();
+    }
+    
+    // Start the application
+    init();
+  </script>
+</body>
+</html>
