@@ -1109,7 +1109,14 @@
         toolButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentTool = btn.dataset.tool;
+        
+        // Always perform a full reset of tool mode, which will reattach all event handlers
         updateToolMode();
+        
+        // If switching to select tool, ensure multiple selection is enabled
+        if (currentTool === 'select') {
+          initializeMultiSelect();
+        }
       });
     });
 
@@ -1120,6 +1127,13 @@
         
         // Allow selection only in select mode
         fc.selection = (currentTool === 'select');
+        
+        // Reset any active tool objects that might be lingering
+        fc._line = null;
+        fc._highlight = null;
+        fc._highlightStart = null;
+        fc._blackout = null;
+        fc._blackoutStart = null;
         
         // Change cursor based on tool
         if (currentTool === 'select') {
@@ -1149,6 +1163,251 @@
         }
         
         fc.renderAll();
+      });
+      
+      // Reattach mouse event handlers for each canvas
+      fabricCanvases.forEach(fc => {
+        // Remove existing mouse event handlers to avoid duplicates
+        fc.off('mouse:down');
+        fc.off('mouse:move');
+        fc.off('mouse:up');
+        
+        // Reattach mouse:down event with the correct handler
+        fc.on('mouse:down', opt => {
+          lastFocusedCanvas = fc;
+          const pt = fc.getPointer(opt.e, true);
+
+          // Check if we're clicking on an existing object
+          if (opt.target && opt.target.selectable) {
+            // We're clicking on a selectable object, temporarily switch to select mode
+            // regardless of current tool
+            fc._tempPreviousTool = currentTool;
+            
+            // Enable object movement
+            opt.target.set({
+              hasControls: true,
+              selectable: true,
+              evented: true
+            });
+            
+            return; // Skip the rest of the function to prevent creating new objects
+          }
+          
+          // Restore previous tool if we were in temporary select mode
+          if (fc._tempPreviousTool) {
+            fc._tempPreviousTool = null;
+          }
+        
+          if (currentTool === 'line') {
+            // Create a new line and add it to the canvas
+            fc._line = new fabric.Line([pt.x, pt.y, pt.x, pt.y], {
+              stroke: colorPicker.value,
+              strokeWidth: +sizeSlider.value,
+              selectable: true // Make selectable so it can be modified later
+            });
+            fc.add(fc._line);
+            
+            // Note: no need to manually add to objectHistory - object:added event handles this
+          } else if (currentTool === 'text') {
+            // Create a new text object with empty text
+            const txt = new fabric.IText('', {
+              left: pt.x, 
+              top: pt.y,
+              fill: colorPicker.value,
+              fontSize: +fontSizeInput.value,
+              selectable: true,
+              placeholder: 'Enter text here' // Add a placeholder property
+            });
+            
+            // Add to canvas and set as active object
+            fc.add(txt);
+            fc.setActiveObject(txt);
+            
+            // Enter editing mode and focus
+            txt.enterEditing();
+            if (txt.hiddenTextarea) {
+              txt.hiddenTextarea.focus();
+              
+              // Set a temporary placeholder text that will be removed on first keystroke
+              if (txt.text === '') {
+                txt.text = 'Enter text here';
+                txt._isPlaceholder = true; // Flag to identify it as placeholder
+                txt._isEmpty = true; // Flag to track if user has entered any text
+                
+                // Style placeholder text differently (lighter color)
+                const originalFill = txt.fill;
+                txt.set('fill', 'rgba(100, 100, 100, 0.7)');
+                fc.renderAll();
+                
+                // Add one-time event listener for keydown to clear placeholder
+                txt.hiddenTextarea.addEventListener('keydown', function clearPlaceholder(e) {
+                  // Don't clear on special keys like shift, ctrl, alt, etc.
+                  if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+                    // Only clear if this is still placeholder text
+                    if (txt._isPlaceholder) {
+                      // Clear the placeholder text before the key's character is added
+                      txt.text = '';
+                      txt.set('fill', originalFill); // Restore original text color
+                      txt._isPlaceholder = false;
+                      fc.renderAll();
+                    }
+                    
+                    // Mark as not empty if user actually typed something
+                    if (e.key.length === 1) {
+                      txt._isEmpty = false;
+                    }
+                    
+                    // Remove this event listener after first use
+                    txt.hiddenTextarea.removeEventListener('keydown', clearPlaceholder);
+                  }
+                }, { once: false }); // We manually remove it after use
+                
+                // Add event listener for when text editing ends
+                txt.on('editing:exited', function() {
+                  // If text is empty or still has placeholder, remove the object
+                  if (txt._isEmpty || txt._isPlaceholder || txt.text === '' || txt.text === 'Enter text here') {
+                    // Remove from undo history if it exists there
+                    objectHistory = objectHistory.filter(item => 
+                      !(item.type === 'add' && item.object === txt)
+                    );
+                    
+                    // Remove from canvas
+                    fc.remove(txt);
+                    fc.renderAll();
+                  }
+                });
+              }
+            }
+          } else if (currentTool === 'highlight') {
+            // Start drawing a highlight rectangle
+            fc._highlightStart = pt;
+            
+            // Create a semi-transparent highlight rectangle
+            const color = colorPicker.value;
+            let opacity = 0.3; // Default highlight opacity
+            
+            // Create the highlight rectangle
+            fc._highlight = new fabric.Rect({
+              left: pt.x,
+              top: pt.y,
+              width: 0,
+              height: 0,
+              fill: color,
+              opacity: opacity,
+              selectable: true
+            });
+            
+            // Add it to the canvas
+            fc.add(fc._highlight);
+          } else if (currentTool === 'blackout') {
+            // Start drawing a black out rectangle
+            fc._blackoutStart = pt;
+            
+            // Create a solid black rectangle
+            // Create the black out rectangle
+            fc._blackout = new fabric.Rect({
+              left: pt.x,
+              top: pt.y,
+              width: 0,
+              height: 0,
+              fill: '#000000', // Always black, regardless of color picker
+              opacity: 1.0,    // Fully opaque
+              selectable: true
+            });
+            
+            // Add it to the canvas
+            fc.add(fc._blackout);
+          }
+        });
+        
+        // Reattach mouse:move event
+        fc.on('mouse:move', opt => {
+          if (!opt.e.buttons) return; // Only process if mouse button is pressed
+          
+          const pt = fc.getPointer(opt.e, true);
+          
+          if (currentTool === 'line' && fc._line) {
+            // Update the endpoint of the line
+            fc._line.set({ 
+              x2: pt.x, 
+              y2: pt.y 
+            });
+            fc.renderAll();
+          } else if (currentTool === 'highlight' && fc._highlight && fc._highlightStart) {
+            // Calculate width and height based on start point and current point
+            const width = Math.abs(pt.x - fc._highlightStart.x);
+            const height = Math.abs(pt.y - fc._highlightStart.y);
+            
+            // Set the top-left corner of the rectangle
+            const left = Math.min(fc._highlightStart.x, pt.x);
+            const top = Math.min(fc._highlightStart.y, pt.y);
+            
+            // Update the highlight rectangle
+            fc._highlight.set({
+              left: left,
+              top: top,
+              width: width,
+              height: height
+            });
+            
+            fc.renderAll();
+          } else if (currentTool === 'blackout' && fc._blackout && fc._blackoutStart) {
+            // Calculate width and height based on start point and current point
+            const width = Math.abs(pt.x - fc._blackoutStart.x);
+            const height = Math.abs(pt.y - fc._blackoutStart.y);
+            
+            // Set the top-left corner of the rectangle
+            const left = Math.min(fc._blackoutStart.x, pt.x);
+            const top = Math.min(fc._blackoutStart.y, pt.y);
+            
+            // Update the black out rectangle
+            fc._blackout.set({
+              left: left,
+              top: top,
+              width: width,
+              height: height
+            });
+            
+            fc.renderAll();
+          }
+        });
+        
+        // Reattach mouse:up event
+        fc.on('mouse:up', () => {
+          if (currentTool === 'line' && fc._line) { 
+            // Finalize the line
+            fc._line.setCoords();
+            
+            // Mark the state as modified to support undo
+            fc.fire('object:modified', { target: fc._line });
+            
+            // Clean up the temporary reference
+            fc._line = null;
+          }
+          
+          if (currentTool === 'highlight' && fc._highlight) {
+            // Finalize the highlight
+            fc._highlight.setCoords();
+            
+            // Mark the state as modified to support undo
+            fc.fire('object:modified', { target: fc._highlight });
+            
+            // Clean up temporary variables
+            fc._highlight = null;
+            fc._highlightStart = null;
+          }
+          if (currentTool === 'blackout' && fc._blackout) {
+            // Finalize the black out rectangle
+            fc._blackout.setCoords();
+            
+            // Mark the state as modified to support undo
+            fc.fire('object:modified', { target: fc._blackout });
+            
+            // Clean up temporary variables
+            fc._blackout = null;
+            fc._blackoutStart = null;
+          }
+        });
       });
     }
 
@@ -1334,14 +1593,21 @@
       if (e.key === 'Delete' || e.key === 'Backspace') {
         // Only process if we're not in a text field
         if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-          // Find the canvas that has the active selection
-          const activeCanvas = fabricCanvases.find(fc => {
-            return fc.getActiveObject() !== null;
-          });
+          // First check if we have a lastFocusedCanvas
+          let activeCanvas = lastFocusedCanvas;
+          
+          // If no canvas is focused or the focused canvas doesn't have an active object,
+          // find any canvas that has an active selection
+          if (!activeCanvas || !activeCanvas.getActiveObject()) {
+            activeCanvas = fabricCanvases.find(fc => fc.getActiveObject() !== null);
+          }
           
           if (activeCanvas) {
             const activeObj = activeCanvas.getActiveObject();
             if (activeObj) {
+              // Log for debugging
+              console.log('Deleting object', activeObj, 'from canvas', fabricCanvases.indexOf(activeCanvas));
+              
               // For multiple object selection
               if (activeObj.type === 'activeSelection') {
                 // Get all objects in the selection
@@ -2247,6 +2513,7 @@
           fc.renderAll();
         });
       }
+      fixCanvasReferences();
     }
 
     // Modify the tool switching event listener
@@ -2497,11 +2764,33 @@
       
       // Rebuild the DOM with the new order
       rebuildPagesDOM();
+      
+      // Reset the last focused canvas
+      lastFocusedCanvas = null;
+      
+      // Reapply current tool to ensure all event handlers are properly set
+      if (currentTool === 'select') {
+        // Force reactivation of select mode
+        const selectButton = document.querySelector('button[data-tool="select"]');
+        if (selectButton) {
+          selectButton.click();
+        } else {
+          // Manual activation if button not found
+          currentTool = 'select';
+          updateToolMode();
+          initializeMultiSelect();
+        }
+      } else {
+        // For other tools, just update the tool mode
+        updateToolMode();
+      }
 
       // Preserve zoom level after reordering pages
       if (currentZoomIndex !== 3) { // If not at default 100%
         applyZoom(zoomLevels[currentZoomIndex]);
       }
+
+      fixCanvasReferences();
     }
 
     // Function to rebuild the DOM with the current page order
@@ -2522,6 +2811,7 @@
         wrapper.className = 'page-container';
         wrapper.style.width = pdfCanv.width + 'px';
         wrapper.style.height = pdfCanv.height + 'px';
+        wrapper.dataset.canvasIndex = i; // Add a data attribute for tracking
         
         // Add the PDF canvas
         wrapper.appendChild(pdfCanv);
@@ -2537,12 +2827,86 @@
           width: pdfCanv.width,
           height: pdfCanv.height
         });
+        
+        // Ensure canvas events are working
+        fc.off('mouse:down');
+        fc.on('mouse:down', function() {
+          console.log('Canvas clicked, setting lastFocusedCanvas to index', i);
+          lastFocusedCanvas = fc;
+        });
+        
+        // Ensure object:added and other event handlers are attached
+        fc.off('object:added');
+        fc.on('object:added', function(e) {
+          // Avoid duplicating path objects (which trigger both events)
+          if (e.target.type !== 'path' || e.target.source !== 'pencil') {
+            objectHistory.push({
+              canvasIndex: fabricCanvases.indexOf(fc),
+              type: 'add',
+              object: e.target
+            });
+          }
+        });
+        
+        fc.off('object:modified');
+        fc.on('object:modified', function(e) {
+          objectHistory.push({
+            canvasIndex: fabricCanvases.indexOf(fc),
+            type: 'modify',
+            object: e.target,
+            oldState: e.target.originalState || {}
+          });
+        });
+        
         fc.calcOffset();
         fc.requestRenderAll();
       }
       
+      // Add click handlers to page containers to help with focus tracking
+      document.querySelectorAll('.page-container').forEach((container, idx) => {
+        container.addEventListener('click', () => {
+          console.log('Container clicked, setting lastFocusedCanvas to index', idx);
+          lastFocusedCanvas = fabricCanvases[idx];
+        });
+      });
+      
       // Restore the scroll position
       window.scrollTo(0, scrollPosition);
+    }
+
+    // Function to ensure all canvas references are properly updated
+    function fixCanvasReferences() {
+      // Update canvas references in the DOM
+      document.querySelectorAll('.page-container').forEach((container, index) => {
+        // Update data attributes
+        container.dataset.canvasIndex = index;
+        
+        // Ensure this container has the correct click handler
+        container.addEventListener('click', () => {
+          lastFocusedCanvas = fabricCanvases[index];
+        });
+        
+        // Get the canvas in this container
+        const fabricContainer = container.querySelector('.canvas-container');
+        if (fabricContainer) {
+          // Find which fabricCanvas this container belongs to
+          const fc = fabricCanvases.find(canvas => canvas.wrapperEl === fabricContainer);
+          if (fc) {
+            // Update event handlers
+            fc.off('mouse:down');
+            fc.on('mouse:down', function() {
+              lastFocusedCanvas = fc;
+            });
+          }
+        }
+      });
+      
+      // Ensure all objects in all canvases are properly set up for the current tool
+      updateToolMode();
+      
+      if (currentTool === 'select') {
+        initializeMultiSelect();
+      }
     }
 
     // Simple function to prevent default drag events
