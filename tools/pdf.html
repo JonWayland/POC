@@ -884,6 +884,21 @@
       box-shadow: 0 0 0 2px #fff, 0 0 0 4px #f8b500;
     }
 
+    /* Page Number Position Selector Styles */
+    input[type="radio"][name="page-number-position"] + label:hover {
+      border-color: #00a896 !important;
+      background-color: rgba(0, 168, 150, 0.05) !important;
+    }
+
+    input[type="radio"][name="page-number-position"]:checked + label {
+      border-color: #00a896 !important;
+      background-color: rgba(0, 168, 150, 0.1) !important;
+    }
+
+    input[type="radio"][name="page-number-position"]:checked + label span {
+      color: #00a896 !important;
+    }
+
   </style>
 </head>
 <body>
@@ -934,6 +949,7 @@
       </div>
       <button id="toggle-selection-btn">Select Pages</button>
       <button id="reorder-pages-btn">Reorder Pages</button>
+      <button id="page-numbers-btn" style="background-color: #f5f9f8; color: var(--dark);">Add Page Numbers</button>
       <button id="save-btn">Download</button>
     </div>
     
@@ -1044,6 +1060,109 @@
       </div>
     </div>
   </div>
+
+  <div class="modal-overlay" id="page-numbers-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Add Page Numbers</h3>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 15px; font-weight: 600;">Position:</label>
+          <div style="max-width: 220px; margin: 0 auto;">
+            <!-- PDF-like container -->
+            <div style="position: relative; border: 2px solid #ddd; border-radius: 5px; background-color: white; width: 200px; height: 280px; margin: 0 auto; box-shadow: 0 3px 8px rgba(0,0,0,0.1);">
+              <!-- Corner position buttons -->
+              <div style="position: absolute; top: 10px; left: 10px; width: 25px; height: 25px;">
+                <input type="radio" id="pos-top-left" name="page-number-position" value="top-left" style="display: none;">
+                <label for="pos-top-left" style="display: block; width: 100%; height: 100%; cursor: pointer; border: 2px solid #ddd; border-radius: 4px; transition: all 0.2s ease;">
+                  <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; font-size: 12px; color: #999;">#</span>
+                </label>
+              </div>
+              
+              <div style="position: absolute; top: 10px; right: 10px; width: 25px; height: 25px;">
+                <input type="radio" id="pos-top-right" name="page-number-position" value="top-right" style="display: none;">
+                <label for="pos-top-right" style="display: block; width: 100%; height: 100%; cursor: pointer; border: 2px solid #ddd; border-radius: 4px; transition: all 0.2s ease;">
+                  <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; font-size: 12px; color: #999;">#</span>
+                </label>
+              </div>
+              
+              <div style="position: absolute; bottom: 10px; left: 10px; width: 25px; height: 25px;">
+                <input type="radio" id="pos-bottom-left" name="page-number-position" value="bottom-left" style="display: none;" checked>
+                <label for="pos-bottom-left" style="display: block; width: 100%; height: 100%; cursor: pointer; border: 2px solid #00a896; background-color: rgba(0, 168, 150, 0.1); border-radius: 4px; transition: all 0.2s ease;">
+                  <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; font-size: 12px; color: #00a896;">#</span>
+                </label>
+              </div>
+              
+              <div style="position: absolute; bottom: 10px; right: 10px; width: 25px; height: 25px;">
+                <input type="radio" id="pos-bottom-right" name="page-number-position" value="bottom-right" style="display: none;">
+                <label for="pos-bottom-right" style="display: block; width: 100%; height: 100%; cursor: pointer; border: 2px solid #ddd; border-radius: 4px; transition: all 0.2s ease;">
+                  <span style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; font-size: 12px; color: #999;">#</span>
+                </label>
+              </div>
+              
+              <!-- Visual PDF content lines -->
+              <div style="position: absolute; top: 50px; left: 20px; right: 20px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 70px; left: 20px; right: 20px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 90px; left: 20px; right: 20px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 110px; left: 20px; right: 55px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 130px; left: 20px; right: 20px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 150px; left: 20px; right: 80px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 170px; left: 20px; right: 40px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 190px; left: 20px; right: 20px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 210px; left: 20px; right: 60px; height: 2px; background-color: #f0f0f0;"></div>
+              <div style="position: absolute; top: 230px; left: 20px; right: 20px; height: 2px; background-color: #f0f0f0;"></div>
+            </div>
+            
+            <!-- Position labels for clarity -->
+            <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; color: #666;">
+              <span>Bottom Left</span>
+              <span>Bottom Right</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 10px; font-weight: 600;">Options:</label>
+          <div style="max-width: 300px; margin: 0 auto; text-align: left;">
+            <label style="display: flex; align-items: center; margin-bottom: 10px;">
+              <input type="checkbox" id="skip-first-page" style="margin-right: 10px;">
+              Skip first page (cover page)
+            </label>
+            
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <label style="margin-right: 10px;">Start numbering from:</label>
+              <input type="number" id="start-number" min="1" value="1" style="width: 60px;">
+            </div>
+            
+            <div style="display: flex; align-items: center;">
+              <label style="margin-right: 10px;">Font size:</label>
+              <input type="number" id="page-number-font-size" min="8" max="72" value="14" style="width: 60px;">
+            </div>
+          </div>
+        </div>
+        
+        <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
+          <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #f44336;">Remove Existing Numbers:</label>
+          <div style="max-width: 300px; margin: 0 auto; text-align: left;">
+            <p style="margin-bottom: 10px; font-size: 0.9rem; color: #666;">
+              Use this option to remove all existing page numbers before adding new ones.
+            </p>
+            <label style="display: flex; align-items: center; margin-bottom: 10px;">
+              <input type="checkbox" id="remove-existing-numbers" style="margin-right: 10px;">
+              Remove existing page numbers
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-cancel" id="cancel-page-numbers">Cancel</button>
+        <button class="modal-btn" id="remove-only-page-numbers" style="background-color: #f44336; color: white;">Remove Numbers Only</button>
+        <button class="modal-btn modal-btn-confirm" id="apply-page-numbers" style="background-color: var(--primary);">Apply</button>
+      </div>
+    </div>
+  </div>
+  
   
   <!-- libs -->
   <script src="/libs/pdf.min.js"></script>
@@ -3080,6 +3199,392 @@
         }
       }
     }, { passive: false });
+
+
+    // Page numbering feature
+    const pageNumbersBtn = document.getElementById('page-numbers-btn');
+    const pageNumbersModal = document.getElementById('page-numbers-modal');
+    const cancelPageNumbersBtn = document.getElementById('cancel-page-numbers');
+    const applyPageNumbersBtn = document.getElementById('apply-page-numbers');
+
+    // Show the page numbers modal when the button is clicked
+    pageNumbersBtn.addEventListener('click', () => {
+      if (!pdfCanvases.length) {
+        alert('Please load a PDF first.');
+        return;
+      }
+      
+      // Show the modal
+      pageNumbersModal.classList.add('active');
+    });
+
+    // Hide the modal when cancel is clicked
+    cancelPageNumbersBtn.addEventListener('click', () => {
+      pageNumbersModal.classList.remove('active');
+    });
+
+    // Hide modal if clicked outside
+    pageNumbersModal.addEventListener('click', (e) => {
+      if (e.target === pageNumbersModal) {
+        pageNumbersModal.classList.remove('active');
+      }
+    });
+
+    // Apply page numbers when the apply button is clicked
+    applyPageNumbersBtn.addEventListener('click', () => {
+      // Get selected position
+      const positionRadios = document.getElementsByName('page-number-position');
+      let selectedPosition = '';
+      
+      for (const radio of positionRadios) {
+        if (radio.checked) {
+          selectedPosition = radio.value;
+          break;
+        }
+      }
+      
+      // Get other options
+      const skipFirstPage = document.getElementById('skip-first-page').checked;
+      const startNumber = parseInt(document.getElementById('start-number').value) || 1;
+      const fontSize = parseInt(document.getElementById('page-number-font-size').value) || 14;
+      
+      // Apply page numbers
+      addPageNumbers(selectedPosition, skipFirstPage, startNumber, fontSize);
+      
+      // Hide the modal
+      pageNumbersModal.classList.remove('active');
+    });
+
+    // Function to add page numbers to PDF pages
+    function addPageNumbers(position, skipFirstPage, startNumber, fontSize) {
+      // Calculate starting page index (0-based) and starting number
+      const startIndex = skipFirstPage ? 1 : 0;
+      let currentNumber = startNumber;
+      
+      // Loop through each page and add the page number
+      for (let i = startIndex; i < fabricCanvases.length; i++) {
+        const fc = fabricCanvases[i];
+        const pdfCanvas = pdfCanvases[i];
+        
+        // Calculate position coordinates based on selected position
+        let left, top;
+        const padding = 20; // Padding from edges
+        
+        switch (position) {
+          case 'top-left':
+            left = padding;
+            top = padding;
+            break;
+          case 'top-right':
+            left = pdfCanvas.width - padding;
+            top = padding;
+            break;
+          case 'bottom-left':
+            left = padding;
+            top = pdfCanvas.height - padding - fontSize;
+            break;
+          case 'bottom-right':
+            left = pdfCanvas.width - padding;
+            top = pdfCanvas.height - padding - fontSize;
+            break;
+          default:
+            left = padding;
+            top = padding;
+        }
+        
+        // Create the text object
+        const pageText = new fabric.Text(currentNumber.toString(), {
+          left: left,
+          top: top,
+          fontSize: fontSize,
+          fontFamily: 'Arial',
+          fill: '#000000',
+          selectable: true,
+          originX: position.includes('right') ? 'right' : 'left',
+          originY: position.includes('bottom') ? 'bottom' : 'top'
+        });
+        
+        // Add the page number to the canvas
+        fc.add(pageText);
+        fc.renderAll();
+        
+        // Add to object history for undo functionality
+        objectHistory.push({
+          canvasIndex: i,
+          type: 'add',
+          object: pageText
+        });
+        
+        // Increment the page number
+        currentNumber++;
+      }
+      
+      // Show confirmation message
+      const startPage = skipFirstPage ? 2 : 1;
+      const message = `Page numbers added (${startNumber} → ${currentNumber - 1})`;
+      
+      // Create a temporary notification
+      const notification = document.createElement('div');
+      notification.style.position = 'fixed';
+      notification.style.top = '70px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.backgroundColor = 'rgba(0, 168, 150, 0.9)';
+      notification.style.color = 'white';
+      notification.style.padding = '10px 20px';
+      notification.style.borderRadius = '5px';
+      notification.style.zIndex = '3000';
+      notification.style.transition = 'opacity 0.5s ease';
+      notification.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Remove the notification after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 500);
+      }, 3000);
+    }
+
+
+    // Get reference to the removal checkbox and the remove-only button
+    const removeExistingNumbersCheckbox = document.getElementById('remove-existing-numbers');
+    const removeOnlyBtn = document.getElementById('remove-only-page-numbers');
+
+    // Function to identify and remove page number objects
+    function removePageNumbers() {
+      let removedCount = 0;
+      
+      // Loop through each canvas and look for page number objects
+      fabricCanvases.forEach((fc, canvasIndex) => {
+        // Look for objects that are likely page numbers
+        // We'll identify them by looking for Text objects with only numeric content
+        const objects = fc.getObjects();
+        const pageNumberObjects = objects.filter(obj => {
+          // Check if it's a Text object with numeric content
+          return obj.type === 'text' && /^\d+$/.test(obj.text);
+        });
+        
+        // Store objects for undo history before removing
+        if (pageNumberObjects.length > 0) {
+          pageNumberObjects.forEach(obj => {
+            // Add to undo history
+            objectHistory.push({
+              canvasIndex: canvasIndex,
+              type: 'add',
+              object: obj
+            });
+            
+            // Remove the object
+            fc.remove(obj);
+            removedCount++;
+          });
+          
+          // Render the canvas to update display
+          fc.renderAll();
+        }
+      });
+      
+      return removedCount;
+    }
+
+    // Add click handler for the Remove Only button
+    removeOnlyBtn.addEventListener('click', () => {
+      // Only proceed if PDFs are loaded
+      if (!pdfCanvases.length) {
+        alert('Please load a PDF first.');
+        return;
+      }
+      
+      // Remove page numbers
+      const removedCount = removePageNumbers();
+      
+      // Display notification
+      displayNotification(`Removed ${removedCount} page number${removedCount !== 1 ? 's' : ''}`, 'warning');
+      
+      // Close the modal
+      pageNumbersModal.classList.remove('active');
+    });
+
+    // Update the Apply button handler to check for removal first
+    applyPageNumbersBtn.addEventListener('click', () => {
+      // Get selected position
+      const positionRadios = document.getElementsByName('page-number-position');
+      let selectedPosition = '';
+      
+      for (const radio of positionRadios) {
+        if (radio.checked) {
+          selectedPosition = radio.value;
+          break;
+        }
+      }
+      
+      // Get other options
+      const skipFirstPage = document.getElementById('skip-first-page').checked;
+      const startNumber = parseInt(document.getElementById('start-number').value) || 1;
+      const fontSize = parseInt(document.getElementById('page-number-font-size').value) || 14;
+      
+      // Check if we should remove existing numbers first
+      if (removeExistingNumbersCheckbox.checked) {
+        removePageNumbers();
+      }
+      
+      // Apply page numbers
+      addPageNumbers(selectedPosition, skipFirstPage, startNumber, fontSize);
+      
+      // Hide the modal
+      pageNumbersModal.classList.remove('active');
+    });
+
+    // Create a reusable notification function
+    function displayNotification(message, type = 'success') {
+      // Create a temporary notification
+      const notification = document.createElement('div');
+      notification.style.position = 'fixed';
+      notification.style.top = '70px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      
+      // Set background color based on notification type
+      let bgColor = 'rgba(0, 168, 150, 0.9)'; // Default success color
+      if (type === 'warning') {
+        bgColor = 'rgba(244, 67, 54, 0.9)';
+      } else if (type === 'info') {
+        bgColor = 'rgba(5, 102, 141, 0.9)';
+      }
+      
+      notification.style.backgroundColor = bgColor;
+      notification.style.color = 'white';
+      notification.style.padding = '10px 20px';
+      notification.style.borderRadius = '5px';
+      notification.style.zIndex = '3000';
+      notification.style.transition = 'opacity 0.5s ease';
+      notification.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Remove the notification after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 500);
+      }, 3000);
+    }
+
+    // Update the addPageNumbers function to use the new notification function
+    function addPageNumbers(position, skipFirstPage, startNumber, fontSize) {
+      // Calculate starting page index (0-based) and starting number
+      const startIndex = skipFirstPage ? 1 : 0;
+      let currentNumber = startNumber;
+      
+      // Loop through each page and add the page number
+      for (let i = startIndex; i < fabricCanvases.length; i++) {
+        const fc = fabricCanvases[i];
+        const pdfCanvas = pdfCanvases[i];
+        
+        // Calculate position coordinates based on selected position
+        let left, top;
+        const padding = 20; // Padding from edges
+        
+        switch (position) {
+          case 'top-left':
+            left = padding;
+            top = padding;
+            break;
+          case 'top-right':
+            left = pdfCanvas.width - padding;
+            top = padding;
+            break;
+          case 'bottom-left':
+            left = padding;
+            top = pdfCanvas.height - padding - fontSize;
+            break;
+          case 'bottom-right':
+            left = pdfCanvas.width - padding;
+            top = pdfCanvas.height - padding - fontSize;
+            break;
+          default:
+            left = padding;
+            top = padding;
+        }
+        
+        // Create the text object
+        const pageText = new fabric.Text(currentNumber.toString(), {
+          left: left,
+          top: top,
+          fontSize: fontSize,
+          fontFamily: 'Arial',
+          fill: '#000000',
+          selectable: true,
+          originX: position.includes('right') ? 'right' : 'left',
+          originY: position.includes('bottom') ? 'bottom' : 'top'
+        });
+        
+        // Add the page number to the canvas
+        fc.add(pageText);
+        fc.renderAll();
+        
+        // Add to object history for undo functionality
+        objectHistory.push({
+          canvasIndex: i,
+          type: 'add',
+          object: pageText
+        });
+        
+        // Increment the page number
+        currentNumber++;
+      }
+      
+      // Show confirmation message
+      const startPage = skipFirstPage ? 2 : 1;
+      const message = `Page numbers added (${startNumber} → ${currentNumber - 1})`;
+      
+      // Use the new notification function
+      displayNotification(message, 'success');
+    }
+
+    // Function to update the visual state of the position selectors
+    function updatePositionSelectors() {
+      // Get all position radio inputs
+      const positionRadios = document.querySelectorAll('input[name="page-number-position"]');
+      
+      // Reset all labels to default state
+      positionRadios.forEach(radio => {
+        const label = radio.nextElementSibling;
+        label.style.borderColor = radio.checked ? '#00a896' : '#ddd';
+        label.style.backgroundColor = radio.checked ? 'rgba(0, 168, 150, 0.1)' : '';
+        
+        // Update the # symbol color
+        const span = label.querySelector('span');
+        if (span) {
+          span.style.color = radio.checked ? '#00a896' : '#999';
+        }
+      });
+    }
+
+    // Add change event listeners to each position radio button
+    document.querySelectorAll('input[name="page-number-position"]').forEach(radio => {
+      radio.addEventListener('change', updatePositionSelectors);
+    });
+
+    // Make sure the visual state is correct when the modal opens
+    pageNumbersBtn.addEventListener('click', () => {
+      if (!pdfCanvases.length) {
+        alert('Please load a PDF first.');
+        return;
+      }
+      
+      // Show the modal
+      pageNumbersModal.classList.add('active');
+      
+      // Update the position selectors visual state
+      setTimeout(updatePositionSelectors, 100);
+    });
   </script>
 </body>
 </html>
