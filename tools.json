@@ -1,7 +1,7 @@
 {
     "tools": [
       {
-        "name": "PDF Toolbox",
+        "name": "PDF Modifier",
         "url": "../tools/pdf.html",
         "description": "Combine, split, rearrange, select pages, and edit PDF files with ease. Add text, draw, highlight, blackout, or make any other changes before downloading.",
         "tier": "premium",
