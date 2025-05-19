@@ -385,11 +385,15 @@
 
     /* Footer Styles */
     .site-footer {
-      background: var(--dark);
-      padding: 40px 0 50px;
-      margin-top: 80px;
-      position: relative;
-      color: white;
+      position: relative;            /* keep positioning context */
+      width: calc(100% + 40px);    /* body has 20px padding on each side */
+      margin: 2rem -20px -20px;     /* push left/right out by 20px and bottom up by 20px */
+      left: 0;                       /* reset any offset */
+      transform: none;               /* reset any transform */
+      box-sizing: border-box;        /* include any padding in that width */
+      background: var(--dark);        /* your blue footer color */
+      padding: 2rem 0;                /* vertical padding for “blue” band */
+      color: var(--light);            /* ensure text stays light on dark bg */
     }
 
     .footer-wave {
