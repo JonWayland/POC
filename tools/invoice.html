@@ -916,11 +916,15 @@
 
     /* Footer Styles */
     .site-footer {
-      background: var(--dark);
-      padding: 40px 0 50px;
-      margin-top: 80px;
-      position: relative;
-      color: white;
+      position: relative;            /* keep positioning context */
+      width: calc(100% + 40px);;   /* cover the 1rem body‑padding on each side full container width + left/right gutter */
+      margin: 1rem -20px -40px;;   /* add a 1 rem gap above the footer */
+      left: 0;                       /* reset any offset */
+      transform: none;               /* reset any transform */
+      box-sizing: border-box;        /* include any padding in that width */
+      background: var(--dark);        /* your blue footer color */
+      padding: 2rem 0;                /* vertical padding for “blue” band */
+      color: var(--light);            /* ensure text stays light on dark bg */
     }
 
     .footer-wave {
