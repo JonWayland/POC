@@ -79,11 +79,6 @@
       justify-content: flex-start;  /* push content to the top */
     }
 
-    /* Make the footer span the full width */
-    .site-footer {
-      align-self: stretch;          /* override align-items:center on body */
-    }
-
     /* Navigation Bar Styles */
     .main-nav {
       background: white;
@@ -251,15 +246,19 @@
       color: var(--primary); text-decoration: none; font-size: 0.75rem;
     }
     .footer-links a:hover { text-decoration: underline; }
-    /*=== END QR PAGE STYLES ===*/
-    /* ── SITE FOOTER STYLES (scoped under .site-footer) ── */
+
     .site-footer {
-      background: var(--dark);
-      padding: 40px 0 50px;
-      margin-top: 80px;
-      position: relative;
-      color: white;
+      position: relative;            /* keep positioning context */
+      width: calc(100vw + 2rem);   /* cover the 1rem body‑padding on each side full container width + left/right gutter */
+      margin: 1rem -1rem -1rem;   /* add a 1 rem gap above the footer */
+      left: 0;                       /* reset any offset */
+      transform: none;               /* reset any transform */
+      box-sizing: border-box;        /* include any padding in that width */
+      background: var(--dark);        /* your blue footer color */
+      padding: 2rem 0;                /* vertical padding for “blue” band */
+      color: var(--light);            /* ensure text stays light on dark bg */
     }
+    
     .site-footer .footer-wave {
       position: absolute;
       top: -120px;
