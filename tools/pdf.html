@@ -3255,101 +3255,6 @@
       pageNumbersModal.classList.remove('active');
     });
 
-    // Function to add page numbers to PDF pages
-    function addPageNumbers(position, skipFirstPage, startNumber, fontSize) {
-      // Calculate starting page index (0-based) and starting number
-      const startIndex = skipFirstPage ? 1 : 0;
-      let currentNumber = startNumber;
-      
-      // Loop through each page and add the page number
-      for (let i = startIndex; i < fabricCanvases.length; i++) {
-        const fc = fabricCanvases[i];
-        const pdfCanvas = pdfCanvases[i];
-        
-        // Calculate position coordinates based on selected position
-        let left, top;
-        const padding = 20; // Padding from edges
-        
-        switch (position) {
-          case 'top-left':
-            left = padding;
-            top = padding;
-            break;
-          case 'top-right':
-            left = pdfCanvas.width - padding;
-            top = padding;
-            break;
-          case 'bottom-left':
-            left = padding;
-            top = pdfCanvas.height - padding - fontSize;
-            break;
-          case 'bottom-right':
-            left = pdfCanvas.width - padding;
-            top = pdfCanvas.height - padding - fontSize;
-            break;
-          default:
-            left = padding;
-            top = padding;
-        }
-        
-        // Create the text object
-        const pageText = new fabric.Text(currentNumber.toString(), {
-          left: left,
-          top: top,
-          fontSize: fontSize,
-          fontFamily: 'Arial',
-          fill: '#000000',
-          selectable: true,
-          originX: position.includes('right') ? 'right' : 'left',
-          originY: position.includes('bottom') ? 'bottom' : 'top'
-        });
-        
-        // Add the page number to the canvas
-        fc.add(pageText);
-        fc.renderAll();
-        
-        // Add to object history for undo functionality
-        objectHistory.push({
-          canvasIndex: i,
-          type: 'add',
-          object: pageText
-        });
-        
-        // Increment the page number
-        currentNumber++;
-      }
-      
-      // Show confirmation message
-      const startPage = skipFirstPage ? 2 : 1;
-      const message = `Page numbers added (${startNumber} → ${currentNumber - 1})`;
-      
-      // Create a temporary notification
-      const notification = document.createElement('div');
-      notification.style.position = 'fixed';
-      notification.style.top = '70px';
-      notification.style.left = '50%';
-      notification.style.transform = 'translateX(-50%)';
-      notification.style.backgroundColor = 'rgba(0, 168, 150, 0.9)';
-      notification.style.color = 'white';
-      notification.style.padding = '10px 20px';
-      notification.style.borderRadius = '5px';
-      notification.style.zIndex = '3000';
-      notification.style.transition = 'opacity 0.5s ease';
-      notification.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-      notification.textContent = message;
-      
-      document.body.appendChild(notification);
-      
-      // Remove the notification after 3 seconds
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => {
-          document.body.removeChild(notification);
-        }, 500);
-      }, 3000);
-    }
-
-
     // Get reference to the removal checkbox and the remove-only button
     const removeExistingNumbersCheckbox = document.getElementById('remove-existing-numbers');
     const removeOnlyBtn = document.getElementById('remove-only-page-numbers');
@@ -3358,10 +3263,18 @@
     function removePageNumbers() {
       let removedCount = 0;
       
-      // Loop through each canvas and look for page number objects
-      fabricCanvases.forEach((fc, canvasIndex) => {
+      // Get all page containers in their current display order
+      const pageContainers = Array.from(document.querySelectorAll('.page-container'));
+      
+      // Loop through each page container and find its associated fabric canvas
+      pageContainers.forEach((container, displayIndex) => {
+        // Find the fabric canvas associated with this container
+        const canvasWrapper = container.querySelector('.canvas-container');
+        const fc = fabricCanvases.find(canvas => canvas.wrapperEl === canvasWrapper);
+        
+        if (!fc) return;
+        
         // Look for objects that are likely page numbers
-        // We'll identify them by looking for Text objects with only numeric content
         const objects = fc.getObjects();
         const pageNumberObjects = objects.filter(obj => {
           // Check if it's a Text object with numeric content
@@ -3371,6 +3284,9 @@
         // Store objects for undo history before removing
         if (pageNumberObjects.length > 0) {
           pageNumberObjects.forEach(obj => {
+            // Find the correct canvas index in the fabricCanvases array
+            const canvasIndex = fabricCanvases.indexOf(fc);
+            
             // Add to undo history
             objectHistory.push({
               canvasIndex: canvasIndex,
@@ -3478,14 +3394,25 @@
 
     // Update the addPageNumbers function to use the new notification function
     function addPageNumbers(position, skipFirstPage, startNumber, fontSize) {
+      // Get all page containers in their current display order
+      const pageContainers = Array.from(document.querySelectorAll('.page-container'));
+      
       // Calculate starting page index (0-based) and starting number
       const startIndex = skipFirstPage ? 1 : 0;
       let currentNumber = startNumber;
       
-      // Loop through each page and add the page number
-      for (let i = startIndex; i < fabricCanvases.length; i++) {
-        const fc = fabricCanvases[i];
-        const pdfCanvas = pdfCanvases[i];
+      // Loop through each page container in display order and add the page number
+      for (let i = startIndex; i < pageContainers.length; i++) {
+        const container = pageContainers[i];
+        
+        // Find the fabric canvas associated with this container
+        const canvasWrapper = container.querySelector('.canvas-container');
+        const fc = fabricCanvases.find(canvas => canvas.wrapperEl === canvasWrapper);
+        
+        // Find the PDF canvas for dimensions
+        const pdfCanvas = container.querySelector('.pdf-canvas');
+        
+        if (!fc || !pdfCanvas) continue;
         
         // Calculate position coordinates based on selected position
         let left, top;
@@ -3530,8 +3457,10 @@
         fc.renderAll();
         
         // Add to object history for undo functionality
+        // Find the correct canvas index in the fabricCanvases array
+        const canvasIndex = fabricCanvases.indexOf(fc);
         objectHistory.push({
-          canvasIndex: i,
+          canvasIndex: canvasIndex,
           type: 'add',
           object: pageText
         });
@@ -3541,10 +3470,11 @@
       }
       
       // Show confirmation message
-      const startPage = skipFirstPage ? 2 : 1;
-      const message = `Page numbers added (${startNumber} → ${currentNumber - 1})`;
+      const totalNumbers = pageContainers.length - startIndex;
+      const endNumber = startNumber + totalNumbers - 1;
+      const message = `Page numbers added (${startNumber} → ${endNumber})`;
       
-      // Use the new notification function
+      // Use the notification function
       displayNotification(message, 'success');
     }
 
